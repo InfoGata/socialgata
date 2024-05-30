@@ -18,7 +18,7 @@ export const Route = createFileRoute("/plugins/$pluginId/community/$apiId/")({
   loader: async ({ params, context }) => {
     const accessToken = context.accessToken;
     const service = getService(params.pluginId);
-    if (service) {
+    if (service && service.getCommunity) {
       const response = await service.getCommunity(accessToken, params.apiId);
       return response.items;
     } else {

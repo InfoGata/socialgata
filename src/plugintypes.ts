@@ -56,6 +56,7 @@ export interface GetCommunityResponse {
 
 export interface GetUserReponse {
   page?: PageInfo;
+  user?: User;
   items: (Post | PostComment)[]
 }
 
