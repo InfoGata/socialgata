@@ -4,10 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "start": "vite",
+    "dev": "concurrently --kill-others \"npm run cors-server\" \"npm start\"",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cors-server": "node servers/cors/server.js",
+    "postinstall": "cd servers/cors && npm install"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.0.2",
@@ -15,6 +18,7 @@
     "@tanstack/react-router": "^1.34.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "concurrently": "^8.2.2",
     "lucide-react": "^0.378.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
