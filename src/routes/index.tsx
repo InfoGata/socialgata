@@ -1,8 +1,14 @@
-import LogginedIn from "@/components/LoggedIn";
+import Feed from "@/components/Feed";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { setAccessToken } from "@/store/reducers/authSlice";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { getService } from "@/services/selector-service";
 import { createFileRoute } from "@tanstack/react-router";
 import React from "react";
 
@@ -20,98 +26,90 @@ function usePersistedState(
 }
 
 export const Index: React.FC = () => {
-  const [redditApiKey, setRedditApiKey] = usePersistedState("redditkey", "");
-  const [redditApiSecret, setRedditApiSecret] = usePersistedState(
-    "redditsecret",
-    ""
-  );
-  const token = useAppSelector((state) => state.auth.accessToken);
-  const dispatch = useAppDispatch();
+  const [pluginId, setPluginId] = React.useState("reddit");
+  const [apiKey, setApiKey] = usePersistedState("redditkey", "");
+  const [apiSecret, setApiSecret] = usePersistedState("redditsecret", "");
+  const [hasLogin, setHasLogin] = React.useState(false);
+  const [isLoggedin, setIsLoggedIn] = React.useState(false);
+  const showFeed = !hasLogin || isLoggedin;
 
-  const setApiKey = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRedditApiKey(event.currentTarget.value);
-  };
-
-  const setApiSecret = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRedditApiSecret(event.currentTarget.value);
-  };
-
-  const loginReddit = async () => {
-    const tokenUrl = "https://www.reddit.com/api/v1/access_token";
-    const redirectUri = "http://localhost:3000/login_popup.html";
-    const authUrl = "https://www.reddit.com/api/v1/authorize";
-    const responseType = "code";
-    const state = "12345";
-    const scope = "read history";
-    const duration = "permanent";
-    const url = new URL(authUrl);
-    url.searchParams.append("redirect_uri", redirectUri);
-    url.searchParams.append("client_id", redditApiKey);
-    url.searchParams.append("state", state);
-    url.searchParams.append("response_type", responseType);
-    url.searchParams.append("duration", duration);
-    url.searchParams.append("scope", scope);
-    const newWindow = window.open(url);
-
-    const onMessage = async (returnUrl: string) => {
-      const codeUrl = new URL(returnUrl);
-      const code = codeUrl.searchParams.get("code");
-      if (code) {
-        const auth = btoa(`${redditApiKey}:${redditApiSecret}`);
-        const params = new URLSearchParams();
-        params.append("code", code);
-        params.append("grant_type", "authorization_code");
-        params.append("redirect_uri", redirectUri);
-        const response = await fetch(tokenUrl, {
-          method: "POST",
-          body: params.toString(),
-          headers: {
-            "Content-type": "application/x-www-form-urlencoded",
-            Authorization: `Basic ${auth}`,
-          },
-        });
-        const json = await response.json();
-        dispatch(setAccessToken(json.access_token));
-      }
-      if (newWindow) {
-        newWindow.close();
+  React.useEffect(() => {
+    const getLoginStatus = async () => {
+      const service = getService(pluginId);
+      if (service) {
+        setHasLogin(!!service.login);
+        if (service.isLoggedIn) {
+          setIsLoggedIn(await service.isLoggedIn());
+        }
+      } else {
+        setHasLogin(false);
+        setIsLoggedIn(false);
       }
     };
+    getLoginStatus();
+  }, [pluginId]);
 
-    window.onmessage = (event: MessageEvent) => {
-      if (event.source == newWindow) {
-        onMessage(event.data.url);
-      }
-    };
+  const onChangeApiKey = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setApiKey(event.currentTarget.value);
   };
 
-  const logoutReddit = async () => {
-    dispatch(setAccessToken(""));
-    useAppDispatch;
+  const onChangeApiSecret = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setApiSecret(event.currentTarget.value);
+  };
+
+  const login = async () => {
+    const service = getService(pluginId);
+    if (service && service.login) {
+      await service.login({ apiKey: apiKey, apiSecret: apiSecret });
+    }
+  };
+
+  const logout = async () => {
+    const service = getService(pluginId);
+    if (service && service.logout && service.isLoggedIn) {
+      await service.logout();
+      setIsLoggedIn(await service.isLoggedIn());
+    }
+  };
+
+  const onPluginChange = (value: string) => {
+    setPluginId(value);
   };
 
   return (
     <div>
-      <Input
-        type="text"
-        placeholder="Reddit Api Key"
-        value={redditApiKey}
-        onChange={setApiKey}
-      />
-      <Input
-        type="text"
-        placeholder="Reddit Api Secret"
-        value={redditApiSecret}
-        onChange={setApiSecret}
-      />
-      <Button onClick={loginReddit}>Get Token</Button>
-      {token && (
+      <Select value={pluginId} onValueChange={onPluginChange}>
+        <SelectTrigger>
+          <SelectValue placeholder="Plugin" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="reddit">Reddit</SelectItem>
+          <SelectItem value="mastodon">Mastodon</SelectItem>
+          <SelectItem value="lemmy">Lemmy</SelectItem>
+        </SelectContent>
+      </Select>
+      {hasLogin && (
         <div>
-          <Button onClick={logoutReddit}>Logout</Button>
-          <div>{token}</div>
-          <LogginedIn accessToken={token} />
+          <Input
+            type="text"
+            placeholder="Reddit Api Key"
+            value={apiKey}
+            onChange={onChangeApiKey}
+          />
+          <Input
+            type="text"
+            placeholder="Reddit Api Secret"
+            value={apiSecret}
+            onChange={onChangeApiSecret}
+          />
+          {isLoggedin ? (
+            <Button onClick={logout}>Logout</Button>
+          ) : (
+            <Button onClick={login}>Login</Button>
+          )}
         </div>
       )}
+      {showFeed && <Feed pluginId={pluginId} />}
     </div>
   );
 };

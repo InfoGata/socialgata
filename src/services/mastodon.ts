@@ -2,6 +2,7 @@ import { createRestAPIClient } from "masto";
 import { ServiceType } from "../types";
 import { Post, GetUserReponse, GetHomeResponse } from "../plugintypes";
 
+const pluginName = "mastodon";
 const baseUrl = "https://mastodon.social";
 const masto = createRestAPIClient({ url: baseUrl });
 const func = masto.v1.timelines.public.list;
@@ -15,13 +16,13 @@ const statusToPost = (status: Status): Post => {
     authorApiId: status.account.id,
     counts: { upvotes: status.favouritesCount, comments: status.repliesCount },
     publishedDate: status.createdAt,
-    type: "post"
+    type: "post",
+    pluginId: pluginName
   };
 };
 
 class MastodonService implements ServiceType {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getHome(_accessToken: string): Promise<GetHomeResponse> {
+  async getFeed(): Promise<GetHomeResponse> {
     const timelines = await masto.v1.timelines.public.list({ limit: 30 });
     const items: Post[] = timelines.map(statusToPost);
     return {
@@ -29,7 +30,7 @@ class MastodonService implements ServiceType {
     };
   }
 
-  async getUser(_accessToken: string, apiId: string): Promise<GetUserReponse> {
+  async getUser(apiId: string): Promise<GetUserReponse> {
     const statuses = await masto.v1.accounts.$select(apiId).statuses.list({ limit: 30});
     const items = statuses.map(statusToPost);
     return {
@@ -42,4 +43,4 @@ class MastodonService implements ServiceType {
   }
 }
 
-export default MastodonService;
+export const mastodon = new MastodonService();

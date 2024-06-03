@@ -1,5 +1,4 @@
-import { MyRouterContext } from "@/router";
-import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
+import { Outlet, createRootRoute } from "@tanstack/react-router";
 import React from "react";
 
 const Root: React.FC = () => {
@@ -10,6 +9,6 @@ const Root: React.FC = () => {
   );
 };
 
-export const Route = createRootRouteWithContext<MyRouterContext>()({
+export const Route = createRootRoute({
   component: Root,
 });

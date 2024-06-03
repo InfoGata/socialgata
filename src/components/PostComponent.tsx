@@ -12,7 +12,7 @@ const PostComponent: React.FC<Props> = (props) => {
         <Link
           to="/plugins/$pluginId/community/$communityId/comments/$apiId"
           params={{
-            pluginId: "reddit",
+            pluginId: post.pluginId || "",
             communityId: post.communityApiId || "",
             apiId: post.apiId || "",
           }}
@@ -24,7 +24,10 @@ const PostComponent: React.FC<Props> = (props) => {
         in{" "}
         <Link
           to="/plugins/$pluginId/community/$apiId"
-          params={{ pluginId: "reddit", apiId: post.communityApiId || "" }}
+          params={{
+            pluginId: post.pluginId || "",
+            apiId: post.communityApiId || "",
+          }}
         >
           {post.communityName}
         </Link>
@@ -33,7 +36,10 @@ const PostComponent: React.FC<Props> = (props) => {
         by{" "}
         <Link
           to="/plugins/$pluginId/user/$apiId"
-          params={{ pluginId: "reddit", apiId: post.authorApiId || "" }}
+          params={{
+            pluginId: post.pluginId || "",
+            apiId: post.authorApiId || "",
+          }}
         >
           {post.authorName}
         </Link>

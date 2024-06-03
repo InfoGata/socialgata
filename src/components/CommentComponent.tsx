@@ -13,7 +13,10 @@ const CommentComponent: React.FC<Props> = (props) => {
         by{" "}
         <Link
           to="/plugins/$pluginId/user/$apiId"
-          params={{ pluginId: "reddit", apiId: comment.authorApiId || "" }}
+          params={{
+            pluginId: comment.pluginId || "",
+            apiId: comment.authorApiId || "",
+          }}
         >
           {comment.authorName}
         </Link>

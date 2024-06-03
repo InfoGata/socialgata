@@ -2,6 +2,7 @@ import { GetCommunityResponse, GetHomeResponse, GetUserReponse, Post } from "@/p
 import { ServiceType } from "@/types";
 import { GetPersonDetails, GetPosts, LemmyHttp, PostView } from "lemmy-js-client";
 
+const pluginName = "lemmy";
 const baseUrl = "https://lemmy.ml";
 
 const lemmyPostToPost = (postView: PostView): Post => {
@@ -16,7 +17,8 @@ const lemmyPostToPost = (postView: PostView): Post => {
     },
     authorApiId: postView.creator.name,
     authorName: postView.creator.name,
-    type: "post"
+    type: "post",
+    pluginId: pluginName
   };
 };
 
@@ -24,15 +26,15 @@ const lemmyPostToPost = (postView: PostView): Post => {
    request: RequestInfo | URL,
    init?: RequestInit
  ) => {
-   const proxyUrl = "http://localhost:3000/api?url=";
-   const requestUrl = `${proxyUrl}${encodeURIComponent(request.toString())}`;
+   const proxyUrl = "http://localhost:8085/";
+   const requestUrl = `${proxyUrl}${(request.toString())}`;
    return fetch(requestUrl, init);
  };
 
 
 class LemmyService implements ServiceType {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getHome(_accessToken: string): Promise<GetHomeResponse> {
+  async getFeed(): Promise<GetHomeResponse> {
     const client = new LemmyHttp(baseUrl, { fetchFunction: proxyFetch});
     const perPage = 30;
     const page = 1;
@@ -51,7 +53,7 @@ class LemmyService implements ServiceType {
     }
   }
 
-  async getCommunity(_accessToken: string, apiId: string): Promise<GetCommunityResponse> {
+  async getCommunity(apiId: string): Promise<GetCommunityResponse> {
     const client = new LemmyHttp(baseUrl, {fetchFunction: proxyFetch});
     const perPage = 30;
     const page = 1;
@@ -67,13 +69,13 @@ class LemmyService implements ServiceType {
     return {
       community: {
         apiId: apiId,
-        name: communityResponse.community_view.community.name
+        name: communityResponse.community_view.community.name,
       },
       items: postsResponse.posts.map(lemmyPostToPost)
     }
   }
 
-  async getUser(_accessToken: string, apiId: string): Promise<GetUserReponse> {
+  async getUser(apiId: string): Promise<GetUserReponse> {
 
     const client = new LemmyHttp(baseUrl, { fetchFunction: proxyFetch });
     const perPage = 30;
@@ -97,4 +99,4 @@ class LemmyService implements ServiceType {
 }
 
 
-export default LemmyService;
+export const lemmy = new LemmyService();

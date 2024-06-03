@@ -1,9 +1,10 @@
-import { GetCommentsResponse, GetCommunityResponse, GetHomeResponse, GetUserReponse, Post, PostComment } from "@/plugintypes";
+import { GetCommentsResponse, GetCommunityResponse, GetHomeResponse, GetUserReponse, LoginRequest, Post, PostComment } from "@/plugintypes";
 import { ServiceType } from "@/types";
 
+const pluginName = "reddit";
 const redditUrl = "https://oauth.reddit.com/";
 
-export type RedditResponse = Listing;
+type RedditResponse = Listing;
 
 interface Listing {
   kind: "Listing";
@@ -184,7 +185,8 @@ const redditPostsToPost = (post: ListingChildPostData): Post => {
     communityName: post.subreddit,
     communityApiId: post.subreddit,
     body: post.selftext,
-    type: "post"
+    type: "post",
+    pluginId: pluginName
   }
 }
 
@@ -194,15 +196,17 @@ const redditCommentToComment = (comment: ListingChildCommentData): PostComment =
     body: comment.body,
     authorName: comment.author,
     authorApiId: comment.author,
-    type: "comment"
+    type: "comment",
+    pluginId: pluginName
   }
 }
 
-export default class RedditService implements ServiceType {
+class RedditService implements ServiceType {
+  private accessToken = "";
 
-  getHome = async (accessToken: string): Promise<GetHomeResponse> => {
+  getFeed = async (): Promise<GetHomeResponse> => {
     const requestHeaders = {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${this.accessToken}`,
     };
     const url = `${redditUrl}/hot`;
     const response = await fetch(url, {
@@ -214,9 +218,9 @@ export default class RedditService implements ServiceType {
     return { items }
   };
 
-  getCommunity = async (accessToken: string, apiId: string): Promise<GetCommunityResponse> => {
+  getCommunity = async (apiId: string): Promise<GetCommunityResponse> => {
     const requestHeaders = {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${this.accessToken}`,
     };
     const url = `${redditUrl}/r/${apiId}`;
     const response = await fetch(url, {
@@ -230,9 +234,9 @@ export default class RedditService implements ServiceType {
     }
   }
 
-  getComments = async (accessToken: string, communityId: string, apiId: string): Promise<GetCommentsResponse> => {
+  getComments = async (communityId: string, apiId: string): Promise<GetCommentsResponse> => {
     const requestHeaders = {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${this.accessToken}`,
     };
     const url = `${redditUrl}/r/${communityId}/comments/${apiId}`;
     const response = await fetch(url, {
@@ -245,18 +249,81 @@ export default class RedditService implements ServiceType {
     }
   }
 
-  getUser = async (accessToken: string, apiId: string): Promise<GetUserReponse> => {
+  getUser = async (apiId: string): Promise<GetUserReponse> => {
     const requestHeaders = {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${this.accessToken}`,
     };
     const url = `${redditUrl}/user/${apiId}/overview`;
     const response = await fetch(url, {
       headers: requestHeaders
     });
     const json: UserResponse = await response.json();
-    const items = json.data.children.map((c): Post | PostComment => c.kind === "t1" ? redditCommentToComment(c.data) : redditPostsToPost(c.data));
+    const items = json.data.children
+      .map((c): Post | PostComment => c.kind === "t1" ? redditCommentToComment(c.data) : redditPostsToPost(c.data));
     return {
       items
     }
   }
+
+  async logout(): Promise<void> {
+    this.accessToken = "";
+  }
+
+  async isLoggedIn(): Promise<boolean> {
+    return !!this.accessToken;
+  }
+
+  login = (request: LoginRequest): Promise<void> => {
+    return new Promise((resolve) => {
+      const tokenUrl = "https://www.reddit.com/api/v1/access_token";
+      const redirectUri = "http://localhost:3000/login_popup.html";
+      const authUrl = "https://www.reddit.com/api/v1/authorize";
+      const responseType = "code";
+      const state = "12345";
+      const scope = "read history";
+      const duration = "permanent";
+      const url = new URL(authUrl);
+      url.searchParams.append("redirect_uri", redirectUri);
+      url.searchParams.append("client_id", request.apiKey);
+      url.searchParams.append("state", state);
+      url.searchParams.append("response_type", responseType);
+      url.searchParams.append("duration", duration);
+      url.searchParams.append("scope", scope);
+      const newWindow = window.open(url);
+
+      const onMessage = async (returnUrl: string) => {
+        const codeUrl = new URL(returnUrl);
+        const code = codeUrl.searchParams.get("code");
+        if (code) {
+          const auth = btoa(`${request.apiKey}:${request.apiSecret}`);
+          const params = new URLSearchParams();
+          params.append("code", code);
+          params.append("grant_type", "authorization_code");
+          params.append("redirect_uri", redirectUri);
+          const response = await fetch(tokenUrl, {
+            method: "POST",
+            body: params.toString(),
+            headers: {
+              "Content-type": "application/x-www-form-urlencoded",
+              Authorization: `Basic ${auth}`,
+            },
+          });
+          const json = await response.json();
+          this.accessToken = json.access_token;
+          resolve();
+        }
+        if (newWindow) {
+          newWindow.close();
+        }
+      };
+
+      window.onmessage = (event: MessageEvent) => {
+        if (event.source == newWindow) {
+          onMessage(event.data.url);
+        }
+      };
+    });
+  }
 }
+
+export const reddit = new RedditService();

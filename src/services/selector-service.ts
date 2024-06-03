@@ -1,10 +1,16 @@
 import { ServiceType } from "@/types";
-import RedditService from "./reddit"
+import { lemmy } from "./lemmy";
+import { mastodon } from "./mastodon";
+import { reddit } from "./reddit";
 
 export const getService = (serviceName: string) : ServiceType | null => {
   switch (serviceName) {
     case "reddit":
-      return new RedditService();
+      return reddit;
+    case "mastodon":
+      return mastodon;
+    case "lemmy":
+      return lemmy;
   }
   return null;
 }

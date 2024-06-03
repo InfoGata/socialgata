@@ -9,6 +9,7 @@ export interface Post {
   authorApiId?: string;
   authorName?: string;
   type: "post";
+  pluginId?: string;
 }
 
 export interface PostComment {
@@ -17,6 +18,7 @@ export interface PostComment {
   authorApiId?: string;
   authorName?: string;
   type: "comment";
+  pluginId?: string;
 }
 
 export interface PostCounts {
@@ -67,3 +69,8 @@ export interface GetCommentsResponse {
 }
 
 export type ListingType = "comment" | "post";
+
+export interface LoginRequest {
+  apiKey: string;
+  apiSecret: string;
+}

@@ -15,11 +15,10 @@ const Community: React.FC = () => {
 
 export const Route = createFileRoute("/plugins/$pluginId/community/$apiId/")({
   component: Community,
-  loader: async ({ params, context }) => {
-    const accessToken = context.accessToken;
+  loader: async ({ params }) => {
     const service = getService(params.pluginId);
     if (service && service.getCommunity) {
-      const response = await service.getCommunity(accessToken, params.apiId);
+      const response = await service.getCommunity(params.apiId);
       return response.items;
     } else {
       throw notFound();

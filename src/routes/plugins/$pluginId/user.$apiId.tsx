@@ -21,11 +21,10 @@ const UserOverview: React.FC = () => {
 
 export const Route = createFileRoute("/plugins/$pluginId/user/$apiId")({
   component: UserOverview,
-  loader: async ({ params, context }) => {
+  loader: async ({ params }) => {
     const service = getService(params.pluginId);
     if (service) {
-      const accessToken = context.accessToken;
-      const overview = await service.getUser(accessToken, params.apiId);
+      const overview = await service.getUser(params.apiId);
       return overview.items;
     } else {
       throw notFound();

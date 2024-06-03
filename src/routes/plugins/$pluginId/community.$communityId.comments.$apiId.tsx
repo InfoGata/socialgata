@@ -18,12 +18,10 @@ export const Route = createFileRoute(
   "/plugins/$pluginId/community/$communityId/comments/$apiId"
 )({
   component: Comments,
-  loader: async ({ params, context }) => {
+  loader: async ({ params }) => {
     const service = getService(params.pluginId);
     if (service && service.getComments) {
-      const accessToken = context.accessToken;
       const response = await service.getComments(
-        accessToken,
         params.communityId,
         params.apiId
       );

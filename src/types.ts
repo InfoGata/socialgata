@@ -1,8 +1,11 @@
-import { GetCommentsResponse, GetCommunityResponse, GetHomeResponse, GetUserReponse } from "./plugintypes";
+import { GetCommentsResponse, GetCommunityResponse, GetHomeResponse, GetUserReponse, LoginRequest } from "./plugintypes";
 
 export interface ServiceType {
-  getHome(accessToken: string): Promise<GetHomeResponse>;
-  getCommunity?(accessToken: string, apiId: string): Promise<GetCommunityResponse>;
-  getComments?(accessToken: string, communityId: string, apiId: string): Promise<GetCommentsResponse>;
-  getUser(accessToken: string, apiId: string): Promise<GetUserReponse>;
+  getFeed(): Promise<GetHomeResponse>;
+  getCommunity?(apiId: string): Promise<GetCommunityResponse>;
+  getComments?(communityId: string, apiId: string): Promise<GetCommentsResponse>;
+  getUser(apiId: string): Promise<GetUserReponse>;
+  login?(request: LoginRequest): Promise<void>;
+  logout?(): Promise<void>;
+  isLoggedIn?(): Promise<boolean>;
 }
