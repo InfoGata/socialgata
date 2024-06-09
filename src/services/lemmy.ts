@@ -1,6 +1,6 @@
-import { GetCommunityResponse, GetHomeResponse, GetUserReponse, Post } from "@/plugintypes";
+import { GetCommentsResponse, GetCommunityResponse, GetHomeResponse, GetUserReponse, Post } from "@/plugintypes";
 import { ServiceType } from "@/types";
-import { GetPersonDetails, GetPosts, LemmyHttp, PostView } from "lemmy-js-client";
+import { GetComments, GetPersonDetails, GetPosts, LemmyHttp, PostView } from "lemmy-js-client";
 
 const pluginName = "lemmy";
 const baseUrl = "https://lemmy.ml";
@@ -17,30 +17,34 @@ const lemmyPostToPost = (postView: PostView): Post => {
     },
     authorApiId: postView.creator.name,
     authorName: postView.creator.name,
-    type: "post",
-    pluginId: pluginName
+    pluginId: pluginName,
+    originalUrl: postView.post.ap_id,
+    publishedDate: postView.post.published,
+    url: postView.post.url,
+    thumbnail_url: postView.post.thumbnail_url,
+    authorAvatar: postView.creator.avatar
   };
 };
 
- const proxyFetch: typeof fetch = (
-   request: RequestInfo | URL,
-   init?: RequestInit
- ) => {
-   const proxyUrl = "http://localhost:8085/";
-   const requestUrl = `${proxyUrl}${(request.toString())}`;
-   return fetch(requestUrl, init);
- };
+const proxyFetch: typeof fetch = (
+  request: RequestInfo | URL,
+  init?: RequestInit
+) => {
+  const proxyUrl = "http://localhost:8085/";
+  const requestUrl = `${proxyUrl}${(request.toString())}`;
+  return fetch(requestUrl, init);
+};
 
 
 class LemmyService implements ServiceType {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getFeed(): Promise<GetHomeResponse> {
-    const client = new LemmyHttp(baseUrl, { fetchFunction: proxyFetch});
+    const client = new LemmyHttp(baseUrl, { fetchFunction: proxyFetch });
     const perPage = 30;
     const page = 1;
 
     const form: GetPosts = {
-      type_: "All",
+      type_: "Local",
       sort: "Active",
       limit: perPage,
       page: page
@@ -54,10 +58,10 @@ class LemmyService implements ServiceType {
   }
 
   async getCommunity(apiId: string): Promise<GetCommunityResponse> {
-    const client = new LemmyHttp(baseUrl, {fetchFunction: proxyFetch});
+    const client = new LemmyHttp(baseUrl, { fetchFunction: proxyFetch });
     const perPage = 30;
     const page = 1;
-    const communityResponse = await client.getCommunity({name: apiId});
+    const communityResponse = await client.getCommunity({ name: apiId });
 
     const form: GetPosts = {
       sort: "Active",
@@ -72,6 +76,34 @@ class LemmyService implements ServiceType {
         name: communityResponse.community_view.community.name,
       },
       items: postsResponse.posts.map(lemmyPostToPost)
+    }
+  }
+
+  async getComments(_communityId: string, apiId: string): Promise<GetCommentsResponse> {
+    const client = new LemmyHttp(baseUrl, { fetchFunction: proxyFetch });
+    const form: GetComments = {
+      post_id: Number(apiId)
+    }
+
+    const commentsResponse = await client.getComments(form);
+
+    const items = commentsResponse.comments.map((c):Post => ({
+      body: c.comment.content,
+      authorApiId: c.creator.id.toString(),
+      authorName: c.creator.name,
+      authorAvatar: c.creator.avatar,
+      apiId: c.comment.id.toString(),
+      pluginId: pluginName,
+      counts: {
+        upvotes: c.counts.score,
+        comments: c.counts.child_count
+      },
+      originalUrl: c.comment.ap_id
+    }));
+
+
+    return {
+      items
     }
   }
 

@@ -1,5 +1,9 @@
 import { Post } from "@/plugintypes";
+import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Link } from "@tanstack/react-router";
+import { Button } from "./ui/button";
+import { ArrowDownIcon, ArrowUpIcon, MessageCircleIcon } from "lucide-react";
+import ReactTimeago from "react-timeago";
 
 type Props = {
   post: Post;
@@ -7,42 +11,74 @@ type Props = {
 const PostComponent: React.FC<Props> = (props) => {
   const { post } = props;
   return (
-    <div>
-      <div className="text-2xl">
-        <Link
-          to="/plugins/$pluginId/community/$communityId/comments/$apiId"
-          params={{
-            pluginId: post.pluginId || "",
-            communityId: post.communityApiId || "",
-            apiId: post.apiId || "",
-          }}
-        >
-          {post.title}
-        </Link>
+    <div className="border-y py-2">
+      <div className="flex gap-2 items-center">
+        <Avatar>
+          <AvatarImage src={post.authorAvatar} />
+          <AvatarFallback>{post.authorName?.slice(0, 2)}</AvatarFallback>
+        </Avatar>
+        <div className="flex gap-1 items-center">
+          <Link
+            to="/plugins/$pluginId/user/$apiId"
+            className="font-semibold"
+            params={{
+              pluginId: post.pluginId || "",
+              apiId: post.authorApiId || "",
+            }}
+          >
+            {post.authorName}
+          </Link>
+          <p>to</p>
+          <Link
+            to="/plugins/$pluginId/community/$apiId"
+            className="font-semibold"
+            params={{
+              pluginId: post.pluginId || "",
+              apiId: post.communityApiId || "",
+            }}
+          >
+            {post.communityName}
+          </Link>
+
+          <p className="text-xs">
+            {post.publishedDate && <ReactTimeago date={post.publishedDate} />}
+          </p>
+        </div>
       </div>
-      <div>
-        in{" "}
-        <Link
-          to="/plugins/$pluginId/community/$apiId"
-          params={{
-            pluginId: post.pluginId || "",
-            apiId: post.communityApiId || "",
-          }}
-        >
-          {post.communityName}
-        </Link>
-      </div>
-      <div>
-        by{" "}
-        <Link
-          to="/plugins/$pluginId/user/$apiId"
-          params={{
-            pluginId: post.pluginId || "",
-            apiId: post.authorApiId || "",
-          }}
-        >
-          {post.authorName}
-        </Link>
+      <Link
+        className="leading-snug whitespace-pre-line"
+        to="/plugins/$pluginId/community/$communityId/comments/$apiId"
+        params={{
+          pluginId: post.pluginId || "",
+          communityId: post.communityApiId || "",
+          apiId: post.apiId || "",
+        }}
+      >
+        {post.title}
+      </Link>
+      {post.thumbnail_url && (
+        <img src={post.thumbnail_url} className="rounded-md" />
+      )}
+      <div className="flex items-center">
+        {post.counts && (
+          <div className="flex items-center">
+          <Button variant="ghost" size="icon">
+            <ArrowDownIcon />
+          </Button>
+            <p>{post.counts.upvotes}</p>
+            <Button variant="ghost" size="icon">
+              <ArrowUpIcon />
+            </Button>
+          </div>
+        )}
+        {post.counts && (
+          <div className="flex items-center">
+            <Button variant="ghost" size="icon">
+              <MessageCircleIcon />
+            </Button>
+            <p>{post.counts.comments}</p>
+          </div>
+        )}
       </div>
     </div>
   );

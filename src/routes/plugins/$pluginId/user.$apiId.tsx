@@ -1,4 +1,3 @@
-import CommentComponent from "@/components/CommentComponent";
 import PostComponent from "@/components/PostComponent";
 import { getService } from "@/services/selector-service";
 import { createFileRoute, notFound } from "@tanstack/react-router";
@@ -8,13 +7,9 @@ const UserOverview: React.FC = () => {
   const data = Route.useLoaderData();
   return (
     <div>
-      {data.map((d) =>
-        d.type == "comment" ? (
-          <CommentComponent comment={d} />
-        ) : (
-          <PostComponent post={d} />
-        )
-      )}
+      {data.map((d) => (
+        <PostComponent post={d} />
+      ))}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { GetCommentsResponse, GetCommunityResponse, GetHomeResponse, GetUserReponse, LoginRequest, Post, PostComment } from "@/plugintypes";
+import { GetCommentsResponse, GetCommunityResponse, GetHomeResponse, GetUserReponse, LoginRequest, Post } from "@/plugintypes";
 import { ServiceType } from "@/types";
 
 const pluginName = "reddit";
@@ -185,18 +185,16 @@ const redditPostsToPost = (post: ListingChildPostData): Post => {
     communityName: post.subreddit,
     communityApiId: post.subreddit,
     body: post.selftext,
-    type: "post",
     pluginId: pluginName
   }
 }
 
-const redditCommentToComment = (comment: ListingChildCommentData): PostComment => {
+const redditCommentToPost = (comment: ListingChildCommentData): Post => {
   return {
     apiId: comment.id,
     body: comment.body,
     authorName: comment.author,
     authorApiId: comment.author,
-    type: "comment",
     pluginId: pluginName
   }
 }
@@ -243,7 +241,7 @@ class RedditService implements ServiceType {
       headers: requestHeaders
     });
     const json: CommentsResponse = await response.json();
-    const items = json[1].children.map(c => c.data).map(redditCommentToComment);
+    const items = json[1].children.map(c => c.data).map(redditCommentToPost);
     return {
       items
     }
@@ -259,7 +257,7 @@ class RedditService implements ServiceType {
     });
     const json: UserResponse = await response.json();
     const items = json.data.children
-      .map((c): Post | PostComment => c.kind === "t1" ? redditCommentToComment(c.data) : redditPostsToPost(c.data));
+      .map((c): Post => c.kind === "t1" ? redditCommentToPost(c.data) : redditPostsToPost(c.data));
     return {
       items
     }

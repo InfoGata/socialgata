@@ -16,7 +16,6 @@ const statusToPost = (status: Status): Post => {
     authorApiId: status.account.id,
     counts: { upvotes: status.favouritesCount, comments: status.repliesCount },
     publishedDate: status.createdAt,
-    type: "post",
     pluginId: pluginName
   };
 };

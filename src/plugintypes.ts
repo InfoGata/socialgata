@@ -5,20 +5,14 @@ export interface Post {
   publishedDate?: string;
   communityApiId?: string;
   communityName?: string;
-  counts: PostCounts;
+  counts?: PostCounts;
   authorApiId?: string;
   authorName?: string;
-  type: "post";
+  authorAvatar?: string;
   pluginId?: string;
-}
-
-export interface PostComment {
-  apiId?: string;
-  body: string;
-  authorApiId?: string;
-  authorName?: string;
-  type: "comment";
-  pluginId?: string;
+  originalUrl?: string;
+  url?: string;
+  thumbnail_url?: string;
 }
 
 export interface PostCounts {
@@ -29,6 +23,7 @@ export interface PostCounts {
 export interface User {
   apiId: string;
   name: string;
+  avatar?: string;
 }
 
 export interface Community {
@@ -59,11 +54,11 @@ export interface GetCommunityResponse {
 export interface GetUserReponse {
   page?: PageInfo;
   user?: User;
-  items: (Post | PostComment)[]
+  items: Post[]
 }
 
 export interface GetCommentsResponse {
-  items: PostComment[];
+  items: Post[];
   post?: Post;
   page?: PageInfo;
 }

@@ -1,8 +1,8 @@
-import { PostComment } from "@/plugintypes";
+import { Post } from "@/plugintypes";
 import { Link } from "@tanstack/react-router";
 
 type Props = {
-  comment: PostComment;
+  comment: Post;
 };
 const CommentComponent: React.FC<Props> = (props) => {
   const { comment } = props;
