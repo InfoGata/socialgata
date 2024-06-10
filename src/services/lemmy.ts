@@ -1,9 +1,43 @@
 import { GetCommentsResponse, GetCommunityResponse, GetHomeResponse, GetUserReponse, Post } from "@/plugintypes";
 import { ServiceType } from "@/types";
-import { GetComments, GetPersonDetails, GetPosts, LemmyHttp, PostView } from "lemmy-js-client";
+import { GetComments, GetPersonDetails, GetPosts, LemmyHttp, PostView, Comment } from "lemmy-js-client";
 
 const pluginName = "lemmy";
 const baseUrl = "https://lemmy.ml";
+
+function getCommentParentId(comment: Comment): string | undefined {
+  const split = comment.path.split(".");
+  split?.shift();
+
+  return split && split.length > 1
+    ? split.at(split.length - 2)
+    : undefined;
+}
+
+function buildCommentTree(comments: Post[]): Post[] {
+  const map = new Map<string, Post>();
+  for (const comment of comments) {
+    if (comment.apiId) {
+      map.set(comment.apiId, comment);
+    }
+  }
+  const result: Post[] = []
+  for (const comment of comments) {
+    if (comment.apiId) {
+      const child = map.get(comment.apiId)
+      const parentId = child?.parentId;
+      if (parentId) {
+        const parent = map.get(parentId);
+        if (parent) {
+          parent.comments?.push(comment);
+        }
+      } else {
+        result.push(comment);
+      }
+    }
+  }
+  return result;
+}
 
 const lemmyPostToPost = (postView: PostView): Post => {
   return {
@@ -21,7 +55,7 @@ const lemmyPostToPost = (postView: PostView): Post => {
     originalUrl: postView.post.ap_id,
     publishedDate: postView.post.published,
     url: postView.post.url,
-    thumbnail_url: postView.post.thumbnail_url,
+    thumbnailUrl: postView.post.thumbnail_url,
     authorAvatar: postView.creator.avatar
   };
 };
@@ -79,15 +113,20 @@ class LemmyService implements ServiceType {
     }
   }
 
-  async getComments(_communityId: string, apiId: string): Promise<GetCommentsResponse> {
+  async getComments(communityId: string, apiId: string): Promise<GetCommentsResponse> {
     const client = new LemmyHttp(baseUrl, { fetchFunction: proxyFetch });
     const form: GetComments = {
-      post_id: Number(apiId)
+      type_: "All",
+      post_id: Number(apiId),
+      sort: "Hot",
+      saved_only: false,
+      max_depth: 8
     }
 
+    const postResponse = await client.getPost({ id: Number(apiId) })
     const commentsResponse = await client.getComments(form);
 
-    const items = commentsResponse.comments.map((c):Post => ({
+    const posts = commentsResponse.comments.map((c): Post => ({
       body: c.comment.content,
       authorApiId: c.creator.id.toString(),
       authorName: c.creator.name,
@@ -98,12 +137,21 @@ class LemmyService implements ServiceType {
         upvotes: c.counts.score,
         comments: c.counts.child_count
       },
-      originalUrl: c.comment.ap_id
+      originalUrl: c.comment.ap_id,
+      publishedDate: c.comment.published,
+      parentId: getCommentParentId(c.comment),
+      comments: []
     }));
 
+    const items = buildCommentTree(posts);
 
     return {
-      items
+      items,
+      post: lemmyPostToPost(postResponse.post_view),
+      community: {
+        apiId: communityId,
+        name: postResponse.community_view.community.name,
+      },
     }
   }
 

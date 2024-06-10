@@ -12,7 +12,9 @@ export interface Post {
   pluginId?: string;
   originalUrl?: string;
   url?: string;
-  thumbnail_url?: string;
+  thumbnailUrl?: string;
+  parentId?: string;
+  comments?: Post[];
 }
 
 export interface PostCounts {
@@ -60,6 +62,7 @@ export interface GetUserReponse {
 export interface GetCommentsResponse {
   items: Post[];
   post?: Post;
+  community?: Community;
   page?: PageInfo;
 }
 

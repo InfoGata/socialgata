@@ -56,15 +56,15 @@ const PostComponent: React.FC<Props> = (props) => {
       >
         {post.title}
       </Link>
-      {post.thumbnail_url && (
-        <img src={post.thumbnail_url} className="rounded-md" />
+      {post.thumbnailUrl && (
+        <img src={post.thumbnailUrl} className="rounded-md" />
       )}
       <div className="flex items-center">
         {post.counts && (
           <div className="flex items-center">
-          <Button variant="ghost" size="icon">
-            <ArrowDownIcon />
-          </Button>
+            <Button variant="ghost" size="icon">
+              <ArrowDownIcon />
+            </Button>
             <p>{post.counts.upvotes}</p>
             <Button variant="ghost" size="icon">
               <ArrowUpIcon />
