@@ -2,7 +2,8 @@ import { Post } from "@/plugintypes";
 import { Link } from "@tanstack/react-router";
 import { Button } from "./ui/button";
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
-import Markdown from "react-markdown";
+import parse from 'html-react-parser';
+import DOMPurify from "dompurify";
 
 type Props = {
   comment: Post;
@@ -10,6 +11,8 @@ type Props = {
 
 const CommentComponent: React.FC<Props> = (props) => {
   const { comment } = props;
+  const sanitizer = DOMPurify.sanitize;
+  const clean = sanitizer(comment.body || "");
   return (
     <div className="border-y border-l-2 ml-1 py-1 pl-1">
       <div>
@@ -24,22 +27,7 @@ const CommentComponent: React.FC<Props> = (props) => {
         </Link>
       </div>
       <div>
-        <Markdown
-          components={{
-            a(props) {
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              const { node, ...rest } = props;
-              return (
-                <a
-                  className="text-blue-600 dark:text-blue-500 hover:underline"
-                  {...rest}
-                />
-              );
-            },
-          }}
-        >
-          {comment.body}
-        </Markdown>
+        {parse(clean)}
       </div>
       <div>
         {comment.score && (

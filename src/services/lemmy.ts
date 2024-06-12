@@ -1,7 +1,9 @@
 import { GetCommentsRequest, GetCommentsResponse, GetCommunityResponse, GetHomeResponse, GetUserReponse, Post } from "@/plugintypes";
 import { ServiceType } from "@/types";
 import { GetComments, GetPersonDetails, GetPosts, LemmyHttp, PostView, Comment } from "lemmy-js-client";
+import { Converter } from "showdown";
 
+const markdownConverter = new Converter();
 const pluginName = "lemmy";
 const baseUrl = "https://lemmy.ml";
 
@@ -124,7 +126,7 @@ class LemmyService implements ServiceType {
     const commentsResponse = await client.getComments(form);
 
     const posts = commentsResponse.comments.map((c): Post => ({
-      body: c.comment.content,
+      body: markdownConverter.makeHtml(c.comment.content),
       authorApiId: c.creator.id.toString(),
       authorName: c.creator.name,
       authorAvatar: c.creator.avatar,
