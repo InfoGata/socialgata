@@ -1,4 +1,4 @@
-import { GetCommentsResponse, GetCommunityResponse, GetHomeResponse, GetUserReponse, Post } from "@/plugintypes";
+import { GetCommentsRequest, GetCommentsResponse, GetCommunityResponse, GetHomeResponse, GetUserReponse, Post } from "@/plugintypes";
 import { ServiceType } from "@/types";
 import { GetComments, GetPersonDetails, GetPosts, LemmyHttp, PostView, Comment } from "lemmy-js-client";
 
@@ -45,10 +45,8 @@ const lemmyPostToPost = (postView: PostView): Post => {
     apiId: postView.post.id.toString(),
     communityName: postView.community.name,
     communityApiId: postView.community.name,
-    counts: {
-      upvotes: postView.counts.upvotes,
-      comments: postView.counts.comments,
-    },
+    score: postView.counts.score,
+    numOfComments: postView.counts.comments,
     authorApiId: postView.creator.name,
     authorName: postView.creator.name,
     pluginId: pluginName,
@@ -71,7 +69,6 @@ const proxyFetch: typeof fetch = (
 
 
 class LemmyService implements ServiceType {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getFeed(): Promise<GetHomeResponse> {
     const client = new LemmyHttp(baseUrl, { fetchFunction: proxyFetch });
     const perPage = 30;
@@ -113,17 +110,17 @@ class LemmyService implements ServiceType {
     }
   }
 
-  async getComments(communityId: string, apiId: string): Promise<GetCommentsResponse> {
+  async getComments(request: GetCommentsRequest): Promise<GetCommentsResponse> {
     const client = new LemmyHttp(baseUrl, { fetchFunction: proxyFetch });
     const form: GetComments = {
       type_: "All",
-      post_id: Number(apiId),
+      post_id: Number(request.apiId),
       sort: "Hot",
       saved_only: false,
       max_depth: 8
     }
 
-    const postResponse = await client.getPost({ id: Number(apiId) })
+    const postResponse = await client.getPost({ id: Number(request.apiId) })
     const commentsResponse = await client.getComments(form);
 
     const posts = commentsResponse.comments.map((c): Post => ({
@@ -133,10 +130,8 @@ class LemmyService implements ServiceType {
       authorAvatar: c.creator.avatar,
       apiId: c.comment.id.toString(),
       pluginId: pluginName,
-      counts: {
-        upvotes: c.counts.score,
-        comments: c.counts.child_count
-      },
+      score: c.counts.score,
+      numOfComments: c.counts.child_count,
       originalUrl: c.comment.ap_id,
       publishedDate: c.comment.published,
       parentId: getCommentParentId(c.comment),
@@ -149,7 +144,7 @@ class LemmyService implements ServiceType {
       items,
       post: lemmyPostToPost(postResponse.post_view),
       community: {
-        apiId: communityId,
+        apiId: request.communityId || "",
         name: postResponse.community_view.community.name,
       },
     }

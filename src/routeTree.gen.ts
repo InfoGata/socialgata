@@ -13,8 +13,9 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as PluginsPluginIdUserApiIdImport } from './routes/plugins/$pluginId/user.$apiId'
+import { Route as PluginsPluginIdPostApiIdImport } from './routes/plugins/$pluginId/post.$apiId'
 import { Route as PluginsPluginIdCommunityApiIdIndexImport } from './routes/plugins/$pluginId/community.$apiId.index'
-import { Route as PluginsPluginIdCommunityCommunityIdCommentsApiIdImport } from './routes/plugins/$pluginId/community.$communityId.comments.$apiId'
+import { Route as PluginsPluginIdCommunityCommunityIdPostApiIdImport } from './routes/plugins/$pluginId/community.$communityId.post.$apiId'
 
 // Create/Update Routes
 
@@ -28,15 +29,20 @@ const PluginsPluginIdUserApiIdRoute = PluginsPluginIdUserApiIdImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const PluginsPluginIdPostApiIdRoute = PluginsPluginIdPostApiIdImport.update({
+  path: '/plugins/$pluginId/post/$apiId',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const PluginsPluginIdCommunityApiIdIndexRoute =
   PluginsPluginIdCommunityApiIdIndexImport.update({
     path: '/plugins/$pluginId/community/$apiId/',
     getParentRoute: () => rootRoute,
   } as any)
 
-const PluginsPluginIdCommunityCommunityIdCommentsApiIdRoute =
-  PluginsPluginIdCommunityCommunityIdCommentsApiIdImport.update({
-    path: '/plugins/$pluginId/community/$communityId/comments/$apiId',
+const PluginsPluginIdCommunityCommunityIdPostApiIdRoute =
+  PluginsPluginIdCommunityCommunityIdPostApiIdImport.update({
+    path: '/plugins/$pluginId/community/$communityId/post/$apiId',
     getParentRoute: () => rootRoute,
   } as any)
 
@@ -49,6 +55,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/plugins/$pluginId/post/$apiId': {
+      id: '/plugins/$pluginId/post/$apiId'
+      path: '/plugins/$pluginId/post/$apiId'
+      fullPath: '/plugins/$pluginId/post/$apiId'
+      preLoaderRoute: typeof PluginsPluginIdPostApiIdImport
       parentRoute: typeof rootRoute
     }
     '/plugins/$pluginId/user/$apiId': {
@@ -65,11 +78,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PluginsPluginIdCommunityApiIdIndexImport
       parentRoute: typeof rootRoute
     }
-    '/plugins/$pluginId/community/$communityId/comments/$apiId': {
-      id: '/plugins/$pluginId/community/$communityId/comments/$apiId'
-      path: '/plugins/$pluginId/community/$communityId/comments/$apiId'
-      fullPath: '/plugins/$pluginId/community/$communityId/comments/$apiId'
-      preLoaderRoute: typeof PluginsPluginIdCommunityCommunityIdCommentsApiIdImport
+    '/plugins/$pluginId/community/$communityId/post/$apiId': {
+      id: '/plugins/$pluginId/community/$communityId/post/$apiId'
+      path: '/plugins/$pluginId/community/$communityId/post/$apiId'
+      fullPath: '/plugins/$pluginId/community/$communityId/post/$apiId'
+      preLoaderRoute: typeof PluginsPluginIdCommunityCommunityIdPostApiIdImport
       parentRoute: typeof rootRoute
     }
   }
@@ -79,9 +92,10 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
+  PluginsPluginIdPostApiIdRoute,
   PluginsPluginIdUserApiIdRoute,
   PluginsPluginIdCommunityApiIdIndexRoute,
-  PluginsPluginIdCommunityCommunityIdCommentsApiIdRoute,
+  PluginsPluginIdCommunityCommunityIdPostApiIdRoute,
 })
 
 /* prettier-ignore-end */
@@ -93,13 +107,17 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/plugins/$pluginId/post/$apiId",
         "/plugins/$pluginId/user/$apiId",
         "/plugins/$pluginId/community/$apiId/",
-        "/plugins/$pluginId/community/$communityId/comments/$apiId"
+        "/plugins/$pluginId/community/$communityId/post/$apiId"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/plugins/$pluginId/post/$apiId": {
+      "filePath": "plugins/$pluginId/post.$apiId.tsx"
     },
     "/plugins/$pluginId/user/$apiId": {
       "filePath": "plugins/$pluginId/user.$apiId.tsx"
@@ -107,8 +125,8 @@ export const routeTree = rootRoute.addChildren({
     "/plugins/$pluginId/community/$apiId/": {
       "filePath": "plugins/$pluginId/community.$apiId.index.tsx"
     },
-    "/plugins/$pluginId/community/$communityId/comments/$apiId": {
-      "filePath": "plugins/$pluginId/community.$communityId.comments.$apiId.tsx"
+    "/plugins/$pluginId/community/$communityId/post/$apiId": {
+      "filePath": "plugins/$pluginId/community.$communityId.post.$apiId.tsx"
     }
   }
 }

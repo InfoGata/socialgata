@@ -5,7 +5,6 @@ export interface Post {
   publishedDate?: string;
   communityApiId?: string;
   communityName?: string;
-  counts?: PostCounts;
   authorApiId?: string;
   authorName?: string;
   authorAvatar?: string;
@@ -15,11 +14,8 @@ export interface Post {
   thumbnailUrl?: string;
   parentId?: string;
   comments?: Post[];
-}
-
-export interface PostCounts {
-  upvotes: number;
-  comments: number;
+  score?: number;
+  numOfComments?: number;
 }
 
 export interface User {
@@ -53,10 +49,16 @@ export interface GetCommunityResponse {
   items: Post[];
 }
 
+
 export interface GetUserReponse {
   page?: PageInfo;
   user?: User;
   items: Post[]
+}
+
+export interface GetCommentsRequest {
+  communityId?: string;
+  apiId?: string;
 }
 
 export interface GetCommentsResponse {

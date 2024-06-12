@@ -86,6 +86,7 @@ export const Index: React.FC = () => {
           <SelectItem value="reddit">Reddit</SelectItem>
           <SelectItem value="mastodon">Mastodon</SelectItem>
           <SelectItem value="lemmy">Lemmy</SelectItem>
+          <SelectItem value="hackernews">Hacker News</SelectItem>
         </SelectContent>
       </Select>
       {hasLogin && (

@@ -42,12 +42,12 @@ const CommentComponent: React.FC<Props> = (props) => {
         </Markdown>
       </div>
       <div>
-        {comment.counts && (
+        {comment.score && (
           <div className="flex items-center">
             <Button variant="ghost" size="icon">
               <ArrowDownIcon />
             </Button>
-            <p>{comment.counts.upvotes}</p>
+            <p>{comment.score}</p>
             <Button variant="ghost" size="icon">
               <ArrowUpIcon />
             </Button>

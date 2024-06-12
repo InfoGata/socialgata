@@ -1,4 +1,4 @@
-import { GetCommentsResponse, GetCommunityResponse, GetHomeResponse, GetUserReponse, LoginRequest, Post } from "@/plugintypes";
+import { GetCommentsRequest, GetCommentsResponse, GetCommunityResponse, GetHomeResponse, GetUserReponse, LoginRequest, Post } from "@/plugintypes";
 import { ServiceType } from "@/types";
 
 const pluginName = "reddit";
@@ -176,10 +176,8 @@ const redditPostsToPost = (post: ListingChildPostData): Post => {
   return {
     apiId: post.id,
     title: post.title,
-    counts: {
-      comments: post.num_comments,
-      upvotes: post.ups
-    },
+    numOfComments: post.num_comments,
+    score: post.score,
     authorName: post.author,
     authorApiId: post.author,
     communityName: post.subreddit,
@@ -232,11 +230,11 @@ class RedditService implements ServiceType {
     }
   }
 
-  getComments = async (communityId: string, apiId: string): Promise<GetCommentsResponse> => {
+  getComments = async (request: GetCommentsRequest): Promise<GetCommentsResponse> => {
     const requestHeaders = {
       Authorization: `Bearer ${this.accessToken}`,
     };
-    const url = `${redditUrl}/r/${communityId}/comments/${apiId}`;
+    const url = `${redditUrl}/r/${request.communityId}/comments/${request.apiId}`;
     const response = await fetch(url, {
       headers: requestHeaders
     });
