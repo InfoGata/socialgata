@@ -1,9 +1,10 @@
 import { Post } from "@/plugintypes";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Link } from "@tanstack/react-router";
-import { Button } from "./ui/button";
+import { Button, buttonVariants } from "./ui/button";
 import { ArrowDownIcon, ArrowUpIcon, MessageCircleIcon } from "lucide-react";
 import ReactTimeago from "react-timeago";
+import PostLink from "./PostLink";
 
 type Props = {
   post: Post;
@@ -50,27 +51,7 @@ const PostComponent: React.FC<Props> = (props) => {
           </p>
         </div>
       </div>
-      {post.communityApiId ? (
-        <Link
-          className="leading-snug whitespace-pre-line"
-          to="/plugins/$pluginId/community/$communityId/post/$apiId"
-          params={{
-            pluginId: post.pluginId || "",
-            communityId: post.communityApiId,
-            apiId: post.apiId || "",
-          }}
-        >
-          {post.title}
-        </Link>
-      ) : (
-        <Link
-          className="leading-snug whitespace-pre-line"
-          to="/plugins/$pluginId/post/$apiId"
-          params={{ pluginId: post.pluginId || "", apiId: post.apiId || "" }}
-        >
-          {post.title}
-        </Link>
-      )}
+      {<PostLink post={post} isTitleLink>{post.title}</PostLink> }
       {post.thumbnailUrl && (
         <img src={post.thumbnailUrl} className="rounded-md" />
       )}
@@ -87,12 +68,10 @@ const PostComponent: React.FC<Props> = (props) => {
           </div>
         )}
         {post.numOfComments && (
-          <div className="flex items-center">
-            <Button variant="ghost" size="icon">
-              <MessageCircleIcon />
-            </Button>
+          <PostLink post={post} className={buttonVariants({variant: "ghost"})}>
+            <MessageCircleIcon />
             <p>{post.numOfComments}</p>
-          </div>
+          </PostLink>
         )}
       </div>
     </div>
