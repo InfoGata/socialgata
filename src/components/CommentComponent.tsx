@@ -44,7 +44,7 @@ const CommentComponent: React.FC<Props> = (props) => {
       </div>
       <div className="ml-2">
         {comment.comments?.length
-          ? comment.comments.map((c) => <CommentComponent comment={c} />)
+          ? comment.comments.map((c) => <CommentComponent key={c.apiId} comment={c} />)
           : undefined}
       </div>
     </div>

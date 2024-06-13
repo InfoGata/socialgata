@@ -2,10 +2,17 @@ import PostWithComponents from "@/components/PostWithComponents";
 import { getService } from "@/services/selector-service";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import React from "react";
+import { Helmet } from "react-helmet-async";
 
 const CommunityPostComments: React.FC = () => {
   const data = Route.useLoaderData();
-  return <PostWithComponents data={data} />;
+  const title = data.post?.title;
+  return (
+    <>
+      <Helmet>{title}</Helmet>
+      <PostWithComponents data={data} />;
+    </>
+  );
 };
 
 export const Route = createFileRoute(

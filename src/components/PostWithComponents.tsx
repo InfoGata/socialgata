@@ -1,6 +1,7 @@
 import { GetCommentsResponse } from "@/plugintypes";
 import PostComponent from "./PostComponent";
 import CommentComponent from "./CommentComponent";
+import React from "react";
 
 interface Props {
   data: GetCommentsResponse;
@@ -14,7 +15,7 @@ const PostWithComponents: React.FC<Props> = (props) => {
       {data.post && <PostComponent post={data.post} />}
       <div>
         {data.items.map((d) => (
-          <CommentComponent comment={d} />
+          <CommentComponent key={d.apiId} comment={d} />
         ))}
       </div>
     </div>
