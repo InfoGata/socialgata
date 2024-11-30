@@ -1,8 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Post } from "@/plugintypes";
-import { getService } from "@/services/selector-service";
+import { Link } from "@tanstack/react-router";
 import React from "react";
-import PostComponent from "./PostComponent";
+import { buttonVariants } from "./ui/button";
 
 type Props = {
   pluginId: string;
@@ -10,20 +8,15 @@ type Props = {
 
 const LogginedIn: React.FC<Props> = (props) => {
   const { pluginId } = props;
-  const [posts, setPosts] = React.useState<Post[]>([]);
-  const getRedditHome = async () => {
-    const service = getService(pluginId);
-    if (service) {
-      const response = await service.getFeed();
-      setPosts(response.items);
-    }
-  };
   return (
     <div>
-      <Button onClick={getRedditHome}>Get Feed</Button>
-      {posts.map((p) => (
-        <PostComponent key={p.title} post={p} />
-      ))}
+      <Link
+        className={buttonVariants({ variant: "default" })}
+        to="/plugins/$pluginId/feed"
+        params={{ pluginId: pluginId }}
+      >
+        Feed
+      </Link>
     </div>
   );
 };

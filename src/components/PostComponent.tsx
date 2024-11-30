@@ -12,7 +12,7 @@ type Props = {
 const PostComponent: React.FC<Props> = (props) => {
   const { post } = props;
   return (
-    <div className="border-y py-2">
+    <div className="rounded-lg border p-4 hover:bg-accent transition-colors">
       <div className="flex gap-2 items-center">
         {post.authorAvatar && (
           <Avatar>
@@ -51,7 +51,7 @@ const PostComponent: React.FC<Props> = (props) => {
           </p>
         </div>
       </div>
-      {<PostLink post={post} isTitleLink>{post.title}</PostLink> }
+      {<PostLink post={post} isTitleLink className="text-lg font-semibold">{post.title}</PostLink> }
       {post.thumbnailUrl && (
         <img src={post.thumbnailUrl} className="rounded-md" />
       )}

@@ -14,8 +14,8 @@ const CommentComponent: React.FC<Props> = (props) => {
   const sanitizer = DOMPurify.sanitize;
   const clean = sanitizer(comment.body || "");
   return (
-    <div className="border-y border-l-2 ml-1 py-1 pl-1">
-      <div>
+    <div className="border-l-2 border-muted pl-4 my-4">
+      <div className="text-sm text-muted-foreground mb-2">
         <Link
           to="/plugins/$pluginId/user/$apiId"
           params={{

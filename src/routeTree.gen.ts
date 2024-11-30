@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as PluginsPluginIdFeedImport } from './routes/plugins/$pluginId/feed'
 import { Route as PluginsPluginIdUserApiIdImport } from './routes/plugins/$pluginId/user.$apiId'
 import { Route as PluginsPluginIdPostApiIdImport } from './routes/plugins/$pluginId/post.$apiId'
 import { Route as PluginsPluginIdCommunityApiIdIndexImport } from './routes/plugins/$pluginId/community.$apiId.index'
@@ -21,6 +22,11 @@ import { Route as PluginsPluginIdCommunityCommunityIdPostApiIdImport } from './r
 
 const IndexRoute = IndexImport.update({
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PluginsPluginIdFeedRoute = PluginsPluginIdFeedImport.update({
+  path: '/plugins/$pluginId/feed',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -55,6 +61,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/plugins/$pluginId/feed': {
+      id: '/plugins/$pluginId/feed'
+      path: '/plugins/$pluginId/feed'
+      fullPath: '/plugins/$pluginId/feed'
+      preLoaderRoute: typeof PluginsPluginIdFeedImport
       parentRoute: typeof rootRoute
     }
     '/plugins/$pluginId/post/$apiId': {
@@ -92,6 +105,7 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
+  PluginsPluginIdFeedRoute,
   PluginsPluginIdPostApiIdRoute,
   PluginsPluginIdUserApiIdRoute,
   PluginsPluginIdCommunityApiIdIndexRoute,
@@ -107,6 +121,7 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/plugins/$pluginId/feed",
         "/plugins/$pluginId/post/$apiId",
         "/plugins/$pluginId/user/$apiId",
         "/plugins/$pluginId/community/$apiId/",
@@ -115,6 +130,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/plugins/$pluginId/feed": {
+      "filePath": "plugins/$pluginId/feed.tsx"
     },
     "/plugins/$pluginId/post/$apiId": {
       "filePath": "plugins/$pluginId/post.$apiId.tsx"
