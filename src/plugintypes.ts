@@ -31,27 +31,31 @@ export interface Community {
 
 export interface PageInfo {
   totalResults?: number;
-  resultsPerPage: number;
-  offset: number;
-  nextPage?: string;
-  prevPage?: string;
+  resultsPerPage?: number;
+  offset?: number;
+  page?: string | number;
+  nextPage?: string | number;
+  prevPage?: string | number;
 }
 
+export interface GetFeedRequest {
+  pageInfo?: PageInfo;
+}
 
-export interface GetHomeResponse {
-  page?: PageInfo;
+export interface GetFeedResponse {
+  pageInfo?: PageInfo;
   items: Post[];
 }
 
 export interface GetCommunityResponse {
-  page?: PageInfo;
+  pageInfo?: PageInfo;
   community?: Community;
   items: Post[];
 }
 
 
 export interface GetUserReponse {
-  page?: PageInfo;
+  pageInfo?: PageInfo;
   user?: User;
   items: Post[]
 }
@@ -65,7 +69,7 @@ export interface GetCommentsResponse {
   items: Post[];
   post?: Post;
   community?: Community;
-  page?: PageInfo;
+  pageInfo?: PageInfo;
 }
 
 export type ListingType = "comment" | "post";

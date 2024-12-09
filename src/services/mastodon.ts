@@ -1,6 +1,6 @@
 import { createRestAPIClient } from "masto";
 import { ServiceType } from "../types";
-import { Post, GetUserReponse, GetHomeResponse } from "../plugintypes";
+import { Post, GetUserReponse, GetFeedResponse } from "../plugintypes";
 
 const pluginName = "mastodon";
 const baseUrl = "https://mastodon.social";
@@ -22,7 +22,7 @@ const statusToPost = (status: Status): Post => {
 };
 
 class MastodonService implements ServiceType {
-  async getFeed(): Promise<GetHomeResponse> {
+  async getFeed(): Promise<GetFeedResponse> {
     const timelines = await masto.v1.timelines.public.list({ limit: 30 });
     const items: Post[] = timelines.map(statusToPost);
     return {

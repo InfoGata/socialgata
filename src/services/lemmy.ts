@@ -1,4 +1,4 @@
-import { GetCommentsRequest, GetCommentsResponse, GetCommunityResponse, GetHomeResponse, GetUserReponse, Post } from "@/plugintypes";
+import { GetCommentsRequest, GetCommentsResponse, GetCommunityResponse, GetFeedResponse, GetUserReponse, Post } from "@/plugintypes";
 import { ServiceType } from "@/types";
 import { GetComments, GetPersonDetails, GetPosts, LemmyHttp, PostView, Comment } from "lemmy-js-client";
 import { Converter } from "showdown";
@@ -71,7 +71,7 @@ const proxyFetch: typeof fetch = (
 
 
 class LemmyService implements ServiceType {
-  async getFeed(): Promise<GetHomeResponse> {
+  async getFeed(): Promise<GetFeedResponse> {
     const client = new LemmyHttp(baseUrl, { fetchFunction: proxyFetch });
     const perPage = 30;
     const page = 1;

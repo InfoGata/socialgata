@@ -1,7 +1,7 @@
-import { GetCommentsRequest, GetCommentsResponse, GetCommunityResponse, GetHomeResponse, GetUserReponse, LoginRequest } from "./plugintypes";
+import { GetCommentsRequest, GetCommentsResponse, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetUserReponse, LoginRequest } from "./plugintypes";
 
 export interface ServiceType {
-  getFeed(): Promise<GetHomeResponse>;
+  getFeed(request?: GetFeedRequest): Promise<GetFeedResponse>;
   getCommunity?(apiId: string): Promise<GetCommunityResponse>;
   getComments?(request: GetCommentsRequest): Promise<GetCommentsResponse>;
   getUser(apiId: string): Promise<GetUserReponse>;

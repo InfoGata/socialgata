@@ -1,4 +1,4 @@
-import { GetCommentsRequest, GetCommentsResponse, GetCommunityResponse, GetHomeResponse, GetUserReponse, LoginRequest, Post } from "@/plugintypes";
+import { GetCommentsRequest, GetCommentsResponse, GetCommunityResponse, GetFeedResponse, GetUserReponse, LoginRequest, Post } from "@/plugintypes";
 import { ServiceType } from "@/types";
 
 const pluginName = "reddit";
@@ -200,7 +200,7 @@ const redditCommentToPost = (comment: ListingChildCommentData): Post => {
 class RedditService implements ServiceType {
   private accessToken = "";
 
-  getFeed = async (): Promise<GetHomeResponse> => {
+  getFeed = async (): Promise<GetFeedResponse> => {
     const requestHeaders = {
       Authorization: `Bearer ${this.accessToken}`,
     };

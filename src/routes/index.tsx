@@ -1,4 +1,4 @@
-import Feed from "@/components/Feed";
+import LoggedIn from "@/components/LoggedIn";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -110,7 +110,7 @@ export const Index: React.FC = () => {
           )}
         </div>
       )}
-      {showFeed && <Feed pluginId={pluginId} />}
+      {showFeed && <LoggedIn pluginId={pluginId} />}
     </div>
   );
 };

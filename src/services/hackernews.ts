@@ -1,7 +1,7 @@
-import { GetCommentsRequest, GetCommentsResponse, GetHomeResponse, GetUserReponse, Post } from "@/plugintypes";
+import { GetCommentsRequest, GetCommentsResponse, GetFeedRequest, GetFeedResponse, GetUserReponse, Post } from "@/plugintypes";
 import { ServiceType } from "@/types";
 import { initializeApp } from "firebase/app"
-import { getDatabase, ref, child, get, query, orderByKey, limitToFirst } from "firebase/database"
+import { getDatabase, ref, child, get, query, orderByKey } from "firebase/database"
 
 const pluginName = "hackernews";
 const hackerNewsUrl = "https://news.ycombinator.com"
@@ -154,14 +154,25 @@ const algoliaCommentHitToPost = (comment: AlgoriaCommentHit): Post => {
 }
 
 class HackerNewsService implements ServiceType {
-  async getFeed(): Promise<GetHomeResponse> {
-    const snapshot = await get(query(child(db, "v0/topstories"), limitToFirst(50), orderByKey()));
+  async getFeed(request?: GetFeedRequest): Promise<GetFeedResponse> {
+    const storiesPerPage = 20;
+    const currentPage = Number(request?.pageInfo?.page ?? "1");
+    const startIndex = (currentPage - 1) * storiesPerPage;
+    
+    const snapshot = await get(query(child(db, "v0/topstories"), orderByKey()));
     if (snapshot.exists()) {
-      const ids: number[] = snapshot.val();
-      const stories = await Promise.all(ids.map(getStory));
+      const allIds: number[] = snapshot.val();
+      const pageIds = allIds.slice(startIndex, startIndex + storiesPerPage);
+      const stories = await Promise.all(pageIds.map(getStory));
       const items = stories.map(firebaseStoryToPost);
+      
       return {
-        items
+        items,
+        pageInfo: {
+          page: currentPage,
+          nextPage: currentPage < Math.floor(allIds.length / storiesPerPage) ? (currentPage + 1) : undefined,
+          prevPage: currentPage > 1 ? (currentPage - 1) : undefined,
+        }
       }
     }
     return { items: [] };
