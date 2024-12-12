@@ -165,6 +165,9 @@ class HackerNewsService implements ServiceType {
       const pageIds = allIds.slice(startIndex, startIndex + storiesPerPage);
       const stories = await Promise.all(pageIds.map(getStory));
       const items = stories.map(firebaseStoryToPost);
+      items.forEach((item, index) => {
+        item.number = (currentPage - 1) * storiesPerPage + index + 1;
+      });
       
       return {
         items,
