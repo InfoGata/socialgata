@@ -1,5 +1,5 @@
 import PostComponent from '@/components/PostComponent';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink } from '@/components/ui/pagination';
+import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { usePagination } from '@/hooks/usePagination';
 import { PageInfo } from '@/plugintypes';
 import { getService } from '@/services/selector-service';
@@ -18,16 +18,12 @@ const Feed: React.FC = () => {
         <PaginationContent>
           {hasPreviousPage && (
             <PaginationItem>
-              <PaginationLink search={{...prevPage}}>
-                Previous
-              </PaginationLink>
+              <PaginationPrevious search={{...prevPage}} />
             </PaginationItem>
           )}
           {hasNextPage && (
             <PaginationItem>
-              <PaginationLink search={{...nextPage}}>
-                Next
-              </PaginationLink>
+              <PaginationNext search={{...nextPage}} />
             </PaginationItem>
           )}
         </PaginationContent>

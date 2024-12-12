@@ -21,7 +21,7 @@ export const usePagination = (currentPage?: PageInfo) => {
     };
   }
 
-  const hasPreviousPage = (currentPage.offset ?? 0) !== 0;
+  const hasPreviousPage = (currentPage.offset ?? 0) !== 0 || !!currentPage.prevPage;
   const nextOffset =
     currentPage.offset && currentPage.resultsPerPage
       ? currentPage.offset + currentPage.resultsPerPage
