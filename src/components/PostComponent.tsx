@@ -64,11 +64,11 @@ const PostComponent: React.FC<Props> = (props) => {
         <div className="flex items-center">
           {post.score && (
             <div className="flex items-center">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" disabled={true}>
                 <ArrowDownIcon />
               </Button>
               <p>{post.score}</p>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" disabled={true}>
                 <ArrowUpIcon />
               </Button>
             </div>
