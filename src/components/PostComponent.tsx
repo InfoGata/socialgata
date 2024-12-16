@@ -73,7 +73,7 @@ const PostComponent: React.FC<Props> = (props) => {
               </Button>
             </div>
           )}
-          {post.numOfComments && (
+          {post.numOfComments !== undefined && (
             <PostLink
               post={post}
               className={buttonVariants({ variant: "ghost" })}
