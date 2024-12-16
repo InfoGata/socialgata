@@ -79,3 +79,5 @@ export interface LoginRequest {
   apiKey: string;
   apiSecret: string;
 }
+
+export type Theme = "light" | "dark" | "system";

@@ -6,7 +6,8 @@ export interface MyRouterContext {
   accessToken: string;
 }
 
-const router = createRouter({
+// eslint-disable-next-line react-refresh/only-export-components
+export const router = createRouter({
   routeTree,
   defaultPendingComponent: Spinner,
 });

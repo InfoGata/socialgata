@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as SettingsImport } from './routes/settings'
 import { Route as IndexImport } from './routes/index'
 import { Route as PluginsPluginIdFeedImport } from './routes/plugins/$pluginId/feed'
 import { Route as PluginsPluginIdUserApiIdImport } from './routes/plugins/$pluginId/user.$apiId'
@@ -19,6 +20,11 @@ import { Route as PluginsPluginIdCommunityApiIdIndexImport } from './routes/plug
 import { Route as PluginsPluginIdCommunityCommunityIdPostApiIdImport } from './routes/plugins/$pluginId/community.$communityId.post.$apiId'
 
 // Create/Update Routes
+
+const SettingsRoute = SettingsImport.update({
+  path: '/settings',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   path: '/',
@@ -63,6 +69,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsImport
+      parentRoute: typeof rootRoute
+    }
     '/plugins/$pluginId/feed': {
       id: '/plugins/$pluginId/feed'
       path: '/plugins/$pluginId/feed'
@@ -105,6 +118,7 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
+  SettingsRoute,
   PluginsPluginIdFeedRoute,
   PluginsPluginIdPostApiIdRoute,
   PluginsPluginIdUserApiIdRoute,
@@ -121,6 +135,7 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/settings",
         "/plugins/$pluginId/feed",
         "/plugins/$pluginId/post/$apiId",
         "/plugins/$pluginId/user/$apiId",
@@ -130,6 +145,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/settings": {
+      "filePath": "settings.tsx"
     },
     "/plugins/$pluginId/feed": {
       "filePath": "plugins/$pluginId/feed.tsx"
