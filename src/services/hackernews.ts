@@ -154,12 +154,22 @@ const algoliaCommentHitToPost = (comment: AlgoriaCommentHit): Post => {
 }
 
 class HackerNewsService implements ServiceType {
+  private getFeedPath(feedTypeId: string) {
+    switch (feedTypeId) {
+      case "top": return "/v0/topstories";
+      case "new": return "/v0/newstories";
+      case "best": return "/v0/beststories";
+      default: throw new Error(`Invalid feed type: ${feedTypeId}`);
+    }
+  }
+
   async getFeed(request?: GetFeedRequest): Promise<GetFeedResponse> {
     const storiesPerPage = 20;
     const currentPage = Number(request?.pageInfo?.page ?? "1");
     const startIndex = (currentPage - 1) * storiesPerPage;
-    
-    const snapshot = await get(query(child(db, "v0/topstories"), orderByKey()));
+    const feedTypeId = request?.feedTypeId ?? "top";
+    const path = this.getFeedPath(feedTypeId);
+    const snapshot = await get(query(child(db, path), orderByKey()));
     if (snapshot.exists()) {
       const allIds: number[] = snapshot.val();
       const pageIds = allIds.slice(startIndex, startIndex + storiesPerPage);
@@ -175,7 +185,22 @@ class HackerNewsService implements ServiceType {
           page: currentPage,
           nextPage: currentPage < Math.floor(allIds.length / storiesPerPage) ? (currentPage + 1) : undefined,
           prevPage: currentPage > 1 ? (currentPage - 1) : undefined,
-        }
+        },
+        feedTypeId,
+        feedTypes: [
+          {
+            displayName: "Top",
+            id: "top"
+          },
+          {
+            displayName: "New",
+            id: "new"
+          },
+          {
+            displayName: "Best",
+            id: "best"
+          },
+        ]
       }
     }
     return { items: [] };

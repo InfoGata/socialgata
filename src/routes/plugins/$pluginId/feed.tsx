@@ -1,4 +1,5 @@
 import PostComponent from '@/components/PostComponent';
+import { TabLink } from '@/components/TabLink';
 import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { usePagination } from '@/hooks/usePagination';
 import { PageInfo } from '@/plugintypes';
@@ -8,9 +9,20 @@ import { createFileRoute, notFound } from '@tanstack/react-router'
 const Feed: React.FC = () => {
   const data = Route.useLoaderData();
   const { nextPage, prevPage, hasNextPage, hasPreviousPage } = usePagination(data.pageInfo);
+  const params = Route.useParams();
   
   return (
     <div>
+      <div className="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 mb-2 text-muted-foreground">
+        {data.feedTypes?.map((feedType) => (
+          <TabLink
+            key={feedType.id}
+            label={feedType.displayName}
+            to={`/plugins/${params.pluginId}/feed?feedTypeId=${feedType.id}`}
+            active={data.feedTypeId === feedType.id}
+          />
+        ))}
+      </div>
       {data.items.map((item) => (
         <PostComponent key={item.title} post={item} />
       ))}
@@ -18,12 +30,16 @@ const Feed: React.FC = () => {
         <PaginationContent>
           {hasPreviousPage && (
             <PaginationItem>
-              <PaginationPrevious search={{...prevPage}} />
+              <PaginationPrevious
+                search={{ ...prevPage, feedTypeId: data.feedTypeId }}
+              />
             </PaginationItem>
           )}
           {hasNextPage && (
             <PaginationItem>
-              <PaginationNext search={{...nextPage}} />
+              <PaginationNext
+                search={{ ...nextPage, feedTypeId: data.feedTypeId }}
+              />
             </PaginationItem>
           )}
         </PaginationContent>
@@ -34,19 +50,19 @@ const Feed: React.FC = () => {
 
 export const Route = createFileRoute('/plugins/$pluginId/feed')({
   component: Feed,
-  loaderDeps: ({search}) => ({pageInfo: search}),
-  loader: async ({ params, deps: { pageInfo } }) => {
+  loaderDeps: ({search}) => ({pageInfo: search.pageInfo, feedTypeId: search.feedTypeId}),
+  loader: async ({ params, deps: { pageInfo, feedTypeId } }) => {
     const service = getService(params.pluginId);
     if (service && service.getFeed) {
-      const response = await service.getFeed({pageInfo});
+      const response = await service.getFeed({pageInfo: pageInfo, feedTypeId: feedTypeId});
       return response;
     } else {
       throw notFound();
     }
   },
-  validateSearch: (search: Record<string, unknown>): PageInfo => {
+  validateSearch: (search: Record<string, unknown>): {pageInfo: PageInfo, feedTypeId?: string} => {
     const pageInfo: PageInfo = search;
-
-    return pageInfo;
+    const feedTypeId = search.feedTypeId as string | undefined;
+    return {pageInfo, feedTypeId};
   }
 });

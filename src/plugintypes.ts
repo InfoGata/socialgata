@@ -41,12 +41,20 @@ export interface PageInfo {
 
 export interface GetFeedRequest {
   pageInfo?: PageInfo;
+  feedTypeId?: string;
 }
 
 export interface GetFeedResponse {
   pageInfo?: PageInfo;
   items: Post[];
+  feedTypes?: FeedType[];
+  feedTypeId?: string;
 }
+
+export interface FeedType {
+  displayName: string;
+  id: string;
+} 
 
 export interface GetCommunityResponse {
   pageInfo?: PageInfo;
