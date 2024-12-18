@@ -10,6 +10,7 @@ const Feed: React.FC = () => {
   const data = Route.useLoaderData();
   const { nextPage, prevPage, hasNextPage, hasPreviousPage } = usePagination(data.pageInfo);
   const params = Route.useParams();
+  const feedTypeId = Route.useSearch().feedTypeId;
   
   return (
     <div>
@@ -31,14 +32,14 @@ const Feed: React.FC = () => {
           {hasPreviousPage && (
             <PaginationItem>
               <PaginationPrevious
-                search={{ ...prevPage, feedTypeId: data.feedTypeId }}
+                search={{ ...prevPage, feedTypeId: feedTypeId }}
               />
             </PaginationItem>
           )}
           {hasNextPage && (
             <PaginationItem>
               <PaginationNext
-                search={{ ...nextPage, feedTypeId: data.feedTypeId }}
+                search={{ ...nextPage, feedTypeId: feedTypeId }}
               />
             </PaginationItem>
           )}
