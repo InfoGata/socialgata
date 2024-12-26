@@ -31,9 +31,10 @@ const InstanceCard: React.FC<InstanceCardProps> = (props) => {
       </CardHeader>
       <CardContent>
         <img
-          src={instance.bannerUrl}
+          loading="lazy"
+          src={instance.bannerUrl || instance.iconUrl}
           alt={instance.name}
-          className="w-full h-48 bg-background object-cover"
+          className="w-full h-48 bg-background object-contain"
         />
         <CardDescription>{props.instance.description}</CardDescription>
       </CardContent>
