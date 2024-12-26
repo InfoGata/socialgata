@@ -1,4 +1,4 @@
-import { GetCommentsRequest, GetCommentsResponse, GetCommunityResponse, GetFeedResponse, GetUserReponse, Post } from "@/plugintypes";
+import { GetCommentsRequest, GetCommentsResponse, GetCommunityRequest, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetInstancesRequest, GetInstancesResponse, GetUserReponse, GetUserRequest, Post } from "@/plugintypes";
 import { ServiceType } from "@/types";
 import { GetComments, GetPersonDetails, GetPosts, LemmyHttp, PostView, Comment } from "lemmy-js-client";
 import { Converter } from "showdown";
@@ -69,10 +69,56 @@ const proxyFetch: typeof fetch = (
   return fetch(requestUrl, init);
 };
 
+interface LemmyInstance {
+  baseurl: string;
+  url: string;
+  name: string;
+  desc: string;
+  nsfw: boolean;
+  private: boolean;
+  open: boolean;
+  usage: LemmyInstanceUsage;
+  counts: LemmyInstanceCounts;
+  banner?: string;
+  icon?: string;
+  langs: string[];
+  date: string;
+  published: number;
+  score: number;
+}
+
+interface LemmyInstanceUsage {
+  localPosts: number;
+  localComments: number;
+  users: LemmyInstanceUsageUsers;
+}
+
+interface LemmyInstanceUsageUsers {
+  total: number;
+  activeHalfyear: number;
+  activeMonth: number;
+}
+
+interface LemmyInstanceCounts {
+  users: number;
+  posts: number;
+  comments: number;
+  communities: number;
+  users_active_half_year: number;
+  users_active_month: number;
+  users_active_week: number;
+  users_active_day: number;
+}
+
 
 class LemmyService implements ServiceType {
-  async getFeed(): Promise<GetFeedResponse> {
-    const client = new LemmyHttp(baseUrl, { fetchFunction: proxyFetch });
+  async getFeed(request: GetFeedRequest): Promise<GetFeedResponse> {
+    let url = baseUrl;
+    if (request.instanceId) {
+      // Add protocol to instanceId
+      url = `https://${request.instanceId}`;
+    }
+    const client = new LemmyHttp(url, { fetchFunction: proxyFetch });
     const perPage = 30;
     const page = 1;
 
@@ -90,22 +136,39 @@ class LemmyService implements ServiceType {
     }
   }
 
-  async getCommunity(apiId: string): Promise<GetCommunityResponse> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getInstances(_request?: GetInstancesRequest): Promise<GetInstancesResponse> {
+    const url = "https://data.lemmyverse.net/data/instance.full.json";
+    const response = await proxyFetch(url);
+    const instances: LemmyInstance[] = await response.json();
+    // order by number of users
+    instances.sort((a, b) => b.score - a.score);
+    return {
+      instances: instances.map((i) => ({
+        name: i.name,
+        description: i.desc,
+        url: i.url,
+        apiId: i.baseurl
+      }))
+    }
+  }
+
+  async getCommunity(request: GetCommunityRequest): Promise<GetCommunityResponse> {
     const client = new LemmyHttp(baseUrl, { fetchFunction: proxyFetch });
     const perPage = 30;
     const page = 1;
-    const communityResponse = await client.getCommunity({ name: apiId });
+    const communityResponse = await client.getCommunity({ name: request.apiId });
 
     const form: GetPosts = {
       sort: "Active",
       limit: perPage,
       page: page,
-      community_name: apiId
+      community_name: request.apiId
     }
     const postsResponse = await client.getPosts(form);
     return {
       community: {
-        apiId: apiId,
+        apiId: request.apiId,
         name: communityResponse.community_view.community.name,
       },
       items: postsResponse.posts.map(lemmyPostToPost)
@@ -152,13 +215,13 @@ class LemmyService implements ServiceType {
     }
   }
 
-  async getUser(apiId: string): Promise<GetUserReponse> {
+  async getUser(request: GetUserRequest): Promise<GetUserReponse> {
 
     const client = new LemmyHttp(baseUrl, { fetchFunction: proxyFetch });
     const perPage = 30;
     const page = 1;
     const form: GetPersonDetails = {
-      username: apiId,
+      username: request.apiId,
       limit: perPage,
       page: page,
       sort: "New",
@@ -166,7 +229,7 @@ class LemmyService implements ServiceType {
     const userResponse = await client.getPersonDetails(form);
     return {
       user: {
-        apiId: apiId,
+        apiId: request.apiId,
         name: userResponse.person_view.person.name,
       },
       items: userResponse.posts.map(lemmyPostToPost),

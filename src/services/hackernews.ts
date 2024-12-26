@@ -1,4 +1,4 @@
-import { GetCommentsRequest, GetCommentsResponse, GetFeedRequest, GetFeedResponse, GetUserReponse, Post } from "@/plugintypes";
+import { GetCommentsRequest, GetCommentsResponse, GetFeedRequest, GetFeedResponse, GetUserReponse, GetUserRequest, Post } from "@/plugintypes";
 import { ServiceType } from "@/types";
 import { initializeApp } from "firebase/app"
 import { getDatabase, ref, child, get, query, orderByKey } from "firebase/database"
@@ -219,8 +219,8 @@ class HackerNewsService implements ServiceType {
     }
   } 
 
-  async getUser(apiId: string): Promise<GetUserReponse> {
-    const path = `/search_by_date?tags=(comment, story),author_${apiId}`;
+  async getUser(request: GetUserRequest): Promise<GetUserReponse> {
+    const path = `/search_by_date?tags=(comment, story),author_${request.apiId}`;
     const url = `${algoliaUrl}${path}`
     const response = await fetch(url);
     const json: AlgoriaSearch = await response.json();

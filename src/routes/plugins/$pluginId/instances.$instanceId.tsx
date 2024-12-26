@@ -1,13 +1,13 @@
 import Feed from '@/components/Feed';
 import { PageInfo } from '@/plugintypes';
 import { getService } from '@/services/selector-service';
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { createFileRoute, notFound } from '@tanstack/react-router'
 
-const PluginFeed: React.FC = () => {
+const Instance: React.FC = () => {
   const data = Route.useLoaderData();
   const params = Route.useParams();
-  const feedTypeId = Route.useSearch().feedTypeId;
-  
+  const { feedTypeId } = Route.useSearch();
+
   return (
     <Feed
       feedTypeId={feedTypeId}
@@ -16,15 +16,15 @@ const PluginFeed: React.FC = () => {
       pluginId={params.pluginId}
     />
   );
-};
+}
 
-export const Route = createFileRoute('/plugins/$pluginId/feed')({
-  component: PluginFeed,
+export const Route = createFileRoute('/plugins/$pluginId/instances/$instanceId')({
+  component: Instance,
   loaderDeps: ({search}) => ({pageInfo: search.pageInfo, feedTypeId: search.feedTypeId}),
-  loader: async ({ params, deps: { pageInfo, feedTypeId } }) => {
+  loader: async ({ params }) => {
     const service = getService(params.pluginId);
     if (service && service.getFeed) {
-      const response = await service.getFeed({pageInfo: pageInfo, feedTypeId: feedTypeId});
+      const response = await service.getFeed({instanceId: params.instanceId});
       return response;
     } else {
       throw notFound();
@@ -35,4 +35,4 @@ export const Route = createFileRoute('/plugins/$pluginId/feed')({
     const feedTypeId = search.feedTypeId as string | undefined;
     return {pageInfo, feedTypeId};
   }
-});
+})

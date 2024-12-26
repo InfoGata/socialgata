@@ -14,8 +14,10 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as SettingsImport } from './routes/settings'
 import { Route as IndexImport } from './routes/index'
 import { Route as PluginsPluginIdFeedImport } from './routes/plugins/$pluginId/feed'
+import { Route as PluginsPluginIdInstancesIndexImport } from './routes/plugins/$pluginId/instances.index'
 import { Route as PluginsPluginIdUserApiIdImport } from './routes/plugins/$pluginId/user.$apiId'
 import { Route as PluginsPluginIdPostApiIdImport } from './routes/plugins/$pluginId/post.$apiId'
+import { Route as PluginsPluginIdInstancesInstanceIdImport } from './routes/plugins/$pluginId/instances.$instanceId'
 import { Route as PluginsPluginIdCommunityApiIdIndexImport } from './routes/plugins/$pluginId/community.$apiId.index'
 import { Route as PluginsPluginIdCommunityCommunityIdPostApiIdImport } from './routes/plugins/$pluginId/community.$communityId.post.$apiId'
 
@@ -36,6 +38,12 @@ const PluginsPluginIdFeedRoute = PluginsPluginIdFeedImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const PluginsPluginIdInstancesIndexRoute =
+  PluginsPluginIdInstancesIndexImport.update({
+    path: '/plugins/$pluginId/instances/',
+    getParentRoute: () => rootRoute,
+  } as any)
+
 const PluginsPluginIdUserApiIdRoute = PluginsPluginIdUserApiIdImport.update({
   path: '/plugins/$pluginId/user/$apiId',
   getParentRoute: () => rootRoute,
@@ -45,6 +53,12 @@ const PluginsPluginIdPostApiIdRoute = PluginsPluginIdPostApiIdImport.update({
   path: '/plugins/$pluginId/post/$apiId',
   getParentRoute: () => rootRoute,
 } as any)
+
+const PluginsPluginIdInstancesInstanceIdRoute =
+  PluginsPluginIdInstancesInstanceIdImport.update({
+    path: '/plugins/$pluginId/instances/$instanceId',
+    getParentRoute: () => rootRoute,
+  } as any)
 
 const PluginsPluginIdCommunityApiIdIndexRoute =
   PluginsPluginIdCommunityApiIdIndexImport.update({
@@ -83,6 +97,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PluginsPluginIdFeedImport
       parentRoute: typeof rootRoute
     }
+    '/plugins/$pluginId/instances/$instanceId': {
+      id: '/plugins/$pluginId/instances/$instanceId'
+      path: '/plugins/$pluginId/instances/$instanceId'
+      fullPath: '/plugins/$pluginId/instances/$instanceId'
+      preLoaderRoute: typeof PluginsPluginIdInstancesInstanceIdImport
+      parentRoute: typeof rootRoute
+    }
     '/plugins/$pluginId/post/$apiId': {
       id: '/plugins/$pluginId/post/$apiId'
       path: '/plugins/$pluginId/post/$apiId'
@@ -95,6 +116,13 @@ declare module '@tanstack/react-router' {
       path: '/plugins/$pluginId/user/$apiId'
       fullPath: '/plugins/$pluginId/user/$apiId'
       preLoaderRoute: typeof PluginsPluginIdUserApiIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/plugins/$pluginId/instances/': {
+      id: '/plugins/$pluginId/instances/'
+      path: '/plugins/$pluginId/instances'
+      fullPath: '/plugins/$pluginId/instances'
+      preLoaderRoute: typeof PluginsPluginIdInstancesIndexImport
       parentRoute: typeof rootRoute
     }
     '/plugins/$pluginId/community/$apiId/': {
@@ -120,8 +148,10 @@ export const routeTree = rootRoute.addChildren({
   IndexRoute,
   SettingsRoute,
   PluginsPluginIdFeedRoute,
+  PluginsPluginIdInstancesInstanceIdRoute,
   PluginsPluginIdPostApiIdRoute,
   PluginsPluginIdUserApiIdRoute,
+  PluginsPluginIdInstancesIndexRoute,
   PluginsPluginIdCommunityApiIdIndexRoute,
   PluginsPluginIdCommunityCommunityIdPostApiIdRoute,
 })
@@ -137,8 +167,10 @@ export const routeTree = rootRoute.addChildren({
         "/",
         "/settings",
         "/plugins/$pluginId/feed",
+        "/plugins/$pluginId/instances/$instanceId",
         "/plugins/$pluginId/post/$apiId",
         "/plugins/$pluginId/user/$apiId",
+        "/plugins/$pluginId/instances/",
         "/plugins/$pluginId/community/$apiId/",
         "/plugins/$pluginId/community/$communityId/post/$apiId"
       ]
@@ -152,11 +184,17 @@ export const routeTree = rootRoute.addChildren({
     "/plugins/$pluginId/feed": {
       "filePath": "plugins/$pluginId/feed.tsx"
     },
+    "/plugins/$pluginId/instances/$instanceId": {
+      "filePath": "plugins/$pluginId/instances.$instanceId.tsx"
+    },
     "/plugins/$pluginId/post/$apiId": {
       "filePath": "plugins/$pluginId/post.$apiId.tsx"
     },
     "/plugins/$pluginId/user/$apiId": {
       "filePath": "plugins/$pluginId/user.$apiId.tsx"
+    },
+    "/plugins/$pluginId/instances/": {
+      "filePath": "plugins/$pluginId/instances.index.tsx"
     },
     "/plugins/$pluginId/community/$apiId/": {
       "filePath": "plugins/$pluginId/community.$apiId.index.tsx"

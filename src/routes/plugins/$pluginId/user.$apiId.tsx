@@ -19,7 +19,7 @@ export const Route = createFileRoute("/plugins/$pluginId/user/$apiId")({
   loader: async ({ params }) => {
     const service = getService(params.pluginId);
     if (service) {
-      const overview = await service.getUser(params.apiId);
+      const overview = await service.getUser({ apiId: params.apiId });
       return overview.items;
     } else {
       throw notFound();

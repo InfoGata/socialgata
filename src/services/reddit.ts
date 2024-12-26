@@ -1,4 +1,4 @@
-import { GetCommentsRequest, GetCommentsResponse, GetCommunityResponse, GetFeedResponse, GetUserReponse, LoginRequest, Post } from "@/plugintypes";
+import { GetCommentsRequest, GetCommentsResponse, GetCommunityRequest, GetCommunityResponse, GetFeedResponse, GetUserReponse, GetUserRequest, LoginRequest, Post } from "@/plugintypes";
 import { ServiceType } from "@/types";
 
 const pluginName = "reddit";
@@ -214,11 +214,11 @@ class RedditService implements ServiceType {
     return { items }
   };
 
-  getCommunity = async (apiId: string): Promise<GetCommunityResponse> => {
+  getCommunity = async (request: GetCommunityRequest): Promise<GetCommunityResponse> => {
     const requestHeaders = {
       Authorization: `Bearer ${this.accessToken}`,
     };
-    const url = `${redditUrl}/r/${apiId}`;
+    const url = `${redditUrl}/r/${request.apiId}`;
     const response = await fetch(url, {
       headers: requestHeaders
     });
@@ -245,11 +245,11 @@ class RedditService implements ServiceType {
     }
   }
 
-  getUser = async (apiId: string): Promise<GetUserReponse> => {
+  getUser = async (request: GetUserRequest): Promise<GetUserReponse> => {
     const requestHeaders = {
       Authorization: `Bearer ${this.accessToken}`,
     };
-    const url = `${redditUrl}/user/${apiId}/overview`;
+    const url = `${redditUrl}/user/${request.apiId}/overview`;
     const response = await fetch(url, {
       headers: requestHeaders
     });

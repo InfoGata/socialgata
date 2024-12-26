@@ -10,6 +10,7 @@ export interface Post {
   authorName?: string;
   authorAvatar?: string;
   pluginId?: string;
+  instanceId?: string;
   originalUrl?: string;
   url?: string;
   thumbnailUrl?: string;
@@ -23,11 +24,29 @@ export interface User {
   apiId: string;
   name: string;
   avatar?: string;
+  instanceId?: string;
 }
 
 export interface Community {
   apiId: string;
   name: string;
+  instanceId?: string;
+}
+
+export interface Instance {
+  name: string;
+  description: string;
+  url: string;
+  apiId: string;
+}
+
+export interface GetInstancesRequest {
+  pageInfo?: PageInfo;
+}
+
+export interface GetInstancesResponse {
+  instances: Instance[];
+  pageInfo?: PageInfo;
 }
 
 export interface PageInfo {
@@ -41,6 +60,7 @@ export interface PageInfo {
 
 export interface GetFeedRequest {
   pageInfo?: PageInfo;
+  instanceId?: string;
   feedTypeId?: string;
 }
 
@@ -49,12 +69,18 @@ export interface GetFeedResponse {
   items: Post[];
   feedTypes?: FeedType[];
   feedTypeId?: string;
+  instance?: Instance;
 }
 
 export interface FeedType {
   displayName: string;
   id: string;
 } 
+
+export interface GetCommunityRequest {
+  apiId: string;
+  instanceId?: string;
+}
 
 export interface GetCommunityResponse {
   pageInfo?: PageInfo;
@@ -67,6 +93,11 @@ export interface GetUserReponse {
   pageInfo?: PageInfo;
   user?: User;
   items: Post[]
+}
+
+export interface GetUserRequest {
+  apiId: string;
+  instanceId?: string;
 }
 
 export interface GetCommentsRequest {
