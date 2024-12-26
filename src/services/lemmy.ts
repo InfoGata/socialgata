@@ -120,7 +120,7 @@ class LemmyService implements ServiceType {
     }
     const client = new LemmyHttp(url, { fetchFunction: proxyFetch });
     const perPage = 30;
-    const page = 1;
+    const page = Number(request.pageInfo?.page || 1);
 
     const form: GetPosts = {
       type_: "Local",
@@ -132,7 +132,12 @@ class LemmyService implements ServiceType {
     const postsResponse = await client.getPosts(form);
     const items = postsResponse.posts.map(lemmyPostToPost);
     return {
-      items
+      items,
+      pageInfo: {
+        page: page,
+        nextPage: postsResponse.next_page,
+        prevPage: page > 1 ? page - 1 : undefined
+      }
     }
   }
 
@@ -141,14 +146,19 @@ class LemmyService implements ServiceType {
     const url = "https://data.lemmyverse.net/data/instance.full.json";
     const response = await proxyFetch(url);
     const instances: LemmyInstance[] = await response.json();
-    // order by number of users
+    // order by score
     instances.sort((a, b) => b.score - a.score);
     return {
       instances: instances.map((i) => ({
         name: i.name,
         description: i.desc,
         url: i.url,
-        apiId: i.baseurl
+        apiId: i.baseurl,
+        iconUrl: i.icon,
+        bannerUrl: i.banner,
+        usersCount: i.counts.users,
+        postsCount: i.counts.posts,
+        commentsCount: i.counts.comments
       }))
     }
   }

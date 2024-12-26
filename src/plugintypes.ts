@@ -38,6 +38,11 @@ export interface Instance {
   description: string;
   url: string;
   apiId: string;
+  iconUrl?: string;
+  bannerUrl?: string;
+  usersCount?: number;
+  postsCount?: number;
+  commentsCount?: number;
 }
 
 export interface GetInstancesRequest {

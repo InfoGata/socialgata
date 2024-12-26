@@ -18,7 +18,7 @@ const Instance: React.FC = () => {
   );
 }
 
-export const Route = createFileRoute('/plugins/$pluginId/instances/$instanceId')({
+export const Route = createFileRoute('/plugins/$pluginId/instances/$instanceId/feed')({
   component: Instance,
   loaderDeps: ({search}) => ({pageInfo: search.pageInfo, feedTypeId: search.feedTypeId}),
   loader: async ({ params }) => {
