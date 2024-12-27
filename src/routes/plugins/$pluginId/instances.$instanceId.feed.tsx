@@ -31,7 +31,7 @@ export const Route = createFileRoute('/plugins/$pluginId/instances/$instanceId/f
     }
   },
   validateSearch: (search: Record<string, unknown>): {pageInfo?: PageInfo, feedTypeId?: string} => {
-    const pageInfo = search.pageInfo as PageInfo | undefined;
+    const pageInfo = search as PageInfo | undefined;
     const feedTypeId = search.feedTypeId as string | undefined;
     return {pageInfo, feedTypeId};
   }
