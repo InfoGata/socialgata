@@ -8,7 +8,7 @@ export const Index: React.FC = () => {
   return (
     <div className="flex flex-col gap-2">
       {pluginIds.map((pluginId) => (
-        <PluginFeedButtons pluginId={pluginId} />
+        <PluginFeedButtons key={pluginId} pluginId={pluginId} />
       ))}
     </div>
   );
