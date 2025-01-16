@@ -2,7 +2,8 @@ import { GetCommentsRequest, GetCommentsResponse, GetCommunityRequest, GetCommun
 import { ServiceType } from "@/types";
 
 const pluginName = "reddit";
-const redditUrl = "https://oauth.reddit.com/";
+const REDDIT_API_BASE = "https://oauth.reddit.com";
+const REDDIT_PUBLIC_API_BASE = "https://www.reddit.com";
 
 type RedditResponse = Listing;
 
@@ -16,13 +17,6 @@ interface ListingDataPost {
   before: string | null;
   dist: number;
   children: ListingChildPost[];
-}
-
-interface ListingDataComment {
-  after: string;
-  before: string | null;
-  dist: number;
-  children: ListingChildComment[];
 }
 
 interface ListingData {
@@ -126,7 +120,7 @@ interface ListingChildPostData {
   awarders: Array<string>;
   media_only: boolean;
   can_gild: boolean;
-  spoiler: boolean;
+  spoiler: boolean;	
   locked: boolean;
   author_flair_text: string | null;
   treatment_tags: Array<string>;
@@ -163,8 +157,8 @@ interface ListingChildPostData {
 }
 
 interface CommentsResponse {
-  0: ListingDataPost;
-  1: ListingDataComment;
+  0: { kind: "Listing"; data: { children: ListingChildPost[] } };
+  1: { kind: "Listing"; data: { children: ListingChildComment[] } };
 }
 
 interface UserResponse {
@@ -183,7 +177,9 @@ const redditPostsToPost = (post: ListingChildPostData): Post => {
     communityName: post.subreddit,
     communityApiId: post.subreddit,
     body: post.selftext,
-    pluginId: pluginName
+    pluginId: pluginName,
+    thumbnailUrl: post.thumbnail === "self" ? undefined : post.thumbnail,
+    url: post.thumbnail === "self" ? undefined : post.url
   }
 }
 
@@ -197,61 +193,73 @@ const redditCommentToPost = (comment: ListingChildCommentData): Post => {
   }
 }
 
+
 class RedditService implements ServiceType {
   private accessToken = "";
 
+  private getBaseUrl = () => {
+    return this.hasLogin() ? REDDIT_API_BASE : REDDIT_PUBLIC_API_BASE;
+  }
+
+  private getHeaders = (): HeadersInit => {
+    const headers: HeadersInit = {
+      "Accept": "application/json",
+    }
+    if (this.hasLogin()) {
+      headers['Authorization'] = `Bearer ${this.accessToken}`;
+    }
+    return headers;
+  }
+
   getFeed = async (): Promise<GetFeedResponse> => {
-    const requestHeaders = {
-      Authorization: `Bearer ${this.accessToken}`,
-    };
-    const url = `${redditUrl}/hot`;
-    const response = await fetch(url, {
-      headers: requestHeaders
+    const headers = this.getHeaders();
+    const baseUrl = this.getBaseUrl();
+    const path = "/hot.json";
+    const response = await fetch(`${baseUrl}${path}`, {
+      headers
     });
     const json: RedditResponse = await response.json();
     const items = json.data.children.map(c => c.data).map(redditPostsToPost);
-    console.log(items);
-    return { items }
+    return { items, pageInfo: { nextPage: json.data.after, prevPage: json.data.before ?? undefined } }
   };
 
   getCommunity = async (request: GetCommunityRequest): Promise<GetCommunityResponse> => {
-    const requestHeaders = {
-      Authorization: `Bearer ${this.accessToken}`,
-    };
-    const url = `${redditUrl}/r/${request.apiId}`;
-    const response = await fetch(url, {
-      headers: requestHeaders
+    const headers = this.getHeaders();
+    const baseUrl = this.getBaseUrl();
+    const path = `/r/${request.apiId}/hot.json`;
+    const response = await fetch(`${baseUrl}${path}`, {
+      headers
     });
     const json: RedditResponse = await response.json();
     const items = json.data.children.map(c => c.data).map(redditPostsToPost);
-    console.log(items);
     return {
-      items
+      items,
+      pageInfo: { nextPage: json.data.after, prevPage: json.data.before ?? undefined }
     }
   }
 
   getComments = async (request: GetCommentsRequest): Promise<GetCommentsResponse> => {
-    const requestHeaders = {
-      Authorization: `Bearer ${this.accessToken}`,
-    };
-    const url = `${redditUrl}/r/${request.communityId}/comments/${request.apiId}`;
+    const headers = this.getHeaders();
+    const baseUrl = this.getBaseUrl();
+    const url = `${baseUrl}/r/${request.communityId}/comments/${request.apiId}.json`;
     const response = await fetch(url, {
-      headers: requestHeaders
+      headers 
     });
     const json: CommentsResponse = await response.json();
-    const items = json[1].children.map(c => c.data).map(redditCommentToPost);
+    const items = json[1].data.children
+      .map(c=> redditCommentToPost(c.data));
+
     return {
       items
     }
   }
 
   getUser = async (request: GetUserRequest): Promise<GetUserReponse> => {
-    const requestHeaders = {
-      Authorization: `Bearer ${this.accessToken}`,
-    };
-    const url = `${redditUrl}/user/${request.apiId}/overview`;
+    const headers = this.getHeaders();
+    const baseUrl = this.getBaseUrl();
+    const url = `${baseUrl}/user/${request.apiId}/overview.json`;
     const response = await fetch(url, {
-      headers: requestHeaders
+      headers
     });
     const json: UserResponse = await response.json();
     const items = json.data.children
@@ -265,8 +273,12 @@ class RedditService implements ServiceType {
     this.accessToken = "";
   }
 
-  async isLoggedIn(): Promise<boolean> {
+  hasLogin = () => {
     return !!this.accessToken;
+  }
+
+  async isLoggedIn(): Promise<boolean> {
+    return this.hasLogin();
   }
 
   login = (request: LoginRequest): Promise<void> => {
