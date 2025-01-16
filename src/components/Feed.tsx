@@ -9,10 +9,11 @@ type FeedProps = {
   data: GetFeedResponse;
   pageInfo?: PageInfo;
   pluginId: string;
+  instanceId?: string;
 }
 
 const Feed: React.FC<FeedProps> = (props) => {
-  const { feedTypeId, data, pageInfo, pluginId } = props;
+  const { feedTypeId, data, pageInfo, pluginId, instanceId } = props;
   const { nextPage, prevPage, hasNextPage, hasPreviousPage } = usePagination(pageInfo);
 
   return (
@@ -28,7 +29,7 @@ const Feed: React.FC<FeedProps> = (props) => {
         ))}
       </div>
       {data.items.map((item) => (
-        <PostComponent key={item.title} post={item} />
+        <PostComponent key={item.title} post={item} instanceId={instanceId} />
       ))}
       <Pagination>
         <PaginationContent>
@@ -49,7 +50,7 @@ const Feed: React.FC<FeedProps> = (props) => {
         </PaginationContent>
       </Pagination>
     </div>
-  )
+  );
 }
 
 export default Feed;

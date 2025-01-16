@@ -5,15 +5,32 @@ import { Button, buttonVariants } from "./ui/button";
 import { ArrowDownIcon, ArrowUpIcon, MessageCircleIcon } from "lucide-react";
 import ReactTimeago from "react-timeago";
 import PostLink from "./PostLink";
+import React from "react";
+import ImageThumbnail from "./ImageThumbnail";
 
 type Props = {
   post: Post;
+  instanceId?: string;
 };
+
+
 const PostComponent: React.FC<Props> = (props) => {
-  const { post } = props;
+  const { post, instanceId } = props;
+  const [expand, setExpand] = React.useState(false);
+  const toggleExpand = () => {
+    setExpand(!expand);
+  }
+  const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
   return (
     <div className="rounded-lg border p-2 hover:bg-accent transition-colors flex gap-2">
-      <p> {post.number} </p>
+      <p>{post.number}</p>
+      <div className="rounded-md w-24 h-24 bg-muted-foreground flex items-center justify-center">
+        <ImageThumbnail
+          url={post.url}
+          thumbnailUrl={post.thumbnailUrl}
+          toggleExpand={toggleExpand}
+        />
+      </div>
       <div>
         <div className="flex gap-2 items-center">
           {post.authorAvatar && (
@@ -35,7 +52,7 @@ const PostComponent: React.FC<Props> = (props) => {
             </Link>
             {post.communityName && (
               <div>
-                <span>to</span>
+                <span>to </span>
                 <Link
                   to="/plugins/$pluginId/community/$apiId"
                   className="font-semibold"
@@ -54,20 +71,23 @@ const PostComponent: React.FC<Props> = (props) => {
           </div>
         </div>
         {
-          <PostLink post={post} isTitleLink className="text-lg font-semibold">
+          <PostLink
+            post={post}
+            isTitleLink
+            className="text-lg font-semibold"
+            instanceId={instanceId}
+          >
             {post.title}
           </PostLink>
         }
-        {post.thumbnailUrl && (
-          <img src={post.thumbnailUrl} className="rounded-md" />
-        )}
+        {expand && <img src={post.url} className="rounded-md" />}
         <div className="flex items-center">
           {post.score && (
             <div className="flex items-center">
               <Button variant="ghost" size="icon" disabled={true}>
                 <ArrowDownIcon />
               </Button>
-              <p>{post.score}</p>
+              <p>{numberFormatter.format(post.score)}</p>
               <Button variant="ghost" size="icon" disabled={true}>
                 <ArrowUpIcon />
               </Button>
@@ -77,9 +97,10 @@ const PostComponent: React.FC<Props> = (props) => {
             <PostLink
               post={post}
               className={buttonVariants({ variant: "ghost" })}
+              instanceId={instanceId}
             >
               <MessageCircleIcon />
-              <p>{post.numOfComments}</p>
+              <p>{numberFormatter.format(post.numOfComments)}</p>
             </PostLink>
           )}
         </div>

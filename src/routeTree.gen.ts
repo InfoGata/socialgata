@@ -14,12 +14,14 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as SettingsImport } from './routes/settings'
 import { Route as IndexImport } from './routes/index'
 import { Route as PluginsPluginIdFeedImport } from './routes/plugins/$pluginId/feed'
-import { Route as PluginsPluginIdInstancesIndexImport } from './routes/plugins/$pluginId/instances.index'
+import { Route as PluginsPluginIdInstancesIndexImport } from './routes/plugins/$pluginId/instances/index'
 import { Route as PluginsPluginIdUserApiIdImport } from './routes/plugins/$pluginId/user.$apiId'
 import { Route as PluginsPluginIdPostApiIdImport } from './routes/plugins/$pluginId/post.$apiId'
 import { Route as PluginsPluginIdCommunityApiIdIndexImport } from './routes/plugins/$pluginId/community.$apiId.index'
-import { Route as PluginsPluginIdInstancesInstanceIdFeedImport } from './routes/plugins/$pluginId/instances.$instanceId.feed'
+import { Route as PluginsPluginIdInstancesInstanceIdFeedImport } from './routes/plugins/$pluginId/instances/$instanceId/feed'
 import { Route as PluginsPluginIdCommunityCommunityIdPostApiIdImport } from './routes/plugins/$pluginId/community.$communityId.post.$apiId'
+import { Route as PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexImport } from './routes/plugins/$pluginId/instances/$instanceId/community.$apiId.index'
+import { Route as PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdImport } from './routes/plugins/$pluginId/instances/$instanceId/community.$communityId.post.$apiId'
 
 // Create/Update Routes
 
@@ -69,6 +71,18 @@ const PluginsPluginIdInstancesInstanceIdFeedRoute =
 const PluginsPluginIdCommunityCommunityIdPostApiIdRoute =
   PluginsPluginIdCommunityCommunityIdPostApiIdImport.update({
     path: '/plugins/$pluginId/community/$communityId/post/$apiId',
+    getParentRoute: () => rootRoute,
+  } as any)
+
+const PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexRoute =
+  PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexImport.update({
+    path: '/plugins/$pluginId/instances/$instanceId/community/$apiId/',
+    getParentRoute: () => rootRoute,
+  } as any)
+
+const PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdRoute =
+  PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdImport.update({
+    path: '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId',
     getParentRoute: () => rootRoute,
   } as any)
 
@@ -139,6 +153,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PluginsPluginIdCommunityCommunityIdPostApiIdImport
       parentRoute: typeof rootRoute
     }
+    '/plugins/$pluginId/instances/$instanceId/community/$apiId/': {
+      id: '/plugins/$pluginId/instances/$instanceId/community/$apiId/'
+      path: '/plugins/$pluginId/instances/$instanceId/community/$apiId'
+      fullPath: '/plugins/$pluginId/instances/$instanceId/community/$apiId'
+      preLoaderRoute: typeof PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId': {
+      id: '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId'
+      path: '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId'
+      fullPath: '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId'
+      preLoaderRoute: typeof PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -154,6 +182,8 @@ export const routeTree = rootRoute.addChildren({
   PluginsPluginIdInstancesInstanceIdFeedRoute,
   PluginsPluginIdCommunityApiIdIndexRoute,
   PluginsPluginIdCommunityCommunityIdPostApiIdRoute,
+  PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexRoute,
+  PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdRoute,
 })
 
 /* prettier-ignore-end */
@@ -172,7 +202,9 @@ export const routeTree = rootRoute.addChildren({
         "/plugins/$pluginId/instances/",
         "/plugins/$pluginId/instances/$instanceId/feed",
         "/plugins/$pluginId/community/$apiId/",
-        "/plugins/$pluginId/community/$communityId/post/$apiId"
+        "/plugins/$pluginId/community/$communityId/post/$apiId",
+        "/plugins/$pluginId/instances/$instanceId/community/$apiId/",
+        "/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId"
       ]
     },
     "/": {
@@ -191,16 +223,22 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "plugins/$pluginId/user.$apiId.tsx"
     },
     "/plugins/$pluginId/instances/": {
-      "filePath": "plugins/$pluginId/instances.index.tsx"
+      "filePath": "plugins/$pluginId/instances/index.tsx"
     },
     "/plugins/$pluginId/instances/$instanceId/feed": {
-      "filePath": "plugins/$pluginId/instances.$instanceId.feed.tsx"
+      "filePath": "plugins/$pluginId/instances/$instanceId/feed.tsx"
     },
     "/plugins/$pluginId/community/$apiId/": {
       "filePath": "plugins/$pluginId/community.$apiId.index.tsx"
     },
     "/plugins/$pluginId/community/$communityId/post/$apiId": {
       "filePath": "plugins/$pluginId/community.$communityId.post.$apiId.tsx"
+    },
+    "/plugins/$pluginId/instances/$instanceId/community/$apiId/": {
+      "filePath": "plugins/$pluginId/instances/$instanceId/community.$apiId.index.tsx"
+    },
+    "/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId": {
+      "filePath": "plugins/$pluginId/instances/$instanceId/community.$communityId.post.$apiId.tsx"
     }
   }
 }

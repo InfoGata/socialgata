@@ -9,7 +9,7 @@ const CommunityPostComments: React.FC = () => {
 };
 
 export const Route = createFileRoute(
-  "/plugins/$pluginId/community/$communityId/post/$apiId"
+  "/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId"
 )({
   component: CommunityPostComments,
   loader: async ({ params }) => {
@@ -18,6 +18,7 @@ export const Route = createFileRoute(
       const response = await service.getComments({
         apiId: params.apiId,
         communityId: params.communityId,
+        instanceId: params.instanceId,
       });
       return response;
     } else {

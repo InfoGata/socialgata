@@ -1,12 +1,12 @@
 import { getService } from "@/services/selector-service";
-import { Link } from "@tanstack/react-router"
+import { Link } from "@tanstack/react-router";
 import React from "react";
 import { useState } from "react";
 import PluginLogin from "./PluginLogin";
 import { buttonVariants } from "./ui/button";
 
 interface PluginFeedButtonsProps {
-  pluginId: string
+  pluginId: string;
 }
 
 const PluginFeedButtons = ({ pluginId }: PluginFeedButtonsProps) => {
@@ -51,20 +51,24 @@ const PluginFeedButtons = ({ pluginId }: PluginFeedButtonsProps) => {
               Instances
             </Link>
           )}
-          {(!hasLogin || isLoggedIn) && (
-            <Link
-              className={buttonVariants({ variant: "default" })}
-              to={`/plugins/$pluginId/feed`}
-              params={{ pluginId }}
-            >
-              Feed
-            </Link>
-          )}
+          <Link
+            className={buttonVariants({ variant: "default" })}
+            to={`/plugins/$pluginId/feed`}
+            params={{ pluginId }}
+          >
+            Feed
+          </Link>
         </div>
       </div>
-      {hasLogin && <PluginLogin pluginId={pluginId} isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />}
+      {hasLogin && (
+        <PluginLogin
+          pluginId={pluginId}
+          isLoggedIn={isLoggedIn}
+          setIsLoggedIn={setIsLoggedIn}
+        />
+      )}
     </div>
   );
-}
+};
 
 export default PluginFeedButtons;

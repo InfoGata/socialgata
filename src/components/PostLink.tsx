@@ -6,17 +6,24 @@ type Props = {
   post: Post;
   isTitleLink?: boolean;
   className?: string
+  instanceId?: string;
 }
 
 const PostLink: React.FC<PropsWithChildren<Props>> = (props) => {
-  const { post, isTitleLink, className, children } = props;
-  return isTitleLink && post.url ? (
-    <a className={className} href={post.url}>
-      {children}
-    </a>
-  ) : post.communityApiId ? (
-    <Link
-      className={className}
+  const { post, isTitleLink, className, children, instanceId } = props;
+
+  if (isTitleLink && post.url) {
+    return (
+      <a className={className} href={post.url} target="_blank">
+        {children}
+      </a>
+    );
+  }
+
+  if (post.communityApiId && !instanceId) {
+    return (
+      <Link
+        className={className}
       to="/plugins/$pluginId/community/$communityId/post/$apiId"
       params={{
         pluginId: post.pluginId || "",
@@ -25,8 +32,28 @@ const PostLink: React.FC<PropsWithChildren<Props>> = (props) => {
       }}
     >
       {children}
-    </Link>
-  ) : (
+      </Link>
+    );
+  }
+
+  if (post.communityApiId && instanceId) {
+    return (
+      <Link
+        className={className}
+        to="/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId"
+        params={{
+          pluginId: post.pluginId || "",
+          instanceId: instanceId,
+          communityId: post.communityApiId,
+          apiId: post.apiId || "",
+        }}
+      >
+        {children}
+      </Link>
+    );
+  }
+
+  return (
     <Link
       className={className}
       to="/plugins/$pluginId/post/$apiId"
@@ -36,4 +63,5 @@ const PostLink: React.FC<PropsWithChildren<Props>> = (props) => {
     </Link>
   );
 }
+
 export default PostLink;

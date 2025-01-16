@@ -108,6 +108,7 @@ export interface GetUserRequest {
 export interface GetCommentsRequest {
   communityId?: string;
   apiId?: string;
+  instanceId?: string;
 }
 
 export interface GetCommentsResponse {
