@@ -9,21 +9,14 @@ type RedditResponse = Listing;
 
 interface Listing {
   kind: "Listing";
-  data: ListingDataPost;
-}
-
-interface ListingDataPost {
-  after: string;
-  before: string | null;
-  dist: number;
-  children: ListingChildPost[];
+  data?: ListingData;
 }
 
 interface ListingData {
   after: string;
   before: string | null;
   dist: number;
-  children: (ListingChildPost | ListingChildComment)[];
+  children: (ListingChildPost | ListingChildComment | ListingMore)[];
 }
 
 interface ListingChildPost {
@@ -36,6 +29,17 @@ interface ListingChildComment {
   data: ListingChildCommentData;
 }
 
+interface ListingMore {
+  kind: "more";
+  data: ListingMoreData;
+}
+
+interface ListingMoreData {
+  count: number;
+  parent_id: string;
+  children: string[];
+}
+
 
 interface ListingChildCommentData {
   author: string;
@@ -44,6 +48,7 @@ interface ListingChildCommentData {
   created: number;
   created_utc: number;
   depth: number;
+  replies?: Listing;
   id: string;
 }
 
@@ -189,7 +194,8 @@ const redditCommentToPost = (comment: ListingChildCommentData): Post => {
     body: comment.body,
     authorName: comment.author,
     authorApiId: comment.author,
-    pluginId: pluginName
+    pluginId: pluginName,
+    comments: comment.replies?.data?.children.filter(c => c.kind === "t1").map(c => c.data).map(redditCommentToPost) ?? []
   }
 }
 
@@ -219,8 +225,8 @@ class RedditService implements ServiceType {
       headers
     });
     const json: RedditResponse = await response.json();
-    const items = json.data.children.map(c => c.data).map(redditPostsToPost);
-    return { items, pageInfo: { nextPage: json.data.after, prevPage: json.data.before ?? undefined } }
+    const items = json.data?.children.filter(c => c.kind === "t3").map(c => c.data).map(redditPostsToPost) ?? [];
+    return { items, pageInfo: { nextPage: json.data?.after ?? undefined, prevPage: json.data?.before ?? undefined } }
   };
 
   getCommunity = async (request: GetCommunityRequest): Promise<GetCommunityResponse> => {
@@ -231,10 +237,10 @@ class RedditService implements ServiceType {
       headers
     });
     const json: RedditResponse = await response.json();
-    const items = json.data.children.map(c => c.data).map(redditPostsToPost);
+    const items = json.data?.children.filter(c => c.kind === "t3").map(c => c.data).map(redditPostsToPost) ?? [];
     return {
       items,
-      pageInfo: { nextPage: json.data.after, prevPage: json.data.before ?? undefined }
+      pageInfo: { nextPage: json.data?.after ?? undefined, prevPage: json.data?.before ?? undefined }
     }
   }
 
@@ -247,6 +253,7 @@ class RedditService implements ServiceType {
     });
     const json: CommentsResponse = await response.json();
     const items = json[1].data.children
+      .filter(c => c.kind === "t1")
       .map(c=> redditCommentToPost(c.data));
 
     return {
@@ -263,6 +270,7 @@ class RedditService implements ServiceType {
     });
     const json: UserResponse = await response.json();
     const items = json.data.children
+      .filter(c => c.kind === "t1" || c.kind === "t3")
       .map((c): Post => c.kind === "t1" ? redditCommentToPost(c.data) : redditPostsToPost(c.data));
     return {
       items
