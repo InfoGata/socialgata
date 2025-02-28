@@ -18,6 +18,8 @@ export interface Post {
   comments?: Post[];
   score?: number;
   numOfComments?: number;
+  moreRepliesId?: string;
+  moreRepliesCount?: number;
 }
 
 export interface User {
@@ -126,3 +128,16 @@ export interface LoginRequest {
 }
 
 export type Theme = "light" | "dark" | "system";
+
+export interface GetCommentRepliesRequest {
+  apiId: string;
+  communityApiId?: string;
+  postApiId?: string;
+  instanceId?: string;
+}
+
+export interface GetCommentRepliesResponse {
+  items: Post[];
+  post?: Post;
+  pageInfo?: PageInfo;
+}

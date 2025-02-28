@@ -5,7 +5,8 @@ import React from 'react';
 
 const PostComments: React.FC = () => {
   const data = Route.useLoaderData();
-  return <PostWithComponents data={data} />;
+  const pluginId = Route.useParams().pluginId;
+  return <PostWithComponents data={data} pluginId={pluginId} />;
 };
 
 export const Route = createFileRoute('/plugins/$pluginId/post/$apiId')({

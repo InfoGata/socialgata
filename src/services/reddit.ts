@@ -37,6 +37,8 @@ interface ListingMore {
 interface ListingMoreData {
   count: number;
   parent_id: string;
+  name: string;
+  id: string;
   children: string[];
 }
 
@@ -163,7 +165,7 @@ interface ListingChildPostData {
 
 interface CommentsResponse {
   0: { kind: "Listing"; data: { children: ListingChildPost[] } };
-  1: { kind: "Listing"; data: { children: ListingChildComment[] } };
+  1: Listing;
 }
 
 interface UserResponse {
@@ -184,7 +186,7 @@ const redditPostsToPost = (post: ListingChildPostData): Post => {
     body: post.selftext,
     pluginId: pluginName,
     thumbnailUrl: post.thumbnail === "self" ? undefined : post.thumbnail,
-    url: post.thumbnail === "self" ? undefined : post.url
+    url: post.thumbnail === "self" ? undefined : post.url,
   }
 }
 
@@ -195,7 +197,9 @@ const redditCommentToPost = (comment: ListingChildCommentData): Post => {
     authorName: comment.author,
     authorApiId: comment.author,
     pluginId: pluginName,
-    comments: comment.replies?.data?.children.filter(c => c.kind === "t1").map(c => c.data).map(redditCommentToPost) ?? []
+    comments: comment.replies?.data?.children.filter(c => c.kind === "t1").map(c => c.data).map(redditCommentToPost) ?? [],
+    moreRepliesId: comment.replies?.data?.children.filter(c => c.kind === "more")[0]?.data?.id,
+    moreRepliesCount: comment.replies?.data?.children.filter(c => c.kind === "more")[0]?.data?.count
   }
 }
 
@@ -252,12 +256,16 @@ class RedditService implements ServiceType {
       headers 
     });
     const json: CommentsResponse = await response.json();
-    const items = json[1].data.children
+    const items = json[1].data?.children
       .filter(c => c.kind === "t1")
       .map(c=> redditCommentToPost(c.data));
-
+    const post = json[0].data.children.map(c => c.data).map(redditPostsToPost)[0];
+    const more = json[1].data?.children.filter(c => c.kind === "more")[0]?.data;
+    post.moreRepliesId = more?.id;
+    post.moreRepliesCount = more?.count;
     return {
-      items
+      items: items ?? [],
+      post
     }
   }
 
