@@ -14,7 +14,7 @@ const ThemeChangeSettings: React.FC = () => {
   return (
     <div>
       <Select value={theme.theme} onValueChange={onThemeChange}>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-[180px]" data-testid="theme-select">
           <SelectValue placeholder="Theme" />
         </SelectTrigger>
         <SelectContent>
