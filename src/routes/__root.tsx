@@ -3,7 +3,7 @@ import { TopBar } from "@/layouts/TopBar";
 import { Outlet, createRootRoute, ScrollRestoration } from "@tanstack/react-router";
 import React from "react";
 
-const Root: React.FC = () => {
+export const Root: React.FC = () => {
   return (
     <div className="flex h-screen">
       <ScrollRestoration />

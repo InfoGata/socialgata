@@ -38,7 +38,7 @@ const PluginFeedButtons = ({ pluginId }: PluginFeedButtonsProps) => {
     getInstances();
   }, [pluginId]);
   return (
-    <div>
+    <div data-testid={`plugin-feed-${pluginId}`}>
       <div className="flex gap-2 justify-between border p-2 items-center">
         {pluginId}
         <div className="flex gap-2">
