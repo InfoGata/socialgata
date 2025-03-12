@@ -1,7 +1,7 @@
 import { usePagination } from "@/hooks/usePagination";
 import PostComponent from "./PostComponent";
 import { GetFeedResponse, PageInfo } from "@/plugintypes";
-import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "./ui/pagination";
+import { PaginationNext, PaginationPrevious, Pagination, PaginationContent, PaginationItem } from "./ui/pagination";
 import { TabLink } from "./TabLink";
 
 type FeedProps = {
@@ -29,21 +29,25 @@ const Feed: React.FC<FeedProps> = (props) => {
         ))}
       </div>
       {data.items.map((item) => (
-        <PostComponent key={item.title} post={item} instanceId={instanceId} />
+        <PostComponent key={item.apiId} post={item} instanceId={instanceId} />
       ))}
       <Pagination>
         <PaginationContent>
           {hasPreviousPage && (
             <PaginationItem>
               <PaginationPrevious
-                search={{ ...prevPage, feedTypeId: feedTypeId }}
+                to="/plugins/$pluginId/feed"
+                params={{ pluginId: pluginId }}
+                search={{ page: prevPage?.page, feedTypeId: feedTypeId }}
               />
             </PaginationItem>
           )}
           {hasNextPage && (
             <PaginationItem>
               <PaginationNext
-                search={{ ...nextPage, feedTypeId: feedTypeId }}
+                to="/plugins/$pluginId/feed"
+                params={{ pluginId: pluginId }}
+                search={{ page: nextPage?.page, feedTypeId: feedTypeId }}
               />
             </PaginationItem>
           )}

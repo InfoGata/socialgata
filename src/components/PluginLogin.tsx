@@ -52,11 +52,27 @@ const PluginLogin = (props: PluginLoginProps) => {
     }
   };
 
-  return <div>
-      <Input type="text" value={apiKey} onChange={onChangeApiKey} />
-      <Input type="text" value={apiSecret} onChange={onChangeApiSecret} />
-      {isLoggedIn ? <Button onClick={logout}>Logout</Button> : <Button onClick={login}>Login</Button>}
+  return (
+    <div className="flex flex-col gap-2">
+      <Input
+        type="text"
+        placeholder="API Key"
+        value={apiKey}
+        onChange={onChangeApiKey}
+      />
+      <Input
+        type="text"
+        placeholder="API Secret"
+        value={apiSecret}
+        onChange={onChangeApiSecret}
+      />
+      {isLoggedIn ? (
+        <Button onClick={logout}>Logout</Button>
+      ) : (
+        <Button onClick={login}>Login to {pluginId}</Button>
+      )}
     </div>
+  );
 }
 
 export default PluginLogin;

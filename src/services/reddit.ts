@@ -1,4 +1,4 @@
-import { GetCommentsRequest, GetCommentsResponse, GetCommunityRequest, GetCommunityResponse, GetFeedResponse, GetUserReponse, GetUserRequest, LoginRequest, Post } from "@/plugintypes";
+import { GetCommentsRequest, GetCommentsResponse, GetCommunityRequest, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetUserReponse, GetUserRequest, LoginRequest, Post } from "@/plugintypes";
 import { ServiceType } from "@/types";
 
 const pluginName = "reddit";
@@ -197,9 +197,13 @@ const redditCommentToPost = (comment: ListingChildCommentData): Post => {
     authorName: comment.author,
     authorApiId: comment.author,
     pluginId: pluginName,
-    comments: comment.replies?.data?.children.filter(c => c.kind === "t1").map(c => c.data).map(redditCommentToPost) ?? [],
-    moreRepliesId: comment.replies?.data?.children.filter(c => c.kind === "more")[0]?.data?.id,
-    moreRepliesCount: comment.replies?.data?.children.filter(c => c.kind === "more")[0]?.data?.count
+    comments: comment.replies?.data?.children
+      .filter((c): c is ListingChildComment => c.kind === "t1")
+      .map(c => redditCommentToPost(c.data)) ?? [],
+    moreRepliesId: comment.replies?.data?.children
+      .find((c): c is ListingMore => c.kind === "more")?.data?.id,
+    moreRepliesCount: comment.replies?.data?.children
+      .find((c): c is ListingMore => c.kind === "more")?.data?.count
   }
 }
 
@@ -221,15 +225,24 @@ class RedditService implements ServiceType {
     return headers;
   }
 
-  getFeed = async (): Promise<GetFeedResponse> => {
+  getFeed = async (request?: GetFeedRequest): Promise<GetFeedResponse> => {
     const headers = this.getHeaders();
     const baseUrl = this.getBaseUrl();
     const path = "/hot.json";
-    const response = await fetch(`${baseUrl}${path}`, {
+    
+    // Build URL with pagination parameters
+    const url = new URL(`${baseUrl}${path}`);
+    if (request?.pageInfo?.page) {
+      url.searchParams.append("after", String(request.pageInfo.page));
+    }
+
+    const response = await fetch(url.toString(), {
       headers
     });
     const json: RedditResponse = await response.json();
-    const items = json.data?.children.filter(c => c.kind === "t3").map(c => c.data).map(redditPostsToPost) ?? [];
+    const items = json.data?.children
+      .filter((c): c is ListingChildPost => c.kind === "t3")
+      .map(c => redditPostsToPost(c.data)) ?? [];
     return { items, pageInfo: { nextPage: json.data?.after ?? undefined, prevPage: json.data?.before ?? undefined } }
   };
 
@@ -241,7 +254,9 @@ class RedditService implements ServiceType {
       headers
     });
     const json: RedditResponse = await response.json();
-    const items = json.data?.children.filter(c => c.kind === "t3").map(c => c.data).map(redditPostsToPost) ?? [];
+    const items = json.data?.children
+      .filter((c): c is ListingChildPost => c.kind === "t3")
+      .map(c => redditPostsToPost(c.data)) ?? [];
     return {
       items,
       pageInfo: { nextPage: json.data?.after ?? undefined, prevPage: json.data?.before ?? undefined }
@@ -257,14 +272,17 @@ class RedditService implements ServiceType {
     });
     const json: CommentsResponse = await response.json();
     const items = json[1].data?.children
-      .filter(c => c.kind === "t1")
-      .map(c=> redditCommentToPost(c.data));
-    const post = json[0].data.children.map(c => c.data).map(redditPostsToPost)[0];
-    const more = json[1].data?.children.filter(c => c.kind === "more")[0]?.data;
+      .filter((c): c is ListingChildComment => c.kind === "t1")
+      .map(c => redditCommentToPost(c.data)) ?? [];
+    const post = json[0].data.children
+      .filter((c): c is ListingChildPost => c.kind === "t3")
+      .map(c => redditPostsToPost(c.data))[0];
+    const more = json[1].data?.children
+      .find((c): c is ListingMore => c.kind === "more")?.data;
     post.moreRepliesId = more?.id;
     post.moreRepliesCount = more?.count;
     return {
-      items: items ?? [],
+      items,
       post
     }
   }
@@ -278,8 +296,11 @@ class RedditService implements ServiceType {
     });
     const json: UserResponse = await response.json();
     const items = json.data.children
-      .filter(c => c.kind === "t1" || c.kind === "t3")
-      .map((c): Post => c.kind === "t1" ? redditCommentToPost(c.data) : redditPostsToPost(c.data));
+      .map((c): Post => {
+        if (c.kind === "t1") return redditCommentToPost(c.data);
+        if (c.kind === "t3") return redditPostsToPost(c.data);
+        throw new Error(`Unexpected kind: ${c.kind}`);
+      });
     return {
       items
     }

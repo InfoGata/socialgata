@@ -10,6 +10,7 @@ export interface MyRouterContext {
 export const router = createRouter({
   routeTree,
   defaultPendingComponent: Spinner,
+  scrollRestoration: true,
 });
 
 declare module "@tanstack/react-router" {

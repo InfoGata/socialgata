@@ -87,6 +87,7 @@ export interface FeedType {
 export interface GetCommunityRequest {
   apiId: string;
   instanceId?: string;
+  pageInfo?: PageInfo;
 }
 
 export interface GetCommunityResponse {
