@@ -12,7 +12,6 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 
 const Community: React.FC = () => {
   const data = Route.useLoaderData();
-  const params = Route.useParams();
   const { nextPage, prevPage, hasNextPage, hasPreviousPage } = usePagination(data.pageInfo);
   const posts = data.items;
   return (
@@ -25,8 +24,7 @@ const Community: React.FC = () => {
           {hasPreviousPage && (
             <PaginationItem>
               <PaginationPrevious
-                to="/plugins/$pluginId/community/$apiId"
-                params={{ pluginId: params.pluginId || "", apiId: params.apiId }}
+                to="."
                 search={{ page: prevPage?.page }}
               />
             </PaginationItem>
@@ -34,8 +32,7 @@ const Community: React.FC = () => {
           {hasNextPage && (
             <PaginationItem>
               <PaginationNext
-                to="/plugins/$pluginId/community/$apiId"
-                params={{ pluginId: params.pluginId || "", apiId: params.apiId }}
+                to="."
                 search={{ page: nextPage?.page }}
               />
             </PaginationItem>

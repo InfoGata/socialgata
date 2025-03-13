@@ -36,8 +36,7 @@ const Feed: React.FC<FeedProps> = (props) => {
           {hasPreviousPage && (
             <PaginationItem>
               <PaginationPrevious
-                to="/plugins/$pluginId/feed"
-                params={{ pluginId: pluginId }}
+                to="."
                 search={{ page: prevPage?.page, feedTypeId: feedTypeId }}
               />
             </PaginationItem>
@@ -45,8 +44,7 @@ const Feed: React.FC<FeedProps> = (props) => {
           {hasNextPage && (
             <PaginationItem>
               <PaginationNext
-                to="/plugins/$pluginId/feed"
-                params={{ pluginId: pluginId }}
+                to="."
                 search={{ page: nextPage?.page, feedTypeId: feedTypeId }}
               />
             </PaginationItem>
