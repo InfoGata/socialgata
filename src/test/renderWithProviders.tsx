@@ -12,15 +12,6 @@ import { render } from "@testing-library/react";
 import React, { PropsWithChildren } from "react";
 import { Provider } from "react-redux";
 import { store } from "../store/store";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-    },
-  },
-});
 
 export function renderWithProviders(ui: React.ReactElement) {
   function Wrapper({ children }: PropsWithChildren<unknown>): JSX.Element {
@@ -40,9 +31,7 @@ export function renderWithProviders(ui: React.ReactElement) {
     return (
       <Provider store={store}>
         <ThemeProvider defaultTheme="dark">
-          <QueryClientProvider client={queryClient}>
-            <RouterProvider router={router as any} />
-          </QueryClientProvider>
+          <RouterProvider router={router as any} />
         </ThemeProvider>
       </Provider>
     );
