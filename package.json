@@ -9,8 +9,7 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "cors-server": "node servers/cors/server.js",
-    "postinstall": "cd servers/cors && npm install",
+    "cors-server": "node cors-server.js",
     "test": "vitest"
   },
   "dependencies": {
@@ -59,6 +58,7 @@
     "@typescript-eslint/parser": "^7.2.0",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.19",
+    "cors-anywhere": "^0.4.4",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
