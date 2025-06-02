@@ -142,3 +142,14 @@ export interface GetCommentRepliesResponse {
   post?: Post;
   pageInfo?: PageInfo;
 }
+
+export interface SearchRequest {
+  query: string;
+  pageInfo?: PageInfo;
+  instanceId?: string;
+}
+
+export interface SearchResponse {
+  items: Post[];
+  pageInfo?: PageInfo;
+}

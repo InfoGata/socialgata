@@ -1,4 +1,4 @@
-import { GetCommentsRequest, GetCommentsResponse, GetCommunityRequest, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetUserReponse, GetUserRequest, LoginRequest, Post } from "@/plugintypes";
+import { GetCommentsRequest, GetCommentsResponse, GetCommunityRequest, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetUserReponse, GetUserRequest, LoginRequest, Post, SearchRequest, SearchResponse } from "@/plugintypes";
 import { ServiceType } from "@/types";
 
 const pluginName = "reddit";
@@ -303,6 +303,35 @@ class RedditService implements ServiceType {
       });
     return {
       items
+    }
+  }
+
+  search = async (request: SearchRequest): Promise<SearchResponse> => {
+    const headers = this.getHeaders();
+    const baseUrl = this.getBaseUrl();
+    const path = "/search.json";
+    
+    const url = new URL(`${baseUrl}${path}`);
+    url.searchParams.append("q", request.query);
+    url.searchParams.append("type", "link");
+    if (request.pageInfo?.page) {
+      url.searchParams.append("after", String(request.pageInfo.page));
+    }
+
+    const response = await fetch(url.toString(), {
+      headers
+    });
+    const json: RedditResponse = await response.json();
+    const items = json.data?.children
+      .filter((c): c is ListingChildPost => c.kind === "t3")
+      .map(c => redditPostsToPost(c.data)) ?? [];
+    
+    return { 
+      items, 
+      pageInfo: { 
+        nextPage: json.data?.after ?? undefined, 
+        prevPage: json.data?.before ?? undefined 
+      } 
     }
   }
 
