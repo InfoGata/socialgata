@@ -40,7 +40,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         className="flex-1"
       />
       <Button type="submit" size="icon" variant="ghost">
-        <SearchIcon className="h-4 w-4" />
+        <SearchIcon className="size-4" />
       </Button>
     </form>
   );

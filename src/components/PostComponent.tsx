@@ -24,7 +24,7 @@ const PostComponent: React.FC<Props> = (props) => {
   return (
     <div className="rounded-lg border p-2 hover:bg-accent transition-colors flex gap-2">
       <p>{post.number}</p>
-      <div className="rounded-md w-24 h-24 bg-muted-foreground flex items-center justify-center">
+      <div className="rounded-md size-24 bg-muted-foreground flex items-center justify-center">
         <ImageThumbnail
           url={post.url}
           thumbnailUrl={post.thumbnailUrl}

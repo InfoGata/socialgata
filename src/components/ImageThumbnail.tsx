@@ -36,12 +36,12 @@ const ImageThumbnail: React.FC<ImageThumbnailProps> = (props) => {
   if (url) {
     return (
       <a href={url} target="_blank">
-        <ExternalLinkIcon className="w-12 h-12" />
+        <ExternalLinkIcon className="size-12" />
       </a>
     );
   }
 
-  return <MessageSquareIcon className="w-12 h-12" />;
+  return <MessageSquareIcon className="size-12" />;
 };
 
 export default ImageThumbnail;

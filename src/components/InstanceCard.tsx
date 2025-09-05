@@ -16,7 +16,7 @@ const InstanceCard: React.FC<InstanceCardProps> = (props) => {
       <CardHeader>
         <div className="flex items-center gap-2">
           <Avatar>
-            <AvatarImage className="w-10 h-10" src={instance.iconUrl} />
+            <AvatarImage className="size-10" src={instance.iconUrl} />
             <AvatarFallback>{instance.name.slice(0, 1)}</AvatarFallback>
           </Avatar>
           <CardTitle>
@@ -41,15 +41,15 @@ const InstanceCard: React.FC<InstanceCardProps> = (props) => {
       <CardFooter className="mt-auto">
         <div className="flex gap-2 justify-between items-center w-full">
           {instance.usersCount && <div className="flex items-center gap-1">
-            <UsersIcon className="w-4 h-4" />
+            <UsersIcon className="size-4" />
             <span>{numberFormatter.format(instance.usersCount)}</span>
           </div>}
           {instance.postsCount && <div className="flex items-center gap-1">
-            <MessageSquareTextIcon className="w-4 h-4" />
+            <MessageSquareTextIcon className="size-4" />
             <span>{numberFormatter.format(instance.postsCount)}</span>
           </div>}
           {instance.commentsCount && <div className="flex items-center gap-1">
-            <MessagesSquareIcon className="w-4 h-4" />
+            <MessagesSquareIcon className="size-4" />
             <span>{numberFormatter.format(instance.commentsCount)}</span>
           </div>}
         </div>
