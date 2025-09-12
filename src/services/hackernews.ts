@@ -1,4 +1,4 @@
-import { GetCommentsRequest, GetCommentsResponse, GetFeedRequest, GetFeedResponse, GetUserReponse, GetUserRequest, Post } from "@/plugintypes";
+import { GetCommentsRequest, GetCommentsResponse, GetFeedRequest, GetFeedResponse, GetUserReponse, GetUserRequest, Post, SearchRequest, SearchResponse } from "@/plugintypes";
 import { ServiceType } from "@/types";
 import { initializeApp } from "firebase/app"
 import { getDatabase, ref, child, get, query, orderByKey } from "firebase/database"
@@ -227,6 +227,31 @@ class HackerNewsService implements ServiceType {
     const items = json.hits.map(h => "title" in h ? algoliaStoryHitToPost(h) : algoliaCommentHitToPost(h));
     return {
       items
+    }
+  }
+
+  async search(request: SearchRequest): Promise<SearchResponse> {
+    const url = new URL(`${algoliaUrl}/search`);
+    url.searchParams.append("query", request.query);
+    url.searchParams.append("tags", "story");
+    
+    if (request.pageInfo?.page) {
+      url.searchParams.append("page", String(request.pageInfo.page));
+    }
+    
+    const response = await fetch(url.toString());
+    const json: AlgoriaSearch = await response.json();
+    const items = json.hits
+      .filter((hit): hit is AlgoriaStoryHit => "title" in hit)
+      .map(hit => algoliaStoryHitToPost(hit));
+    
+    return {
+      items,
+      pageInfo: {
+        page: json.page,
+        nextPage: json.page < json.nbPages - 1 ? json.page + 1 : undefined,
+        prevPage: json.page > 0 ? json.page - 1 : undefined
+      }
     }
   }
 }
