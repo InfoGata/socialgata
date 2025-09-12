@@ -34,31 +34,31 @@ const Feed: React.FC<FeedProps> = (props) => {
   };
 
   const EmptyState = () => (
-    <div className="flex flex-col items-center justify-center py-16 px-4">
-      <Inbox className="w-16 h-16 text-muted-foreground mb-4" />
-      <h3 className="text-lg font-semibold mb-2">No posts yet</h3>
-      <p className="text-muted-foreground text-center max-w-sm">
+    <div className="flex flex-col items-center justify-center py-12 px-4">
+      <Inbox className="w-12 h-12 text-muted-foreground mb-3" />
+      <h3 className="text-base font-semibold mb-1">No posts yet</h3>
+      <p className="text-sm text-muted-foreground text-center max-w-sm">
         There are no posts to display. Try refreshing the page or check back later.
       </p>
     </div>
   );
 
   const LoadingState = () => (
-    <div className="flex flex-col items-center justify-center py-16">
-      <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-      <p className="text-muted-foreground">Loading posts...</p>
+    <div className="flex flex-col items-center justify-center py-12">
+      <Loader2 className="w-6 h-6 animate-spin text-primary mb-3" />
+      <p className="text-sm text-muted-foreground">Loading posts...</p>
     </div>
   );
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-5xl mx-auto px-2 sm:px-4 py-2">
         {/* Header Section */}
-        <div className="mb-6">
+        <div className="mb-3">
           {/* Feed Type Tabs */}
           {data.feedTypes && data.feedTypes.length > 0 && (
-            <div className="bg-card border rounded-lg p-2 mb-4">
-              <div className="flex flex-wrap gap-2">
+            <div className="bg-card border rounded-lg p-1.5 mb-2">
+              <div className="flex flex-wrap gap-1">
                 {data.feedTypes.map((feedType) => (
                   <Link
                     key={feedType.id}
@@ -66,7 +66,7 @@ const Feed: React.FC<FeedProps> = (props) => {
                     params={{ pluginId }}
                     search={{ feedTypeId: feedType.id }}
                     className={`
-                      flex items-center gap-2 px-4 py-2 rounded-md transition-all
+                      flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all text-sm
                       ${data.feedTypeId === feedType.id 
                         ? 'bg-primary text-primary-foreground shadow-sm' 
                         : 'hover:bg-muted text-muted-foreground hover:text-foreground'
@@ -83,7 +83,7 @@ const Feed: React.FC<FeedProps> = (props) => {
 
           {/* Active Feed Indicator */}
           {data.feedTypeId && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
               <div className="h-px flex-1 bg-border" />
               <span className="px-2">
                 Viewing {data.feedTypes?.find(f => f.id === data.feedTypeId)?.displayName || 'Feed'}
@@ -94,7 +94,7 @@ const Feed: React.FC<FeedProps> = (props) => {
         </div>
 
         {/* Posts Section */}
-        <div className="space-y-4">
+        <div className="space-y-2">
           {isLoading ? (
             <LoadingState />
           ) : data.items.length === 0 ? (
@@ -102,12 +102,12 @@ const Feed: React.FC<FeedProps> = (props) => {
           ) : (
             <>
               {/* Posts Grid */}
-              <div className="grid gap-4">
+              <div className="grid gap-2">
                 {data.items.map((item, index) => (
                   <div 
                     key={item.apiId} 
-                    className="animate-in fade-in slide-in-from-bottom-2"
-                    style={{ animationDelay: `${index * 50}ms` }}
+                    className="animate-in fade-in slide-in-from-bottom-1"
+                    style={{ animationDelay: `${index * 30}ms` }}
                   >
                     <PostComponent post={item} instanceId={instanceId} />
                   </div>
@@ -116,23 +116,23 @@ const Feed: React.FC<FeedProps> = (props) => {
 
               {/* Pagination */}
               {(hasNextPage || hasPreviousPage) && (
-                <div className="mt-8 py-4 border-t">
+                <div className="mt-4 py-2 border-t">
                   <Pagination>
-                    <PaginationContent className="flex justify-center gap-2">
+                    <PaginationContent className="flex justify-center gap-1">
                       {hasPreviousPage && (
                         <PaginationItem>
                           <PaginationPrevious
                             to="."
                             search={{ page: prevPage?.page, feedTypeId: feedTypeId }}
-                            className="hover:bg-muted transition-colors"
+                            className="hover:bg-muted transition-colors text-sm py-1"
                           />
                         </PaginationItem>
                       )}
                       
                       {/* Page Indicator */}
                       {pageInfo?.page && (
-                        <PaginationItem className="flex items-center px-4">
-                          <span className="text-sm text-muted-foreground">
+                        <PaginationItem className="flex items-center px-2">
+                          <span className="text-xs text-muted-foreground">
                             Page {pageInfo.page}
                           </span>
                         </PaginationItem>
@@ -143,7 +143,7 @@ const Feed: React.FC<FeedProps> = (props) => {
                           <PaginationNext
                             to="."
                             search={{ page: nextPage?.page, feedTypeId: feedTypeId }}
-                            className="hover:bg-muted transition-colors"
+                            className="hover:bg-muted transition-colors text-sm py-1"
                           />
                         </PaginationItem>
                       )}

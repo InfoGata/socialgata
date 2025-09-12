@@ -23,15 +23,15 @@ const PostComponent: React.FC<Props> = (props) => {
   const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
   return (
     <div className="group relative bg-card rounded-lg border hover:border-primary/50 hover:shadow-md transition-all duration-200">
-      <div className="flex gap-4 p-4">
+      <div className="flex gap-3 p-3">
         {/* Post Number & Thumbnail */}
-        <div className="flex gap-3 items-start">
+        <div className="flex gap-2 items-start">
           {post.number && (
-            <span className="text-2xl font-bold text-muted-foreground/50 min-w-[2rem] text-right">
+            <span className="text-lg font-bold text-muted-foreground/50 min-w-[1.5rem] text-right">
               {post.number}
             </span>
           )}
-          <div className="rounded-md size-20 bg-muted overflow-hidden flex-shrink-0">
+          <div className="rounded-md size-16 bg-muted overflow-hidden flex-shrink-0">
             <ImageThumbnail
               url={post.url}
               thumbnailUrl={post.thumbnailUrl}
@@ -43,14 +43,14 @@ const PostComponent: React.FC<Props> = (props) => {
         {/* Main Content */}
         <div className="flex-1 min-w-0">
           {/* Author & Community Info */}
-          <div className="flex items-center gap-2 mb-2 text-sm">
+          <div className="flex items-center gap-1.5 mb-1 text-xs">
             {post.authorAvatar && (
-              <Avatar className="size-6">
+              <Avatar className="size-5">
                 <AvatarImage src={post.authorAvatar} />
-                <AvatarFallback className="text-xs">{post.authorName?.slice(0, 2)}</AvatarFallback>
+                <AvatarFallback className="text-[10px]">{post.authorName?.slice(0, 2)}</AvatarFallback>
               </Avatar>
             )}
-            <div className="flex flex-wrap items-center gap-x-1.5 text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-x-1 text-muted-foreground">
               <Link
                 to="/plugins/$pluginId/user/$apiId"
                 className="font-medium hover:text-foreground transition-colors"
@@ -77,7 +77,7 @@ const PostComponent: React.FC<Props> = (props) => {
                 </>
               )}
               <span>•</span>
-              <span className="text-xs">
+              <span>
                 {post.publishedDate && <ReactTimeago date={post.publishedDate} />}
               </span>
             </div>
@@ -87,7 +87,7 @@ const PostComponent: React.FC<Props> = (props) => {
           <PostLink
             post={post}
             isTitleLink
-            className="text-lg font-semibold text-foreground hover:text-primary transition-colors line-clamp-2 mb-3"
+            className="text-base font-semibold text-foreground hover:text-primary transition-colors line-clamp-2 mb-2"
             instanceId={instanceId}
           >
             {post.title}
@@ -97,7 +97,7 @@ const PostComponent: React.FC<Props> = (props) => {
           {expand && (
             <img 
               src={post.url} 
-              className="rounded-md mb-3 max-w-full" 
+              className="rounded-md mb-2 max-w-full" 
               alt={post.title}
             />
           )}
@@ -105,25 +105,25 @@ const PostComponent: React.FC<Props> = (props) => {
           {/* Actions Bar */}
           <div className="flex items-center gap-1">
             {post.score !== undefined && (
-              <div className="flex items-center rounded-md bg-muted/50 px-2 py-1">
+              <div className="flex items-center rounded-md bg-muted/50 px-1.5 py-0.5">
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-7 w-7 hover:text-orange-500"
+                  className="h-6 w-6 hover:text-orange-500"
                   disabled={true}
                 >
-                  <ArrowUpIcon className="h-4 w-4" />
+                  <ArrowUpIcon className="h-3.5 w-3.5" />
                 </Button>
-                <span className="px-2 font-medium text-sm min-w-[3ch] text-center">
+                <span className="px-1.5 font-medium text-xs min-w-[3ch] text-center">
                   {numberFormatter.format(post.score)}
                 </span>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-7 w-7 hover:text-blue-500"
+                  className="h-6 w-6 hover:text-blue-500"
                   disabled={true}
                 >
-                  <ArrowDownIcon className="h-4 w-4" />
+                  <ArrowDownIcon className="h-3.5 w-3.5" />
                 </Button>
               </div>
             )}
@@ -134,11 +134,11 @@ const PostComponent: React.FC<Props> = (props) => {
                 className={buttonVariants({ 
                   variant: "ghost",
                   size: "sm"
-                })}
+                }) + " h-7 px-2 py-1"}
                 instanceId={instanceId}
               >
-                <MessageCircleIcon className="h-4 w-4" />
-                <span className="ml-1.5 font-medium">
+                <MessageCircleIcon className="h-3.5 w-3.5" />
+                <span className="ml-1 text-xs font-medium">
                   {numberFormatter.format(post.numOfComments)}
                 </span>
               </PostLink>
