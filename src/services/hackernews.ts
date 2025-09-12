@@ -136,6 +136,8 @@ const algoliaStoryHitToPost = (story: AlgoriaStoryHit): Post => {
     authorName: story.author,
     authorApiId: story.author,
     originalUrl: `${hackerNewsUrl}/item?id=${story.objectID}`,
+    score: story.points,
+    numOfComments: story.num_comments,
     pluginId: pluginName
   }
 }
