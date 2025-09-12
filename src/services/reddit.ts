@@ -210,9 +210,14 @@ const redditCommentToPost = (comment: ListingChildCommentData): Post => {
 
 class RedditService implements ServiceType {
   private accessToken = "";
+  private corsProxy = "http://localhost:8085/";
 
   private getBaseUrl = () => {
-    return this.hasLogin() ? REDDIT_API_BASE : REDDIT_PUBLIC_API_BASE;
+    if (this.hasLogin()) {
+      return REDDIT_API_BASE;
+    } else {
+      return `${this.corsProxy}${REDDIT_PUBLIC_API_BASE}`;
+    }
   }
 
   private getHeaders = (): HeadersInit => {
@@ -221,6 +226,8 @@ class RedditService implements ServiceType {
     }
     if (this.hasLogin()) {
       headers['Authorization'] = `Bearer ${this.accessToken}`;
+    } else {
+      headers['x-requested-with'] = 'XMLHttpRequest';
     }
     return headers;
   }
