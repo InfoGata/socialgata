@@ -216,7 +216,8 @@ class RedditService implements ServiceType {
     if (this.hasLogin()) {
       return REDDIT_API_BASE;
     } else {
-      return `${this.corsProxy}${REDDIT_PUBLIC_API_BASE}`;
+      // return `${this.corsProxy}${REDDIT_PUBLIC_API_BASE}`;
+      return `${REDDIT_PUBLIC_API_BASE}`;
     }
   }
 
@@ -226,8 +227,6 @@ class RedditService implements ServiceType {
     }
     if (this.hasLogin()) {
       headers['Authorization'] = `Bearer ${this.accessToken}`;
-    } else {
-      headers['x-requested-with'] = 'XMLHttpRequest';
     }
     return headers;
   }
@@ -357,7 +356,7 @@ class RedditService implements ServiceType {
   login = (request: LoginRequest): Promise<void> => {
     return new Promise((resolve) => {
       const tokenUrl = "https://www.reddit.com/api/v1/access_token";
-      const redirectUri = "http://localhost:3000/login_popup.html";
+      const redirectUri = `${window.location.origin}/login_popup.html`;
       const authUrl = "https://www.reddit.com/api/v1/authorize";
       const responseType = "code";
       const state = "12345";
