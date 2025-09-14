@@ -60,15 +60,6 @@ const lemmyPostToPost = (postView: PostView): Post => {
   };
 };
 
-const proxyFetch: typeof fetch = (
-  request: RequestInfo | URL,
-  init?: RequestInit
-) => {
-  const proxyUrl = "http://localhost:8085/";
-  const requestUrl = `${proxyUrl}${(request.toString())}`;
-  return fetch(requestUrl, init);
-};
-
 interface LemmyInstance {
   baseurl: string;
   url: string;
@@ -118,7 +109,7 @@ class LemmyService implements ServiceType {
       // Add protocol to instanceId
       url = `https://${request.instanceId}`;
     }
-    const client = new LemmyHttp(url, { fetchFunction: proxyFetch });
+    const client = new LemmyHttp(url);
     const perPage = 30;
     const page = Number(request.pageInfo?.page || 1);
 
@@ -144,7 +135,7 @@ class LemmyService implements ServiceType {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getInstances(_request?: GetInstancesRequest): Promise<GetInstancesResponse> {
     const url = "https://data.lemmyverse.net/data/instance.full.json";
-    const response = await proxyFetch(url);
+    const response = await fetch(url);
     const instances: LemmyInstance[] = await response.json();
     // order by score
     instances.sort((a, b) => b.score - a.score);
@@ -164,7 +155,7 @@ class LemmyService implements ServiceType {
   }
 
   async getCommunity(request: GetCommunityRequest): Promise<GetCommunityResponse> {
-    const client = new LemmyHttp(baseUrl, { fetchFunction: proxyFetch });
+    const client = new LemmyHttp(baseUrl);
     const perPage = 30;
     const page = 1;
     const communityResponse = await client.getCommunity({ name: request.apiId });
@@ -186,7 +177,7 @@ class LemmyService implements ServiceType {
   }
 
   async getComments(request: GetCommentsRequest): Promise<GetCommentsResponse> {
-    const client = new LemmyHttp(baseUrl, { fetchFunction: proxyFetch });
+    const client = new LemmyHttp(baseUrl);
     const form: GetComments = {
       type_: "All",
       post_id: Number(request.apiId),
@@ -227,7 +218,7 @@ class LemmyService implements ServiceType {
 
   async getUser(request: GetUserRequest): Promise<GetUserReponse> {
 
-    const client = new LemmyHttp(baseUrl, { fetchFunction: proxyFetch });
+    const client = new LemmyHttp(baseUrl);
     const perPage = 30;
     const page = 1;
     const form: GetPersonDetails = {
