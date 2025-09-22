@@ -5,7 +5,7 @@ import { getDatabase, ref, child, get, query, orderByKey } from "firebase/databa
 
 const pluginName = "hackernews";
 const hackerNewsUrl = "https://news.ycombinator.com"
-const algoliaUrl = "http://hn.algolia.com/api/v1";
+const algoliaUrl = "https://hn.algolia.com/api/v1";
 interface FirebaseStory {
   by: string;
   descendants: number;
