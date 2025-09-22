@@ -57,7 +57,7 @@ export const TopBar: React.FC = () => {
         <Button variant="ghost" size="icon" onClick={onToggleNavigationMenu}>
           <MenuIcon />
         </Button>
-        <h1 className="text-xl font-bold">
+        <h1 className="text-xl font-bold hidden sm:block">
           <Link to="/">SocialGata</Link>
         </h1>
         <div className="flex items-center gap-2 max-w-md ml-auto">
