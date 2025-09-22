@@ -1,30 +1,104 @@
-# React + TypeScript + Vite
+# SocialGata
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A unified social media aggregator that brings together content from multiple platforms into a single, customizable interface. Built with React, TypeScript, and modern web technologies.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Multi-Platform Support**: Aggregate content from Reddit, Lemmy, Mastodon, and Hacker News
+- **Plugin Architecture**: Extensible system for adding new social media platforms
+- **Instance Support**: Connect to different instances of federated platforms (Lemmy, Mastodon)
+- **Dark/Light Theme**: Customizable UI with theme support
+- **Internationalization**: Multi-language support with i18next
+- **Modern UI**: Clean, responsive design using Tailwind CSS and Radix UI components
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **Frontend Framework**: React 18 with TypeScript
+- **Build Tool**: Vite
+- **Routing**: TanStack Router (file-based routing)
+- **State Management**: Redux Toolkit
+- **Styling**: Tailwind CSS with custom theme system
+- **UI Components**: Radix UI + shadcn/ui
+- **Testing**: Vitest with jsdom
 
-- Configure the top-level `parserOptions` property like this:
+## Getting Started
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+### Prerequisites
+
+- Node.js 18+ and npm
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/socialgata.git
+cd socialgata
+
+# Install dependencies
+npm install
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+### Development
+
+```bash
+# Start development server with CORS proxy (recommended)
+npm run dev
+
+# Or start Vite dev server only
+npm start
+
+# Run CORS proxy server separately
+npm run cors-server
+```
+
+The app will be available at `http://localhost:5173` with the CORS proxy running on port 3000.
+
+### Building for Production
+
+```bash
+# Run TypeScript checks and build
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+## Project Structure
+
+```
+src/
+├── components/        # React components
+│   ├── ui/           # shadcn/ui components
+│   └── ...           # Feature components
+├── routes/           # File-based routing (TanStack Router)
+│   ├── plugins/      # Plugin-specific routes
+│   └── ...
+├── services/         # Platform service implementations
+│   ├── reddit.ts
+│   ├── lemmy.ts
+│   ├── mastodon.ts
+│   └── hackernews.ts
+├── store/            # Redux store and slices
+│   ├── authSlice.ts
+│   └── uiSlice.ts
+├── lib/              # Utilities and helpers
+└── test/             # Test utilities and setup
+```
+
+## Available Scripts
+
+- `npm run dev` - Start development server with CORS proxy
+- `npm start` - Start Vite dev server only
+- `npm run build` - Build for production
+- `npm run lint` - Run ESLint
+- `npm test` - Run test suite
+- `npm run preview` - Preview production build
+- `npm run cors-server` - Run CORS proxy server
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+AGPL-3.0 - GNU Affero General Public License v3.0
