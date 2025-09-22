@@ -210,7 +210,6 @@ const redditCommentToPost = (comment: ListingChildCommentData): Post => {
 
 class RedditService implements ServiceType {
   private accessToken = "";
-  private corsProxy = "http://localhost:8085/";
 
   private getBaseUrl = () => {
     if (this.hasLogin()) {
