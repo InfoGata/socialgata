@@ -5,14 +5,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 ### Core Development
-- `npm run dev` - Start development server with CORS proxy (port 3000)
+- `npm run dev` - Start development server with CORS proxy (Vite on port 3000, CORS proxy on port 8085)
 - `npm run build` - Build for production (TypeScript compile + Vite build)
 - `npm run lint` - Run ESLint with TypeScript support
 - `npm test` - Run Vitest test suite
 
 ### Individual Commands
-- `npm start` - Vite dev server only (without CORS proxy)
-- `npm run cors-server` - CORS proxy server only
+- `npm start` - Vite dev server only on port 3000 (without CORS proxy)
+- `npm run cors-server` - CORS proxy server only on port 8085
 
 ## Project Architecture
 
