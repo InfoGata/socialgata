@@ -1,6 +1,6 @@
 import { createRestAPIClient } from "masto";
 import { ServiceType } from "../types";
-import { Post, GetUserReponse, GetFeedResponse, GetUserRequest } from "../plugintypes";
+import { Post, GetUserReponse, GetFeedResponse, GetUserRequest, GetTrendingTopicsRequest, GetTrendingTopicsResponse, TrendingTopic, GetTrendingTopicFeedRequest, GetTrendingTopicFeedResponse } from "../plugintypes";
 
 const pluginName = "mastodon";
 const baseUrl = "https://mastodon.social";
@@ -39,6 +39,41 @@ class MastodonService implements ServiceType {
         name: request.apiId
       },
       items
+    };
+  }
+
+  async getTrendingTopics(request?: GetTrendingTopicsRequest): Promise<GetTrendingTopicsResponse> {
+    const limit = request?.limit ?? 10;
+
+    const trends = await masto.v1.trends.tags.list({ limit });
+
+    const items: TrendingTopic[] = trends.map(tag => ({
+      name: tag.name,
+      url: tag.url,
+      history: tag.history?.map(h => ({
+        day: h.day,
+        uses: h.uses,
+        accounts: h.accounts
+      }))
+    }));
+
+    return {
+      items
+    };
+  }
+
+  async getTrendingTopicFeed(request: GetTrendingTopicFeedRequest): Promise<GetTrendingTopicFeedResponse> {
+    const tag = request.topicName.replace('#', '');
+    const limit = 30;
+
+    const statuses = await masto.v1.timelines.tag.$select(tag).list({ limit });
+    const items = statuses.map(statusToPost);
+
+    return {
+      items,
+      topic: {
+        name: request.topicName
+      }
     };
   }
 }

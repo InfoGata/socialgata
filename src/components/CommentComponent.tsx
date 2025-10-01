@@ -12,6 +12,7 @@ type Props = {
 const CommentComponent: React.FC<Props> = (props) => {
   const { comment } = props;
   const sanitizer = DOMPurify.sanitize;
+
   const clean = sanitizer(comment.body || "");
   return (
     <div className="border-l-2 border-muted pl-4 my-4">

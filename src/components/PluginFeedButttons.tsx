@@ -11,6 +11,7 @@ interface PluginFeedButtonsProps {
 
 const PluginFeedButtons = ({ pluginId }: PluginFeedButtonsProps) => {
   const [hasInstances, setHasInstances] = useState(false);
+  const [hasTrending, setHasTrending] = useState(false);
   const [hasLogin, setHasLogin] = React.useState(false);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
@@ -37,6 +38,18 @@ const PluginFeedButtons = ({ pluginId }: PluginFeedButtonsProps) => {
     };
     getInstances();
   }, [pluginId]);
+
+  React.useEffect(() => {
+    const checkTrending = async () => {
+      const service = getService(pluginId);
+      if (service && service.getTrendingTopics) {
+        setHasTrending(true);
+      } else {
+        setHasTrending(false);
+      }
+    };
+    checkTrending();
+  }, [pluginId]);
   return (
     <div data-testid={`plugin-feed-${pluginId}`}>
       <div className="flex gap-2 justify-between border p-2 items-center">
@@ -49,6 +62,15 @@ const PluginFeedButtons = ({ pluginId }: PluginFeedButtonsProps) => {
               params={{ pluginId }}
             >
               Instances
+            </Link>
+          )}
+          {hasTrending && (
+            <Link
+              className={buttonVariants({ variant: "default" })}
+              to={`/plugins/$pluginId/trending`}
+              params={{ pluginId }}
+            >
+              Trending
             </Link>
           )}
           <Link

@@ -1,5 +1,5 @@
 import { LinkOptions } from "@tanstack/react-router";
-import { GetCommentRepliesRequest, GetCommentRepliesResponse, GetCommentsRequest, GetCommentsResponse, GetCommunityRequest, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetInstancesRequest, GetInstancesResponse, GetUserReponse, GetUserRequest, LoginRequest, SearchRequest, SearchResponse } from "./plugintypes";
+import { GetCommentRepliesRequest, GetCommentRepliesResponse, GetCommentsRequest, GetCommentsResponse, GetCommunityRequest, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetInstancesRequest, GetInstancesResponse, GetTrendingTopicFeedRequest, GetTrendingTopicFeedResponse, GetTrendingTopicsRequest, GetTrendingTopicsResponse, GetUserReponse, GetUserRequest, LoginRequest, SearchRequest, SearchResponse } from "./plugintypes";
 import { router } from "./router";
 
 export interface ServiceType {
@@ -10,6 +10,8 @@ export interface ServiceType {
   getCommentReplies?(request: GetCommentRepliesRequest): Promise<GetCommentRepliesResponse>;
   getUser(request: GetUserRequest): Promise<GetUserReponse>;
   search?(request: SearchRequest): Promise<SearchResponse>;
+  getTrendingTopics?(request?: GetTrendingTopicsRequest): Promise<GetTrendingTopicsResponse>;
+  getTrendingTopicFeed?(request: GetTrendingTopicFeedRequest): Promise<GetTrendingTopicFeedResponse>;
   login?(request: LoginRequest): Promise<void>;
   logout?(): Promise<void>;
   isLoggedIn?(): Promise<boolean>;

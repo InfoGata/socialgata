@@ -7,6 +7,8 @@ import ReactTimeago from "react-timeago";
 import PostLink from "./PostLink";
 import React from "react";
 import ImageThumbnail from "./ImageThumbnail";
+import parse from 'html-react-parser';
+import DOMPurify from "dompurify";
 
 type Props = {
   post: Post;
@@ -21,6 +23,7 @@ const PostComponent: React.FC<Props> = (props) => {
     setExpand(!expand);
   }
   const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
+  const sanitizer = DOMPurify.sanitize;
   return (
     <div className="group relative bg-card rounded-lg border hover:border-primary/50 hover:shadow-md transition-all duration-200">
       <div className="flex gap-3 p-3">
@@ -93,11 +96,18 @@ const PostComponent: React.FC<Props> = (props) => {
             {post.title}
           </PostLink>
 
+          {/* Body */}
+          {post.body && (
+            <div className="text-sm text-muted-foreground mb-2 line-clamp-3">
+              {parse(sanitizer(post.body))}
+            </div>
+          )}
+
           {/* Expanded Image */}
           {expand && (
-            <img 
-              src={post.url} 
-              className="rounded-md mb-2 max-w-full" 
+            <img
+              src={post.url}
+              className="rounded-md mb-2 max-w-full"
               alt={post.title}
             />
           )}

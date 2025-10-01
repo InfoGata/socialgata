@@ -14,8 +14,10 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as SettingsImport } from './routes/settings'
 import { Route as IndexImport } from './routes/index'
 import { Route as PluginsPluginIdFeedImport } from './routes/plugins/$pluginId/feed'
+import { Route as PluginsPluginIdTrendingIndexImport } from './routes/plugins/$pluginId/trending.index'
 import { Route as PluginsPluginIdInstancesIndexImport } from './routes/plugins/$pluginId/instances/index'
 import { Route as PluginsPluginIdUserApiIdImport } from './routes/plugins/$pluginId/user.$apiId'
+import { Route as PluginsPluginIdTrendingTopicNameImport } from './routes/plugins/$pluginId/trending.$topicName'
 import { Route as PluginsPluginIdPostApiIdImport } from './routes/plugins/$pluginId/post.$apiId'
 import { Route as PluginsPluginIdCommunityApiIdIndexImport } from './routes/plugins/$pluginId/community.$apiId.index'
 import { Route as PluginsPluginIdInstancesInstanceIdFeedImport } from './routes/plugins/$pluginId/instances/$instanceId/feed'
@@ -43,6 +45,13 @@ const PluginsPluginIdFeedRoute = PluginsPluginIdFeedImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const PluginsPluginIdTrendingIndexRoute =
+  PluginsPluginIdTrendingIndexImport.update({
+    id: '/plugins/$pluginId/trending/',
+    path: '/plugins/$pluginId/trending/',
+    getParentRoute: () => rootRoute,
+  } as any)
+
 const PluginsPluginIdInstancesIndexRoute =
   PluginsPluginIdInstancesIndexImport.update({
     id: '/plugins/$pluginId/instances/',
@@ -55,6 +64,13 @@ const PluginsPluginIdUserApiIdRoute = PluginsPluginIdUserApiIdImport.update({
   path: '/plugins/$pluginId/user/$apiId',
   getParentRoute: () => rootRoute,
 } as any)
+
+const PluginsPluginIdTrendingTopicNameRoute =
+  PluginsPluginIdTrendingTopicNameImport.update({
+    id: '/plugins/$pluginId/trending/$topicName',
+    path: '/plugins/$pluginId/trending/$topicName',
+    getParentRoute: () => rootRoute,
+  } as any)
 
 const PluginsPluginIdPostApiIdRoute = PluginsPluginIdPostApiIdImport.update({
   id: '/plugins/$pluginId/post/$apiId',
@@ -129,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PluginsPluginIdPostApiIdImport
       parentRoute: typeof rootRoute
     }
+    '/plugins/$pluginId/trending/$topicName': {
+      id: '/plugins/$pluginId/trending/$topicName'
+      path: '/plugins/$pluginId/trending/$topicName'
+      fullPath: '/plugins/$pluginId/trending/$topicName'
+      preLoaderRoute: typeof PluginsPluginIdTrendingTopicNameImport
+      parentRoute: typeof rootRoute
+    }
     '/plugins/$pluginId/user/$apiId': {
       id: '/plugins/$pluginId/user/$apiId'
       path: '/plugins/$pluginId/user/$apiId'
@@ -141,6 +164,13 @@ declare module '@tanstack/react-router' {
       path: '/plugins/$pluginId/instances'
       fullPath: '/plugins/$pluginId/instances'
       preLoaderRoute: typeof PluginsPluginIdInstancesIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/plugins/$pluginId/trending/': {
+      id: '/plugins/$pluginId/trending/'
+      path: '/plugins/$pluginId/trending'
+      fullPath: '/plugins/$pluginId/trending'
+      preLoaderRoute: typeof PluginsPluginIdTrendingIndexImport
       parentRoute: typeof rootRoute
     }
     '/plugins/$pluginId/instances/$instanceId/feed': {
@@ -188,8 +218,10 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/plugins/$pluginId/feed': typeof PluginsPluginIdFeedRoute
   '/plugins/$pluginId/post/$apiId': typeof PluginsPluginIdPostApiIdRoute
+  '/plugins/$pluginId/trending/$topicName': typeof PluginsPluginIdTrendingTopicNameRoute
   '/plugins/$pluginId/user/$apiId': typeof PluginsPluginIdUserApiIdRoute
   '/plugins/$pluginId/instances': typeof PluginsPluginIdInstancesIndexRoute
+  '/plugins/$pluginId/trending': typeof PluginsPluginIdTrendingIndexRoute
   '/plugins/$pluginId/instances/$instanceId/feed': typeof PluginsPluginIdInstancesInstanceIdFeedRoute
   '/plugins/$pluginId/community/$apiId': typeof PluginsPluginIdCommunityApiIdIndexRoute
   '/plugins/$pluginId/community/$communityId/post/$apiId': typeof PluginsPluginIdCommunityCommunityIdPostApiIdRoute
@@ -202,8 +234,10 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/plugins/$pluginId/feed': typeof PluginsPluginIdFeedRoute
   '/plugins/$pluginId/post/$apiId': typeof PluginsPluginIdPostApiIdRoute
+  '/plugins/$pluginId/trending/$topicName': typeof PluginsPluginIdTrendingTopicNameRoute
   '/plugins/$pluginId/user/$apiId': typeof PluginsPluginIdUserApiIdRoute
   '/plugins/$pluginId/instances': typeof PluginsPluginIdInstancesIndexRoute
+  '/plugins/$pluginId/trending': typeof PluginsPluginIdTrendingIndexRoute
   '/plugins/$pluginId/instances/$instanceId/feed': typeof PluginsPluginIdInstancesInstanceIdFeedRoute
   '/plugins/$pluginId/community/$apiId': typeof PluginsPluginIdCommunityApiIdIndexRoute
   '/plugins/$pluginId/community/$communityId/post/$apiId': typeof PluginsPluginIdCommunityCommunityIdPostApiIdRoute
@@ -217,8 +251,10 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/plugins/$pluginId/feed': typeof PluginsPluginIdFeedRoute
   '/plugins/$pluginId/post/$apiId': typeof PluginsPluginIdPostApiIdRoute
+  '/plugins/$pluginId/trending/$topicName': typeof PluginsPluginIdTrendingTopicNameRoute
   '/plugins/$pluginId/user/$apiId': typeof PluginsPluginIdUserApiIdRoute
   '/plugins/$pluginId/instances/': typeof PluginsPluginIdInstancesIndexRoute
+  '/plugins/$pluginId/trending/': typeof PluginsPluginIdTrendingIndexRoute
   '/plugins/$pluginId/instances/$instanceId/feed': typeof PluginsPluginIdInstancesInstanceIdFeedRoute
   '/plugins/$pluginId/community/$apiId/': typeof PluginsPluginIdCommunityApiIdIndexRoute
   '/plugins/$pluginId/community/$communityId/post/$apiId': typeof PluginsPluginIdCommunityCommunityIdPostApiIdRoute
@@ -233,8 +269,10 @@ export interface FileRouteTypes {
     | '/settings'
     | '/plugins/$pluginId/feed'
     | '/plugins/$pluginId/post/$apiId'
+    | '/plugins/$pluginId/trending/$topicName'
     | '/plugins/$pluginId/user/$apiId'
     | '/plugins/$pluginId/instances'
+    | '/plugins/$pluginId/trending'
     | '/plugins/$pluginId/instances/$instanceId/feed'
     | '/plugins/$pluginId/community/$apiId'
     | '/plugins/$pluginId/community/$communityId/post/$apiId'
@@ -246,8 +284,10 @@ export interface FileRouteTypes {
     | '/settings'
     | '/plugins/$pluginId/feed'
     | '/plugins/$pluginId/post/$apiId'
+    | '/plugins/$pluginId/trending/$topicName'
     | '/plugins/$pluginId/user/$apiId'
     | '/plugins/$pluginId/instances'
+    | '/plugins/$pluginId/trending'
     | '/plugins/$pluginId/instances/$instanceId/feed'
     | '/plugins/$pluginId/community/$apiId'
     | '/plugins/$pluginId/community/$communityId/post/$apiId'
@@ -259,8 +299,10 @@ export interface FileRouteTypes {
     | '/settings'
     | '/plugins/$pluginId/feed'
     | '/plugins/$pluginId/post/$apiId'
+    | '/plugins/$pluginId/trending/$topicName'
     | '/plugins/$pluginId/user/$apiId'
     | '/plugins/$pluginId/instances/'
+    | '/plugins/$pluginId/trending/'
     | '/plugins/$pluginId/instances/$instanceId/feed'
     | '/plugins/$pluginId/community/$apiId/'
     | '/plugins/$pluginId/community/$communityId/post/$apiId'
@@ -274,8 +316,10 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   PluginsPluginIdFeedRoute: typeof PluginsPluginIdFeedRoute
   PluginsPluginIdPostApiIdRoute: typeof PluginsPluginIdPostApiIdRoute
+  PluginsPluginIdTrendingTopicNameRoute: typeof PluginsPluginIdTrendingTopicNameRoute
   PluginsPluginIdUserApiIdRoute: typeof PluginsPluginIdUserApiIdRoute
   PluginsPluginIdInstancesIndexRoute: typeof PluginsPluginIdInstancesIndexRoute
+  PluginsPluginIdTrendingIndexRoute: typeof PluginsPluginIdTrendingIndexRoute
   PluginsPluginIdInstancesInstanceIdFeedRoute: typeof PluginsPluginIdInstancesInstanceIdFeedRoute
   PluginsPluginIdCommunityApiIdIndexRoute: typeof PluginsPluginIdCommunityApiIdIndexRoute
   PluginsPluginIdCommunityCommunityIdPostApiIdRoute: typeof PluginsPluginIdCommunityCommunityIdPostApiIdRoute
@@ -288,8 +332,10 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   PluginsPluginIdFeedRoute: PluginsPluginIdFeedRoute,
   PluginsPluginIdPostApiIdRoute: PluginsPluginIdPostApiIdRoute,
+  PluginsPluginIdTrendingTopicNameRoute: PluginsPluginIdTrendingTopicNameRoute,
   PluginsPluginIdUserApiIdRoute: PluginsPluginIdUserApiIdRoute,
   PluginsPluginIdInstancesIndexRoute: PluginsPluginIdInstancesIndexRoute,
+  PluginsPluginIdTrendingIndexRoute: PluginsPluginIdTrendingIndexRoute,
   PluginsPluginIdInstancesInstanceIdFeedRoute:
     PluginsPluginIdInstancesInstanceIdFeedRoute,
   PluginsPluginIdCommunityApiIdIndexRoute:
@@ -316,8 +362,10 @@ export const routeTree = rootRoute
         "/settings",
         "/plugins/$pluginId/feed",
         "/plugins/$pluginId/post/$apiId",
+        "/plugins/$pluginId/trending/$topicName",
         "/plugins/$pluginId/user/$apiId",
         "/plugins/$pluginId/instances/",
+        "/plugins/$pluginId/trending/",
         "/plugins/$pluginId/instances/$instanceId/feed",
         "/plugins/$pluginId/community/$apiId/",
         "/plugins/$pluginId/community/$communityId/post/$apiId",
@@ -337,11 +385,17 @@ export const routeTree = rootRoute
     "/plugins/$pluginId/post/$apiId": {
       "filePath": "plugins/$pluginId/post.$apiId.tsx"
     },
+    "/plugins/$pluginId/trending/$topicName": {
+      "filePath": "plugins/$pluginId/trending.$topicName.tsx"
+    },
     "/plugins/$pluginId/user/$apiId": {
       "filePath": "plugins/$pluginId/user.$apiId.tsx"
     },
     "/plugins/$pluginId/instances/": {
       "filePath": "plugins/$pluginId/instances/index.tsx"
+    },
+    "/plugins/$pluginId/trending/": {
+      "filePath": "plugins/$pluginId/trending.index.tsx"
     },
     "/plugins/$pluginId/instances/$instanceId/feed": {
       "filePath": "plugins/$pluginId/instances/$instanceId/feed.tsx"

@@ -153,3 +153,36 @@ export interface SearchResponse {
   items: Post[];
   pageInfo?: PageInfo;
 }
+
+export interface TrendingTopic {
+  name: string;
+  url?: string;
+  history?: Array<{
+    day: string;
+    uses: string;
+    accounts: string;
+  }>;
+}
+
+export interface GetTrendingTopicsRequest {
+  instanceId?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface GetTrendingTopicsResponse {
+  items: TrendingTopic[];
+  pageInfo?: PageInfo;
+}
+
+export interface GetTrendingTopicFeedRequest {
+  topicName: string;
+  instanceId?: string;
+  pageInfo?: PageInfo;
+}
+
+export interface GetTrendingTopicFeedResponse {
+  items: Post[];
+  pageInfo?: PageInfo;
+  topic?: TrendingTopic;
+}
