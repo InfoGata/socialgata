@@ -22,6 +22,8 @@ const statusToPost = (status: Status): Post => {
 };
 
 class MastodonService implements ServiceType {
+  platformType = "microblog" as const;
+
   async getFeed(): Promise<GetFeedResponse> {
     const timelines = await masto.v1.timelines.public.list({ limit: 30 });
     const items: Post[] = timelines.map(statusToPost);

@@ -209,6 +209,7 @@ const redditCommentToPost = (comment: ListingChildCommentData): Post => {
 
 
 class RedditService implements ServiceType {
+  platformType = "forum" as const;
   private accessToken = "";
 
   private getBaseUrl = () => {

@@ -16,6 +16,9 @@ interface Props {
 const PostWithComponents: React.FC<Props> = (props) => {
   const { data, pluginId } = props;
   const [replies, setReplies] = React.useState<Post[] | null>(null);
+  const service = pluginId ? getService(pluginId) : null;
+  const platformType = service?.platformType || "forum";
+
   const getReplies = async () => {
     if (!pluginId || !data.post?.moreRepliesId) return;
 
@@ -53,7 +56,7 @@ const PostWithComponents: React.FC<Props> = (props) => {
       {data.post && (
         <Card>
           <CardContent className="p-0">
-            <PostComponent post={data.post} />
+            <PostComponent post={data.post} platformType={platformType} />
           </CardContent>
         </Card>
       )}

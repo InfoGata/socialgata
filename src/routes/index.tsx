@@ -2,7 +2,7 @@ import PluginFeedButtons from "@/components/PluginFeedButttons";
 import { createFileRoute } from "@tanstack/react-router";
 import React from "react";
 
-const pluginIds = ["reddit", "mastodon", "lemmy", "hackernews"];
+const pluginIds = ["reddit", "mastodon", "lemmy", "hackernews", "bluesky"];
 
 export const Index: React.FC = () => {
   return (

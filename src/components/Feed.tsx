@@ -5,6 +5,7 @@ import { PaginationNext, PaginationPrevious, Pagination, PaginationContent, Pagi
 import { Loader2, TrendingUp, Clock, Award, Inbox } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import React from "react";
+import { getService } from "@/services/selector-service";
 
 type FeedProps = {
   feedTypeId?: string;
@@ -18,6 +19,8 @@ type FeedProps = {
 const Feed: React.FC<FeedProps> = (props) => {
   const { feedTypeId, data, pageInfo, pluginId, instanceId, isLoading } = props;
   const { nextPage, prevPage, hasNextPage, hasPreviousPage } = usePagination(pageInfo);
+  const service = getService(pluginId);
+  const platformType = service?.platformType || "forum";
 
   const getFeedIcon = (feedTypeId?: string) => {
     switch(feedTypeId?.toLowerCase()) {
@@ -104,12 +107,12 @@ const Feed: React.FC<FeedProps> = (props) => {
               {/* Posts Grid */}
               <div className="grid gap-2">
                 {data.items.map((item, index) => (
-                  <div 
-                    key={item.apiId} 
+                  <div
+                    key={item.apiId}
                     className="animate-in fade-in slide-in-from-bottom-1"
                     style={{ animationDelay: `${index * 30}ms` }}
                   >
-                    <PostComponent post={item} instanceId={instanceId} />
+                    <PostComponent post={item} instanceId={instanceId} platformType={platformType} />
                   </div>
                 ))}
               </div>

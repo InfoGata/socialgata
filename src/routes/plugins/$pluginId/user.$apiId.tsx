@@ -5,10 +5,14 @@ import React from "react";
 
 const UserOverview: React.FC = () => {
   const data = Route.useLoaderData();
+  const { pluginId } = Route.useParams();
+  const service = getService(pluginId);
+  const platformType = service?.platformType || "forum";
+
   return (
     <div>
       {data.map((d) => (
-        <PostComponent post={d} />
+        <PostComponent key={d.apiId} post={d} platformType={platformType} />
       ))}
     </div>
   );

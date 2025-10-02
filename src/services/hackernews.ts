@@ -156,6 +156,8 @@ const algoliaCommentHitToPost = (comment: AlgoriaCommentHit): Post => {
 }
 
 class HackerNewsService implements ServiceType {
+  platformType = "forum" as const;
+
   private getFeedPath(feedTypeId: string) {
     switch (feedTypeId) {
       case "top": return "/v0/topstories";

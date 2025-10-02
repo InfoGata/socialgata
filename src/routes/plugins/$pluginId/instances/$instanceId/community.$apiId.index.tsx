@@ -4,10 +4,14 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 
 const Community: React.FC = () => {
   const data = Route.useLoaderData();
+  const { pluginId } = Route.useParams();
+  const service = getService(pluginId);
+  const platformType = service?.platformType || "forum";
+
   return (
     <div>
       {data.map((p) => (
-        <PostComponent key={p.title} post={p} />
+        <PostComponent key={p.title} post={p} platformType={platformType} />
       ))}
     </div>
   );

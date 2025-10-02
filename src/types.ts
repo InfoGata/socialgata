@@ -2,7 +2,10 @@ import { LinkOptions } from "@tanstack/react-router";
 import { GetCommentRepliesRequest, GetCommentRepliesResponse, GetCommentsRequest, GetCommentsResponse, GetCommunityRequest, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetInstancesRequest, GetInstancesResponse, GetTrendingTopicFeedRequest, GetTrendingTopicFeedResponse, GetTrendingTopicsRequest, GetTrendingTopicsResponse, GetUserReponse, GetUserRequest, LoginRequest, SearchRequest, SearchResponse } from "./plugintypes";
 import { router } from "./router";
 
+export type PlatformType = "forum" | "microblog";
+
 export interface ServiceType {
+  platformType: PlatformType;
   getInstances?(request?: GetInstancesRequest): Promise<GetInstancesResponse>;
   getFeed(request?: GetFeedRequest): Promise<GetFeedResponse>;
   getCommunity?(request: GetCommunityRequest): Promise<GetCommunityResponse>;

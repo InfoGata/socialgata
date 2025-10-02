@@ -103,6 +103,8 @@ interface LemmyInstanceCounts {
 
 
 class LemmyService implements ServiceType {
+  platformType = "forum" as const;
+
   async getFeed(request: GetFeedRequest): Promise<GetFeedResponse> {
     let url = baseUrl;
     if (request.instanceId) {
