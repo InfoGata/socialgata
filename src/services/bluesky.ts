@@ -31,7 +31,7 @@ class BlueskyService implements ServiceType {
       apiId: post.uri,
       body: record?.text || "",
       authorName: post.author?.displayName || post.author?.handle || "",
-      authorApiId: post.author?.did || "",
+      authorApiId: post.author?.handle || "",
       authorAvatar: post.author?.avatar,
       score: post.likeCount || 0,
       numOfComments: post.replyCount || 0,
@@ -85,9 +85,11 @@ class BlueskyService implements ServiceType {
 
   async getUser(request: GetUserRequest): Promise<GetUserReponse> {
     try {
-      const profile = await this.agent.getProfile({ actor: request.apiId });
+      const did = await this.agent.resolveHandle({ handle: request.apiId });
+      const profile = await this.agent.getProfile({ actor: did.data.did });
+
       const feed = await this.agent.getAuthorFeed({
-        actor: request.apiId,
+        actor: did.data.did,
         limit: 30,
       });
 
