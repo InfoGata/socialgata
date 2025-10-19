@@ -198,15 +198,23 @@ class TwitterService implements ServiceType {
         if (processedIds.has(postId)) return;
         processedIds.add(postId);
 
-        // Find the post container - usually a parent div
-        let postContainer = statusLink.closest("div");
-        while (postContainer && postContainer.children.length < 2) {
-          postContainer = postContainer.parentElement as HTMLDivElement;
+        // Find the main post container by going up to find the largest div with proper structure
+        let postContainer = statusLink.parentElement;
+        let attempts = 0;
+        while (postContainer && attempts < 10) {
+          // Look for a container that has both heading and content
+          const hasHeading = postContainer.querySelector('h4');
+          const hasParagraph = postContainer.querySelector('p');
+          if (hasHeading && hasParagraph) {
+            break;
+          }
+          postContainer = postContainer.parentElement;
+          attempts++;
         }
 
         if (!postContainer) return;
 
-        // Extract author info
+        // Extract author info from the h4 heading
         const authorHeading = postContainer.querySelector('h4');
         const authorText = authorHeading?.textContent?.trim() || "";
 
@@ -216,27 +224,47 @@ class TwitterService implements ServiceType {
         if (authorText.includes("@")) {
           const parts = authorText.split("@");
           authorName = parts[0]?.trim().replace(/Verified/g, "").trim() || "";
-          authorHandle = parts[1]?.trim() || "";
+          authorHandle = parts[1]?.trim().split(/\s/)[0] || ""; // Take only the handle, not any text after it
         }
+
+        // Skip if we couldn't extract author info
+        if (!authorName && !authorHandle) return;
 
         // Extract avatar
         const avatarImg = postContainer.querySelector('img[alt*="Profile Picture"]');
         const authorAvatar = avatarImg?.getAttribute("src") ?? undefined;
 
-        // Extract post body - find paragraph elements
-        const bodyParagraphs = postContainer.querySelectorAll("p");
+        // Extract post body - find the first substantial paragraph after the heading
+        const allParagraphs = Array.from(postContainer.querySelectorAll("p"));
         let body = "";
-        bodyParagraphs.forEach((p) => {
-          const text = p.textContent?.trim();
-          if (text && !text.includes("@") && !text.match(/^\d+\s*(hours?|minutes?|days?|ago)/)) {
+
+        for (const p of allParagraphs) {
+          const text = p.textContent?.trim() || "";
+
+          // Skip if it's just a timestamp
+          if (text.match(/^(less than a minute ago|\d+\s*(hours?|minutes?|days?|seconds?)\s*ago)$/i)) {
+            continue;
+          }
+
+          // Skip if it's part of a quoted/nested tweet (has specific parent structure)
+          const parentDiv = p.closest('div[class*="quote"], div[class*="retweet"]');
+          if (parentDiv && parentDiv !== postContainer) {
+            continue;
+          }
+
+          // Add non-empty, non-timestamp text
+          if (text.length > 0) {
             body += text + "\n";
           }
-        });
+        }
+
         body = body.trim();
 
-        // Extract timestamp
-        const timeLink = postContainer.querySelector('a[href*="/status/"]');
-        const timeText = timeLink?.textContent?.trim() || "";
+        // Extract timestamp from the status link
+        const timeLinkText = statusLink.textContent?.trim() || "";
+        const timeText = timeLinkText.match(/^\d+\s*(hours?|minutes?|days?|seconds?)\s*ago|less than a minute ago/i)
+          ? timeLinkText
+          : "";
 
         // Extract engagement metrics - look for links with numbers
         const metricLinks = postContainer.querySelectorAll('a[href="#"]');
@@ -266,22 +294,21 @@ class TwitterService implements ServiceType {
           mediaType = "image";
         }
 
-        if (body || mediaUrl) {
-          posts.push({
-            apiId: postId,
-            body: body,
-            authorName: authorName,
-            authorApiId: authorHandle,
-            authorAvatar: authorAvatar,
-            publishedDate: timeText, // We could convert this to ISO format
-            pluginId: pluginName,
-            url: mediaUrl,
-            thumbnailUrl: mediaType === "image" ? mediaUrl : undefined,
-            score: likes,
-            numOfComments: replies,
-            originalUrl: `https://twitter.com/i/status/${postId}`,
-          });
-        }
+        // Always add the post if we have author info - body can be empty for media-only posts
+        posts.push({
+          apiId: postId,
+          body: body || undefined,
+          authorName: authorName,
+          authorApiId: authorHandle,
+          authorAvatar: authorAvatar,
+          publishedDate: timeText || undefined,
+          pluginId: pluginName,
+          url: mediaUrl,
+          thumbnailUrl: mediaType === "image" ? mediaUrl : undefined,
+          score: likes,
+          numOfComments: replies,
+          originalUrl: `https://twitter.com/i/status/${postId}`,
+        });
       } catch (error) {
         console.error("Error parsing post:", error);
       }
