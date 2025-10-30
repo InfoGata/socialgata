@@ -4,14 +4,16 @@ import { defaultPlugins } from "@/default-plugins";
 import { createFileRoute } from "@tanstack/react-router";
 import React from "react";
 import { isCorsDisabled } from "@/utils";
+import { useExtension } from "@/contexts/ExtensionContext";
 
 export const Index: React.FC = () => {
   const corsDisabled = isCorsDisabled();
+  const { extensionDetected } = useExtension();
 
   const visiblePlugins = defaultPlugins.filter((plugin) => {
     // If plugin requires CORS to be disabled, only show it if CORS is actually disabled
     if (plugin.requiresCorsDisabled) {
-      return corsDisabled;
+      return corsDisabled || extensionDetected;
     }
     // Otherwise, always show the plugin
     return true;
