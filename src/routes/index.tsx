@@ -4,7 +4,7 @@ import { defaultPlugins } from "@/default-plugins";
 import { createFileRoute } from "@tanstack/react-router";
 import React from "react";
 import { isCorsDisabled } from "@/utils";
-import { useExtension } from "@/contexts/ExtensionContext";
+import { useExtension } from "@/hooks/useExtension";
 
 export const Index: React.FC = () => {
   const corsDisabled = isCorsDisabled();

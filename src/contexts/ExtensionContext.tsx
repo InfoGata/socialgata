@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { hasExtension } from "@/utils";
 
-interface ExtensionContextType {
+export interface ExtensionContextType {
   extensionDetected: boolean | null;
 }
 
-const ExtensionContext = createContext<ExtensionContextType | undefined>(undefined);
+export const ExtensionContext = createContext<ExtensionContextType | undefined>(undefined);
 
 export const ExtensionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [extensionDetected, setExtensionDetected] = useState<boolean | null>(null);
@@ -51,12 +51,4 @@ export const ExtensionProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       {children}
     </ExtensionContext.Provider>
   );
-};
-
-export const useExtension = (): ExtensionContextType => {
-  const context = useContext(ExtensionContext);
-  if (context === undefined) {
-    throw new Error("useExtension must be used within an ExtensionProvider");
-  }
-  return context;
 };

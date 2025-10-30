@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
-import { useExtension } from "@/contexts/ExtensionContext";
+import { useExtension } from "@/hooks/useExtension";
 
 export const ExtensionBanner: React.FC = () => {
   const { t } = useTranslation();
