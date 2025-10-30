@@ -1,6 +1,37 @@
 import { LinkOptions } from "@tanstack/react-router";
-import { GetCommentRepliesRequest, GetCommentRepliesResponse, GetCommentsRequest, GetCommentsResponse, GetCommunityRequest, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetInstancesRequest, GetInstancesResponse, GetTrendingTopicFeedRequest, GetTrendingTopicFeedResponse, GetTrendingTopicsRequest, GetTrendingTopicsResponse, GetUserReponse, GetUserRequest, LoginRequest, SearchRequest, SearchResponse } from "./plugintypes";
+import { GetCommentRepliesRequest, GetCommentRepliesResponse, GetCommentsRequest, GetCommentsResponse, GetCommunityRequest, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetInstancesRequest, GetInstancesResponse, GetTrendingTopicFeedRequest, GetTrendingTopicFeedResponse, GetTrendingTopicsRequest, GetTrendingTopicsResponse, GetUserReponse, GetUserRequest, LoginRequest, ManifestAuthentication, SearchRequest, SearchResponse } from "./plugintypes";
 import { router } from "./router";
+
+export interface NetworkRequest {
+  body: Blob | ArrayBuffer | null;
+  headers: { [k: string]: string };
+  status: number;
+  statusText: string;
+  url: string;
+}
+
+export interface NetworkRequestOptions {
+  auth?: ManifestAuthentication;
+}
+
+export interface InfoGataExtension {
+  networkRequest: (
+    input: string,
+    init?: RequestInit,
+    options?: NetworkRequestOptions
+  ) => Promise<NetworkRequest>;
+  openLoginWindow?: (
+    auth: ManifestAuthentication,
+    pluginId: string
+  ) => Promise<void>;
+  getVersion?: () => Promise<string>;
+}
+
+declare global {
+  interface Window {
+    InfoGata?: InfoGataExtension;
+  }
+}
 
 export type PlatformType = "forum" | "microblog";
 

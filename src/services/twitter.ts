@@ -15,7 +15,6 @@ import {
 
 const pluginName = "twitter";
 const TWSTALKER_BASE_URL = "https://twstalker.com";
-const CORS_PROXY = "http://localhost:8888/.netlify/functions/proxy?url=";
 
 // Helper function to parse engagement counts like "2K", "1.5M", "362"
 function parseEngagementCount(countStr: string): number {
@@ -42,10 +41,18 @@ class TwitterService implements ServiceType {
   platformType = "microblog" as const;
 
   private async fetchHTML(url: string): Promise<Document> {
-    // Encode the URL as a query parameter for the CORS proxy
-    const proxiedUrl = `${CORS_PROXY}${encodeURIComponent(url)}`;
-    const response = await fetch(proxiedUrl);
+    if (!window.InfoGata) {
+      throw new Error("InfoGata extension not available");
+    }
+
+    const result = await window.InfoGata.networkRequest(url);
+    const response = new Response(result.body, {
+      headers: result.headers,
+      status: result.status,
+      statusText: result.statusText
+    });
     const html = await response.text();
+
     const parser = new DOMParser();
     return parser.parseFromString(html, "text/html");
   }

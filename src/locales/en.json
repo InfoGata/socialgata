@@ -1,6 +1,9 @@
 {
   "common": {
-    "settings": "Settings"
+    "settings": "Settings",
+    "extensionMessage": "Get the InfoGata extension for enhanced plugin functionality",
+    "installExtension": "Install Extension",
+    "close": "Close"
   },
   "settings": {
     "theme": "Theme",

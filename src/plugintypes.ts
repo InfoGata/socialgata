@@ -1,3 +1,28 @@
+export interface Manifest {
+  name: string;
+  script: string;
+  id?: string;
+  version?: string;
+  description?: string;
+  options?: string | ManifestOptions;
+  homepage?: string;
+  updateUrl?: string;
+  authentication?: ManifestAuthentication;
+}
+
+export interface ManifestAuthentication {
+  loginUrl: string;
+  cookiesToFind?: string[];
+  loginButton?: string;
+  headersToFind?: string[];
+  domainHeadersToFind: Record<string, string[]>;
+  completionUrl?: string;
+}
+
+export interface ManifestOptions {
+  page: string;
+  sameOrigin?: boolean;
+}
 export interface Post {
   number?: number;
   apiId?: string;

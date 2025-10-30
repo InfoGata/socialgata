@@ -4,30 +4,46 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setIsNavigationMenuOpen } from "@/store/reducers/uiSlice";
 import { Link, useNavigate, useParams } from "@tanstack/react-router";
 import { MenuIcon } from "lucide-react";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "@/components/ui/select";
 import React, { useState, useEffect } from "react";
+import { defaultPlugins } from "@/default-plugins";
+import { getService } from "@/services/selector-service";
 
 export const TopBar: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const params = useParams({ strict: false });
   const isNavigationMenuOpen = useAppSelector((state) => state.ui.isNavigationMenuOpen);
-  const [selectedSearchSource, setSelectedSearchSource] = useState<'reddit' | 'hackernews'>('reddit');
-  
+
+  const searchSources = React.useMemo(() => {
+    return defaultPlugins
+      .map(plugin => {
+        const service = getService(plugin.id);
+        if (service && service.search) {
+          return {
+            id: plugin.id,
+            name: plugin.name,
+            pluginId: plugin.id
+          };
+        }
+        return null;
+      })
+      .filter((source): source is NonNullable<typeof source> => source !== null);
+  }, []);
+
+  const [selectedSearchSource, setSelectedSearchSource] = useState<string>(
+    searchSources[0]?.id || 'reddit'
+  );
+
   const onToggleNavigationMenu = () => {
     dispatch(setIsNavigationMenuOpen(!isNavigationMenuOpen));
   };
-
-  const searchSources = React.useMemo(() => [
-    { id: 'reddit' as const, name: 'Reddit', pluginId: 'reddit' },
-    { id: 'hackernews' as const, name: 'Hacker News', pluginId: 'hackernews' }
-  ], []);
 
   const pluginId = (params as Record<string, string | undefined>)?.pluginId;
   
@@ -61,9 +77,9 @@ export const TopBar: React.FC = () => {
           <Link to="/">SocialGata</Link>
         </h1>
         <div className="flex items-center gap-2 max-w-md ml-auto">
-          <Select 
-            value={selectedSearchSource} 
-            onValueChange={(value) => setSelectedSearchSource(value as 'reddit' | 'hackernews')}
+          <Select
+            value={selectedSearchSource}
+            onValueChange={(value) => setSelectedSearchSource(value)}
           >
             <SelectTrigger className="w-32">
               <SelectValue />
