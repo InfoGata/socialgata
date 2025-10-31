@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ThemeProvider } from "@/providers/ThemeProvider";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { Root } from "@/routes/__root";
 import {
   RouterProvider,

@@ -6,7 +6,7 @@ import { Provider } from "react-redux";
 import { store } from "./store/store";
 import Router from "./router";
 import "./i18n";
-import { ThemeProvider } from "./providers/ThemeProvider";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import { ExtensionProvider } from "./contexts/ExtensionContext";
 
 
