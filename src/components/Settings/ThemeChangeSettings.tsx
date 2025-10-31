@@ -1,5 +1,5 @@
 import { Theme } from "@/plugintypes";
-import { useTheme } from "@/providers/ThemeProvider";
+import { useTheme } from "@/hooks/useTheme";
 import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 

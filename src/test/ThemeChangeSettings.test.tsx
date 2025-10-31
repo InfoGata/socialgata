@@ -1,15 +1,14 @@
 import { screen, waitFor, cleanup } from "@testing-library/react";
 import { renderWithProviders } from "./renderWithProviders";
 import ThemeChangeSettings from "@/components/Settings/ThemeChangeSettings";
-import { useTheme } from "@/providers/ThemeProvider";
+import { useTheme } from "@/hooks/useTheme";
 import { describe, it, expect, vi, beforeEach, afterEach, Mock } from "vitest";
 import userEvent from "@testing-library/user-event";
 import '@testing-library/jest-dom/vitest';
 
 // Mock the useTheme hook
-vi.mock("@/providers/ThemeProvider", () => ({
+vi.mock("@/hooks/useTheme", () => ({
   useTheme: vi.fn(),
-  ThemeProvider: ({ children }: { children: React.ReactNode }) => children
 }));
 
 // Mock the translation function
