@@ -12,11 +12,15 @@ vi.mock("@/hooks/useTheme", () => ({
 }));
 
 // Mock the translation function
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string) => key, // Return the key as-is for simplicity
-  }),
-}));
+vi.mock("react-i18next", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useTranslation: () => ({
+      t: (key: string) => key, // Return the key as-is for simplicity
+    }),
+  };
+});
 
 describe("ThemeChangeSettings", () => {
   const mockSetTheme = vi.fn();
@@ -45,18 +49,16 @@ describe("ThemeChangeSettings", () => {
   it("calls setTheme when a new theme is selected", async () => {
     const user = userEvent.setup();
     renderWithProviders(<ThemeChangeSettings />);
-    
-    await waitFor(async () => {
-      // Open the select dropdown
-      const themeSelect = screen.getByTestId("theme-select");
-      await waitFor(() => user.click(themeSelect));
 
-      // Select the dark theme
-      const darkOption = screen.getByText("dark");
-      await waitFor(() => user.click(darkOption));
+    // Open the select dropdown
+    const themeSelect = screen.getByTestId("theme-select");
+    await user.click(themeSelect);
 
-      expect(mockSetTheme).toHaveBeenCalledWith("dark");
-    });
+    // Select the dark theme
+    const darkOption = await screen.findByText("dark");
+    await user.click(darkOption);
+
+    expect(mockSetTheme).toHaveBeenCalledWith("dark");
   });
 
   it("displays theme value from context", async () => {

@@ -16,10 +16,10 @@ describe('Index Route', () => {
 
   it('renders PluginFeedButtons for all plugins', async () => {
     renderWithProviders(<Index />);
-    
-    // Check for all plugin buttons
-    const pluginIds = ['reddit', 'mastodon', 'lemmy', 'hackernews'];
-    
+
+    // Check for all plugin buttons (excluding Twitter which requires CORS disabled)
+    const pluginIds = ['reddit', 'mastodon', 'lemmy', 'hackernews', 'bluesky'];
+
     await waitFor(() => {
       pluginIds.forEach(pluginId => {
         const pluginElement = screen.getByTestId(`plugin-feed-${pluginId}`);
@@ -32,9 +32,10 @@ describe('Index Route', () => {
     renderWithProviders(<Index />);
 
     // This assumes PluginFeedButtons has a data-testid attribute
+    // 5 plugins are visible (6 total, but Twitter requires CORS disabled)
     await waitFor(() => {
       const pluginButtons = screen.getAllByTestId(/^plugin-feed-/);
-      expect(pluginButtons).toHaveLength(4);
+      expect(pluginButtons).toHaveLength(5);
     });
   });
 }); 
