@@ -23,7 +23,7 @@ const TrendingTopics: React.FC = () => {
                   }}
                   className="text-primary hover:underline"
                 >
-                  #{topic.name}
+                  {topic.name}
                 </Link>
               </CardTitle>
             </CardHeader>

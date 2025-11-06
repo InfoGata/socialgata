@@ -10,7 +10,7 @@ const TrendingTopicFeed: React.FC = () => {
     <div>
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">
-          Trending: #{decodeURIComponent(params.topicName)}
+          Trending: {decodeURIComponent(params.topicName)}
         </h1>
       </div>
       <Feed
