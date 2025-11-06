@@ -59,7 +59,7 @@ class TwitterService implements ServiceType {
 
   async getTrendingTopics(request?: GetTrendingTopicsRequest): Promise<GetTrendingTopicsResponse> {
     try {
-      const doc = await this.fetchHTML(TWSTALKER_BASE_URL);
+      const doc = await this.fetchHTML(`${TWSTALKER_BASE_URL}/united-states`);
 
       // Find all trending topic links
       const trendElements = doc.querySelectorAll('a[href*="/search/"]');
