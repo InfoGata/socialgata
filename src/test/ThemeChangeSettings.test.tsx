@@ -13,7 +13,7 @@ vi.mock("@/hooks/useTheme", () => ({
 
 // Mock the translation function
 vi.mock("react-i18next", async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import("react-i18next")>();
   return {
     ...actual,
     useTranslation: () => ({
