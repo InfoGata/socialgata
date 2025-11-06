@@ -41,6 +41,9 @@ const PluginLogin = (props: PluginLoginProps) => {
     const service = getService(pluginId);
     if (service && service.login) {
       await service.login({ apiKey: apiKey, apiSecret: apiSecret });
+      if (service.isLoggedIn) {
+        setIsLoggedIn(await service.isLoggedIn());
+      }
     }
   };
 
