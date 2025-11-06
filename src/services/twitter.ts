@@ -42,7 +42,11 @@ class TwitterService implements ServiceType {
 
   private async fetchHTML(url: string): Promise<Document> {
     if (!window.InfoGata) {
-      throw new Error("InfoGata extension not available");
+      // Retry after 1 second
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!window.InfoGata) {
+        throw new Error("InfoGata extension not available");
+      }
     }
 
     const result = await window.InfoGata.networkRequest(url);
