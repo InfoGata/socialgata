@@ -4,6 +4,7 @@ import { ServiceType } from "@/types";
 const pluginName = "reddit";
 const REDDIT_API_BASE = "https://oauth.reddit.com";
 const REDDIT_PUBLIC_API_BASE = "https://www.reddit.com";
+const REDDIT_TOKEN_KEY = "reddit_access_token";
 
 type RedditResponse = Listing;
 
@@ -210,7 +211,7 @@ const redditCommentToPost = (comment: ListingChildCommentData): Post => {
 
 class RedditService implements ServiceType {
   platformType = "forum" as const;
-  private accessToken = "";
+  private accessToken = localStorage.getItem(REDDIT_TOKEN_KEY) || "";
 
   private getBaseUrl = () => {
     if (this.hasLogin()) {
@@ -343,6 +344,7 @@ class RedditService implements ServiceType {
 
   async logout(): Promise<void> {
     this.accessToken = "";
+    localStorage.removeItem(REDDIT_TOKEN_KEY);
   }
 
   hasLogin = () => {
@@ -390,6 +392,7 @@ class RedditService implements ServiceType {
           });
           const json = await response.json();
           this.accessToken = json.access_token;
+          localStorage.setItem(REDDIT_TOKEN_KEY, json.access_token);
           resolve();
         }
         if (newWindow) {
