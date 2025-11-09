@@ -5,9 +5,10 @@ type Props = {
   isVideo?: boolean;
   alt: string;
   className?: string;
+  thumbnailUrl?: string;
 };
 
-const ExpandedMedia: React.FC<Props> = ({ url, isVideo, alt, className }) => {
+const ExpandedMedia: React.FC<Props> = ({ url, isVideo, alt, className, thumbnailUrl }) => {
   if (isVideo) {
     return (
       <video
@@ -15,6 +16,7 @@ const ExpandedMedia: React.FC<Props> = ({ url, isVideo, alt, className }) => {
         controls
         className={className}
         preload="metadata"
+        poster={thumbnailUrl}
       >
         Your browser does not support the video tag.
       </video>

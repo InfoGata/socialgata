@@ -93,6 +93,7 @@ const PostComponent: React.FC<Props> = (props) => {
               {(expand || showFullPost) && post.url && (
                 <ExpandedMedia
                   url={post.url}
+                  thumbnailUrl={post.thumbnailUrl}
                   alt={post.body || "Post media"}
                   className="rounded-xl mb-2 max-w-full border"
                 />
@@ -221,6 +222,7 @@ const PostComponent: React.FC<Props> = (props) => {
             <ExpandedMedia
               url={post.url}
               isVideo={post.isVideo}
+              thumbnailUrl={post.thumbnailUrl}
               alt={post.title || "Post media"}
               className="rounded-md mb-2 max-w-full"
             />

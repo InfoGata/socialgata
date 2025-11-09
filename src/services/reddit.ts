@@ -207,8 +207,8 @@ const decodeHtmlEntities = (url: string | undefined): string | undefined => {
 }
 
 const redditPostsToPost = (post: ListingChildPostData): Post => {
-  const thumbnailUrl = post.is_video ? post.preview.images[0].resolutions
-    .find((r): r is PreviewImageResolution => r.width === 640)?.url : post.thumbnail;
+  const thumbnailUrl = post.is_video ? post.preview?.images[0]?.resolutions
+    ?.find((r): r is PreviewImageResolution => r.width === 640)?.url : post.thumbnail;
   return {
     apiId: post.id,
     title: post.title,
@@ -309,12 +309,47 @@ class RedditService implements ServiceType {
     }
   }
 
+  private getVideoUrlFromVxReddit = async (permalink: string): Promise<string | undefined> => {
+    try {
+      // Convert Reddit URL to vxReddit URL
+      const vxRedditUrl = `https://vxreddit.com${permalink}`;
+
+      // Fetch the vxReddit page
+      const response = await fetch(vxRedditUrl);
+      const html = await response.text();
+
+      // Parse HTML to find video URL
+      // vxReddit typically has the video URL in a meta tag or video element
+      const videoUrlMatch = html.match(/<meta property="og:video" content="([^"]+)"/);
+      if (videoUrlMatch && videoUrlMatch[1]) {
+        return videoUrlMatch[1];
+      }
+
+      // Fallback: try to find video source tag
+      const sourceMatch = html.match(/<source src="([^"]+)" type="video\/mp4"/);
+      if (sourceMatch && sourceMatch[1]) {
+        return sourceMatch[1];
+      }
+
+      // Another fallback: look for direct video URL in the page
+      const directVideoMatch = html.match(/https:\/\/[^"'\s]+\.mp4/);
+      if (directVideoMatch) {
+        return directVideoMatch[0];
+      }
+
+      return undefined;
+    } catch (error) {
+      console.error('Error fetching video URL from vxReddit:', error);
+      return undefined;
+    }
+  }
+
   getComments = async (request: GetCommentsRequest): Promise<GetCommentsResponse> => {
     const headers = this.getHeaders();
     const baseUrl = this.getBaseUrl();
     const url = `${baseUrl}/r/${request.communityId}/comments/${request.apiId}.json`;
     const response = await fetch(url, {
-      headers 
+      headers
     });
     const json: CommentsResponse = await response.json();
     const items = json[1].data?.children
@@ -327,6 +362,16 @@ class RedditService implements ServiceType {
       .find((c): c is ListingMore => c.kind === "more")?.data;
     post.moreRepliesId = more?.id;
     post.moreRepliesCount = more?.count;
+
+    // If it's a video post, get the actual video URL from vxReddit
+    if (post.isVideo) {
+      const postData = json[0].data.children[0].data;
+      const videoUrl = await this.getVideoUrlFromVxReddit(postData.permalink);
+      if (videoUrl) {
+        post.url = videoUrl;
+      }
+    }
+
     return {
       items,
       post
