@@ -162,6 +162,27 @@ interface ListingChildPostData {
   num_crossposts: number;
   media: string | null;
   is_video: boolean;
+  preview: Preview;
+}
+
+interface Preview {
+  enabled: boolean;
+  images: PreviewImage[];
+}
+
+interface PreviewImage {
+  source: {
+    url: string;
+    width: number;
+    height: number;
+  };
+  resolutions: PreviewImageResolution[];
+}
+
+interface PreviewImageResolution {
+  url: string;
+  width: number;
+  height: number;
 }
 
 interface CommentsResponse {
@@ -174,7 +195,20 @@ interface UserResponse {
   data: ListingData;
 }
 
+/**
+ * Decodes HTML entities in URLs (e.g., &amp; -> &)
+ * Reddit API sometimes returns URLs with HTML-encoded ampersands which break image loading
+ */
+const decodeHtmlEntities = (url: string | undefined): string | undefined => {
+  if (!url) return url;
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = url;
+  return textarea.value;
+}
+
 const redditPostsToPost = (post: ListingChildPostData): Post => {
+  const thumbnailUrl = post.is_video ? post.preview.images[0].resolutions
+    .find((r): r is PreviewImageResolution => r.width === 640)?.url : post.thumbnail;
   return {
     apiId: post.id,
     title: post.title,
@@ -186,8 +220,9 @@ const redditPostsToPost = (post: ListingChildPostData): Post => {
     communityApiId: post.subreddit,
     body: post.selftext,
     pluginId: pluginName,
-    thumbnailUrl: post.thumbnail === "self" ? undefined : post.thumbnail,
-    url: post.thumbnail === "self" ? undefined : post.url,
+    thumbnailUrl: post.thumbnail === "self" ? undefined : decodeHtmlEntities(thumbnailUrl),
+    url: post.thumbnail === "self" ? undefined : decodeHtmlEntities(post.url),
+    isVideo: post.is_video,
   }
 }
 
@@ -250,6 +285,10 @@ class RedditService implements ServiceType {
     const items = json.data?.children
       .filter((c): c is ListingChildPost => c.kind === "t3")
       .map(c => redditPostsToPost(c.data)) ?? [];
+    items.forEach((item, index) => {
+      item.number = (Number(request?.pageInfo?.page ?? "1") - 1) * 25 + index + 1;
+    });
+    console.log(items);
     return { items, pageInfo: { nextPage: json.data?.after ?? undefined, prevPage: json.data?.before ?? undefined } }
   };
 

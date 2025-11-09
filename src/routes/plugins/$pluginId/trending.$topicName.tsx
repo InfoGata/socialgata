@@ -32,7 +32,6 @@ export const Route = createFileRoute('/plugins/$pluginId/trending/$topicName')({
   loader: async ({ params, deps: { page } }) => {
     const service = getService(params.pluginId);
     if (service && service.getTrendingTopicFeed) {
-      console.log('[TrendingTopicFeed] getTrendingTopicFeed called with:', params.topicName, decodeURIComponent(params.topicName));
       const response = await service.getTrendingTopicFeed({
         topicName: decodeURIComponent(params.topicName),
         pageInfo: { page }

@@ -56,7 +56,7 @@ const PostWithComponents: React.FC<Props> = (props) => {
       {data.post && (
         <Card>
           <CardContent className="p-0">
-            <PostComponent post={data.post} platformType={platformType} />
+            <PostComponent post={data.post} platformType={platformType} showFullPost={true} />
           </CardContent>
         </Card>
       )}

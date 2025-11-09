@@ -10,16 +10,18 @@ import ImageThumbnail from "./ImageThumbnail";
 import parse from 'html-react-parser';
 import DOMPurify from "dompurify";
 import { PlatformType } from "@/types";
+import ExpandedMedia from "./ExpandedMedia";
 
 type Props = {
   post: Post;
   instanceId?: string;
   platformType?: PlatformType;
+  showFullPost?: boolean;
 };
 
 
 const PostComponent: React.FC<Props> = (props) => {
-  const { post, instanceId, platformType = "forum" } = props;
+  const { post, instanceId, platformType = "forum", showFullPost = false } = props;
   const [expand, setExpand] = React.useState(false);
   const toggleExpand = () => {
     setExpand(!expand);
@@ -87,12 +89,12 @@ const PostComponent: React.FC<Props> = (props) => {
                 </div>
               )}
 
-              {/* Expanded Image */}
-              {expand && post.url && (
-                <img
-                  src={post.url}
+              {/* Expanded Media */}
+              {(expand || showFullPost) && post.url && (
+                <ExpandedMedia
+                  url={post.url}
+                  alt={post.body || "Post media"}
                   className="rounded-xl mb-2 max-w-full border"
-                  alt={post.body || "Post image"}
                 />
               )}
 
@@ -214,12 +216,13 @@ const PostComponent: React.FC<Props> = (props) => {
             </div>
           )}
 
-          {/* Expanded Image */}
-          {expand && (
-            <img
-              src={post.url}
+          {/* Expanded Media */}
+          {(expand || showFullPost) && post.url && (
+            <ExpandedMedia
+              url={post.url}
+              isVideo={post.isVideo}
+              alt={post.title || "Post media"}
               className="rounded-md mb-2 max-w-full"
-              alt={post.title}
             />
           )}
 

@@ -45,6 +45,7 @@ export interface Post {
   numOfComments?: number;
   moreRepliesId?: string;
   moreRepliesCount?: number;
+  isVideo?: boolean;
 }
 
 export interface User {
