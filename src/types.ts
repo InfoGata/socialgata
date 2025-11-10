@@ -33,7 +33,7 @@ declare global {
   }
 }
 
-export type PlatformType = "forum" | "microblog";
+export type PlatformType = "forum" | "microblog" | "imageboard";
 
 export interface ServiceType {
   platformType: PlatformType;
@@ -42,7 +42,7 @@ export interface ServiceType {
   getCommunity?(request: GetCommunityRequest): Promise<GetCommunityResponse>;
   getComments?(request: GetCommentsRequest): Promise<GetCommentsResponse>;
   getCommentReplies?(request: GetCommentRepliesRequest): Promise<GetCommentRepliesResponse>;
-  getUser(request: GetUserRequest): Promise<GetUserReponse>;
+  getUser?(request: GetUserRequest): Promise<GetUserReponse>;
   search?(request: SearchRequest): Promise<SearchResponse>;
   getTrendingTopics?(request?: GetTrendingTopicsRequest): Promise<GetTrendingTopicsResponse>;
   getTrendingTopicFeed?(request: GetTrendingTopicFeedRequest): Promise<GetTrendingTopicFeedResponse>;

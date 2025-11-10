@@ -5,6 +5,7 @@ import { reddit } from "./reddit";
 import { hackerNews } from "./hackernews";
 import { bluesky } from "./bluesky";
 import { twitter } from "./twitter";
+import imageboard from "./imageboard";
 
 export const getService = (serviceName: string): ServiceType | null => {
   switch (serviceName) {
@@ -20,6 +21,8 @@ export const getService = (serviceName: string): ServiceType | null => {
       return bluesky;
     case "twitter":
       return twitter;
+    case "imageboard":
+      return imageboard;
   }
   return null;
 }

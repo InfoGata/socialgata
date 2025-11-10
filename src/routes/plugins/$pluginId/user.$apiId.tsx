@@ -23,8 +23,12 @@ export const Route = createFileRoute("/plugins/$pluginId/user/$apiId")({
   loader: async ({ params }) => {
     const service = getService(params.pluginId);
     if (service) {
-      const overview = await service.getUser({ apiId: params.apiId });
-      return overview.items;
+      if (service.getUser) {
+        const overview = await service.getUser({ apiId: params.apiId });
+        return overview.items;
+      } else {
+        return [];
+      }
     } else {
       throw notFound();
     }

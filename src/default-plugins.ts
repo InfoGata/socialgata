@@ -30,4 +30,8 @@ export const defaultPlugins: PluginDescription[] = [
     name: "Twitter",
     requiresCorsDisabled: true,
   },
+  {
+    id: "imageboard",
+    name: "Imageboard",
+  },
 ];
