@@ -206,9 +206,24 @@ const decodeHtmlEntities = (url: string | undefined): string | undefined => {
   return textarea.value;
 }
 
+/**
+ * Checks if a string is a valid URL
+ */
+const isValidUrl = (url: string | undefined): boolean => {
+  if (!url) return false;
+  return url.startsWith('http://') || url.startsWith('https://');
+}
+
+/**
+ * Placeholder image for non-URL thumbnails (spoiler, default, nsfw, etc.)
+ */
+const PLACEHOLDER_THUMBNAIL = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="140" height="140" viewBox="0 0 140 140"%3E%3Crect width="140" height="140" fill="%23ddd"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="16" fill="%23999"%3ENo Image%3C/text%3E%3C/svg%3E';
+
 const redditPostsToPost = (post: ListingChildPostData): Post => {
   const thumbnailUrl = post.is_video ? post.preview?.images[0]?.resolutions
     ?.find((r): r is PreviewImageResolution => r.width === 640)?.url : post.thumbnail;
+  const decodedThumbnail = decodeHtmlEntities(thumbnailUrl);
+
   return {
     apiId: post.id,
     title: post.title,
@@ -220,7 +235,7 @@ const redditPostsToPost = (post: ListingChildPostData): Post => {
     communityApiId: post.subreddit,
     body: post.selftext,
     pluginId: pluginName,
-    thumbnailUrl: post.thumbnail === "self" ? undefined : decodeHtmlEntities(thumbnailUrl),
+    thumbnailUrl: post.thumbnail === "self" ? undefined : (isValidUrl(decodedThumbnail) ? decodedThumbnail : PLACEHOLDER_THUMBNAIL),
     url: post.thumbnail === "self" ? undefined : decodeHtmlEntities(post.url),
     isVideo: post.is_video,
   }
