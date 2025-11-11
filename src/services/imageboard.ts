@@ -15,7 +15,7 @@ import type { Thread, Comment, ImageboardId, ImageboardOptionsWithHttpRequestFun
 import { createHttpRequestFunction } from "imageboard";
 
 const pluginName = "imageboard";
-// const corsProxy = "http://localhost:8085/";
+const corsProxy = process.env.NODE_ENV === "development" ? "http://localhost:8085/" : "https://vercelcors-elijahgreen-info-gata.vercel.app/api?url=";
 
 // Supported imageboards as instances (using library's supported IDs)
 const SUPPORTED_IMAGEBOARDS: Instance[] = [
@@ -159,7 +159,6 @@ class ImageboardService implements ServiceType {
   }
 
   private getImageboard = (instanceId: string): Imageboard => {
-    const corsProxy = "http://localhost:8085/";
     const sendHttpRequest = createHttpRequestFunction({
       fetch: fetch,
       FormData: FormData,
