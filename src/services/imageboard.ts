@@ -13,6 +13,7 @@ import { ServiceType } from "@/types";
 import Imageboard from "imageboard/browser";
 import type { Thread, Comment, ImageboardId, ImageboardOptionsWithHttpRequestFunction } from "imageboard";
 import { createHttpRequestFunction } from "imageboard";
+import { doesAttachmentHavePicture, getAttachmentThumbnailSize } from "social-components/attachment";
 
 const pluginName = "imageboard";
 const corsProxy = process.env.NODE_ENV === "development" ? "http://localhost:8085/" : "https://vercelcors-elijahgreen-info-gata.vercel.app/api?url=";
@@ -101,8 +102,10 @@ const imageboardThreadToPost = (
   instanceId: string
 ): Post => {
   const firstComment = thread.comments?.[0];
-  const firstAttachment = firstComment?.attachments?.[0];
-  const attachmentUrl = firstAttachment ? getAttachmentUrl(firstAttachment) : undefined;
+	const thumbnailAttachment = firstComment?.attachments &&
+			firstComment.attachments.filter(doesAttachmentHavePicture)[0]
+  const thumbnail = thumbnailAttachment ? getAttachmentThumbnailSize(thumbnailAttachment) : undefined;
+  const thumbnailUrl = thumbnail ? thumbnail.url : undefined;
 
   return {
     apiId: String(thread.id),
@@ -115,8 +118,8 @@ const imageboardThreadToPost = (
     authorApiId: firstComment?.authorId,
     pluginId: pluginName,
     instanceId: instanceId,
-    thumbnailUrl: attachmentUrl,
-    url: attachmentUrl,
+    thumbnailUrl: thumbnailUrl,
+    url: thumbnailUrl,
     numOfComments: thread.commentsCount,
     number: Number(thread.id),
   };
