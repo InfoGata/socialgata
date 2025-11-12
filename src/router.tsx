@@ -6,12 +6,12 @@ export interface MyRouterContext {
   accessToken: string;
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const router = createRouter({
+const router = createRouter({
   routeTree,
   defaultPendingComponent: Spinner,
   scrollRestoration: true,
 });
+export type RouterType = typeof router;
 
 declare module "@tanstack/react-router" {
   interface Register {

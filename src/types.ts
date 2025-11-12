@@ -1,6 +1,6 @@
 import { LinkOptions } from "@tanstack/react-router";
 import { GetCommentRepliesRequest, GetCommentRepliesResponse, GetCommentsRequest, GetCommentsResponse, GetCommunitiesRequest, GetCommunitiesResponse, GetCommunityRequest, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetInstancesRequest, GetInstancesResponse, GetTrendingTopicFeedRequest, GetTrendingTopicFeedResponse, GetTrendingTopicsRequest, GetTrendingTopicsResponse, GetUserReponse, GetUserRequest, LoginRequest, ManifestAuthentication, SearchRequest, SearchResponse } from "./plugintypes";
-import { router } from "./router";
+import { RouterType } from "./router";
 
 export interface NetworkRequest {
   body: Blob | ArrayBuffer | null;
@@ -52,7 +52,7 @@ export interface ServiceType {
   isLoggedIn?(): Promise<boolean>;
 }
 
-export type LinkRouterProps = LinkOptions<typeof router>;
+export type LinkRouterProps = LinkOptions<RouterType>;
 
 export interface NavigationLinkItem {
   title: string;
