@@ -5,10 +5,9 @@ import { MessageCircleIcon } from "lucide-react";
 import ReactTimeago from "react-timeago";
 import PostLink from "./PostLink";
 import React from "react";
-import ImageThumbnail from "./ImageThumbnail";
 import parse from 'html-react-parser';
 import DOMPurify from "dompurify";
-import ExpandedMedia from "./ExpandedMedia";
+import { AsyncImage} from "loadable-image";
 
 type Props = {
   post: Post;
@@ -16,11 +15,7 @@ type Props = {
   showFullPost?: boolean;
 };
 
-const ImageboardPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) => {
-  const [expand, setExpand] = React.useState(false);
-  const toggleExpand = () => {
-    setExpand(!expand);
-  };
+const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
   const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
   const sanitizer = DOMPurify.sanitize;
 
@@ -29,13 +24,9 @@ const ImageboardPost: React.FC<Props> = ({ post, instanceId, showFullPost = fals
       <div className="p-3">
         <div className="flex gap-3">
           {/* Thumbnail */}
-          {(post.thumbnailUrl || post.url) && (
+          {(post.thumbnailUrl) && (
             <div className="rounded-md w-32 h-32 bg-muted overflow-hidden flex-shrink-0">
-              <ImageThumbnail
-                url={post.url}
-                thumbnailUrl={post.thumbnailUrl}
-                toggleExpand={toggleExpand}
-              />
+              <AsyncImage src={post.thumbnailUrl} alt={post.title || "Thread image"} />
             </div>
           )}
 
@@ -101,16 +92,6 @@ const ImageboardPost: React.FC<Props> = ({ post, instanceId, showFullPost = fals
                   {parse(sanitizer(post.body))}
                 </div>
               </div>
-            )}
-
-            {/* Expanded Media */}
-            {(expand || showFullPost) && post.url && (
-              <ExpandedMedia
-                url={post.url}
-                thumbnailUrl={post.thumbnailUrl}
-                alt={post.title || "Thread image"}
-                className="rounded-md mb-2 max-w-full"
-              />
             )}
 
             {/* Actions Bar */}

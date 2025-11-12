@@ -31,6 +31,7 @@
     "i18next": "^24.2.3",
     "imageboard": "^0.11.5",
     "lemmy-js-client": "^0.19.4-alpha.18",
+    "loadable-image": "^3.3.0",
     "lucide-react": "^0.378.0",
     "masto": "^6.7.7",
     "react": "^18.2.0",
