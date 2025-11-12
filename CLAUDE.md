@@ -24,9 +24,15 @@ React 18 + TypeScript application using:
 
 ### Plugin Architecture
 The app aggregates social media content through a plugin system:
-- Each platform has a service file in `src/services/` (reddit.ts, lemmy.ts, mastodon.ts, hackernews.ts)
+- Each platform has a service file in `src/services/` (reddit.ts, lemmy.ts, mastodon.ts, hackernews.ts, bluesky.ts, twitter.ts, imageboard.ts)
 - Routes support plugin-based URLs: `/plugins/$pluginId/feed`
 - Platform-specific instances: `/plugins/$pluginId/instances/$instanceId/feed`
+- Platform-specific post components:
+  - `ForumPost.tsx` - For forum-style platforms (Reddit, Lemmy)
+  - `MicroblogPost.tsx` - For microblogging platforms (Twitter, Mastodon, Bluesky)
+  - `ImageboardPost.tsx` - For imageboards (4chan, etc.)
+  - `PostComponent.tsx` - Main component that routes to platform-specific components
+  - `PostWithComments.tsx` - Displays posts with their comment threads
 
 ### Key Technical Patterns
 - **Theme System**: Custom CSS variables with Tailwind, managed by ThemeProvider
