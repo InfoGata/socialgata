@@ -13,7 +13,7 @@ interface Props {
   pluginId?: string;
 }
 
-const PostWithComponents: React.FC<Props> = (props) => {
+const PostWithComments: React.FC<Props> = (props) => {
   const { data, pluginId } = props;
   const [replies, setReplies] = React.useState<Post[] | null>(null);
   const service = pluginId ? getService(pluginId) : null;
@@ -112,4 +112,4 @@ const PostWithComponents: React.FC<Props> = (props) => {
   );
 };
 
-export default PostWithComponents;
+export default PostWithComments;

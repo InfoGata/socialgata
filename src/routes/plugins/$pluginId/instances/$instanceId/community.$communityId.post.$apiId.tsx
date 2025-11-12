@@ -1,4 +1,4 @@
-import PostWithComponents from "@/components/PostWithComponents";
+import PostWithComments from "@/components/PostWithComments";
 import { getService } from "@/services/selector-service";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import React from "react";
@@ -6,7 +6,7 @@ import React from "react";
 const CommunityPostComments: React.FC = () => {
   const data = Route.useLoaderData();
   const pluginId = Route.useParams().pluginId;
-  return <PostWithComponents data={data} pluginId={pluginId} />;
+  return <PostWithComments data={data} pluginId={pluginId} />;
 };
 
 export const Route = createFileRoute(
