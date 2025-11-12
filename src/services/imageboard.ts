@@ -106,6 +106,8 @@ const imageboardThreadToPost = (
 			firstComment.attachments.filter(doesAttachmentHavePicture)[0]
   const thumbnail = thumbnailAttachment ? getAttachmentThumbnailSize(thumbnailAttachment) : undefined;
   const thumbnailUrl = thumbnail ? thumbnail.url : undefined;
+  const firstAttachment = firstComment?.attachments?.[0];
+  const attachmentUrl = firstAttachment ? getAttachmentUrl(firstAttachment) : undefined;
 
   return {
     apiId: String(thread.id),
@@ -119,7 +121,7 @@ const imageboardThreadToPost = (
     pluginId: pluginName,
     instanceId: instanceId,
     thumbnailUrl: thumbnailUrl,
-    url: thumbnailUrl,
+    url: attachmentUrl,
     numOfComments: thread.commentsCount,
     number: Number(thread.id),
   };

@@ -7,26 +7,47 @@ import PostLink from "./PostLink";
 import React from "react";
 import parse from 'html-react-parser';
 import DOMPurify from "dompurify";
-import { AsyncImage} from "loadable-image";
+import ImageThumbnail from "./ImageThumbnail";
+import ExpandedMedia from "./ExpandedMedia";
 
 type Props = {
   post: Post;
   instanceId?: string;
-  showFullPost?: boolean;
 };
 
 const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
+  const [expand, setExpand] = React.useState(false);
+  const toggleExpand = () => {
+    setExpand(!expand);
+  };
   const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
   const sanitizer = DOMPurify.sanitize;
 
   return (
     <div className="group relative bg-card rounded-lg border hover:border-primary/50 transition-all duration-200">
       <div className="p-3">
+        {/* Expanded Media - Full Width Above Content */}
+        {expand && post.url && post.thumbnailUrl && (
+          <div className="mb-3">
+            <ExpandedMedia
+              url={post.url}
+              thumbnailUrl={post.thumbnailUrl}
+              alt={post.title || "Thread image"}
+              className="rounded-md max-w-full border w-full"
+              toggleExpand={toggleExpand}
+            />
+          </div>
+        )}
+
         <div className="flex gap-3">
-          {/* Thumbnail */}
-          {(post.thumbnailUrl) && (
+          {/* Thumbnail - Only shown when not expanded */}
+          {!expand && post.thumbnailUrl && (
             <div className="rounded-md w-32 h-32 bg-muted overflow-hidden flex-shrink-0">
-              <AsyncImage src={post.thumbnailUrl} alt={post.title || "Thread image"} />
+              <ImageThumbnail
+                url={post.url}
+                thumbnailUrl={post.thumbnailUrl}
+                toggleExpand={toggleExpand}
+              />
             </div>
           )}
 
@@ -99,10 +120,12 @@ const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
               {post.numOfComments !== undefined && (
                 <PostLink
                   post={post}
-                  className={buttonVariants({
-                    variant: "ghost",
-                    size: "sm"
-                  }) + " h-7 px-2 py-1"}
+                  className={
+                    buttonVariants({
+                      variant: "ghost",
+                      size: "sm",
+                    }) + " h-7 px-2 py-1"
+                  }
                   instanceId={instanceId}
                 >
                   <MessageCircleIcon className="h-3.5 w-3.5" />

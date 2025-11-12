@@ -6,9 +6,10 @@ type Props = {
   alt: string;
   className?: string;
   thumbnailUrl?: string;
+  toggleExpand?: () => void;
 };
 
-const ExpandedMedia: React.FC<Props> = ({ url, isVideo, alt, className, thumbnailUrl }) => {
+const ExpandedMedia: React.FC<Props> = ({ url, isVideo, alt, className, thumbnailUrl, toggleExpand }) => {
   if (isVideo) {
     return (
       <video
@@ -20,6 +21,18 @@ const ExpandedMedia: React.FC<Props> = ({ url, isVideo, alt, className, thumbnai
       >
         Your browser does not support the video tag.
       </video>
+    );
+  }
+
+  if (toggleExpand) {
+    return (
+      <button onClick={toggleExpand} className="cursor-pointer">
+        <img
+          src={url}
+          className={className}
+            alt={alt}
+          />
+      </button>
     );
   }
 

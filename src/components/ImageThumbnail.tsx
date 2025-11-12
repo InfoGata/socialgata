@@ -20,7 +20,11 @@ const ImageThumbnail: React.FC<ImageThumbnailProps> = (props) => {
   if (isImageUrl(url)) {
     return (
       <button onClick={toggleExpand} className="cursor-pointer">
-        {thumbnailUrl ? <img alt="thumbnail" src={thumbnailUrl} className="rounded-md" /> : <img alt="image url" src={url} className="rounded-md" />}
+        {thumbnailUrl ? (
+          <img alt="thumbnail" loading="lazy" src={thumbnailUrl} className="rounded-md" />
+        ) : (
+          <img alt="image url" loading="lazy" src={url} className="rounded-md" />
+        )}
       </button>
     );
   }
@@ -28,7 +32,7 @@ const ImageThumbnail: React.FC<ImageThumbnailProps> = (props) => {
   if (thumbnailUrl) {
     return (
       <a href={url} target="_blank">
-        <img alt="thumbnail url" src={thumbnailUrl} className="rounded-md" />
+        <img alt="thumbnail url" loading="lazy" src={thumbnailUrl} className="rounded-md" />
       </a>
     );
   }

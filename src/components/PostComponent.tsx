@@ -20,7 +20,7 @@ const PostComponent: React.FC<Props> = ({ post, instanceId, platformType = "foru
 
   // Imageboard layout (for 4chan, 8kun, etc.)
   if (platformType === "imageboard") {
-    return <ImageboardPost post={post} instanceId={instanceId} showFullPost={showFullPost} />;
+    return <ImageboardPost post={post} instanceId={instanceId} />;
   }
 
   // Forum layout (for Reddit, Lemmy, HackerNews)
