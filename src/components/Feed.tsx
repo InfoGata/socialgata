@@ -2,10 +2,11 @@ import { usePagination } from "@/hooks/usePagination";
 import PostComponent from "./PostComponent";
 import { GetFeedResponse, PageInfo } from "@/plugintypes";
 import { PaginationNext, PaginationPrevious, Pagination, PaginationContent, PaginationItem } from "./ui/pagination";
-import { Loader2, TrendingUp, Clock, Award, Inbox } from "lucide-react";
+import { Loader2, TrendingUp, Clock, Award, Inbox, LayoutGrid } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import React from "react";
 import { getService } from "@/services/selector-service";
+import { Button } from "./ui/button";
 
 type FeedProps = {
   feedTypeId?: string;
@@ -58,6 +59,22 @@ const Feed: React.FC<FeedProps> = (props) => {
       <div className="max-w-5xl mx-auto px-2 sm:px-4 py-2">
         {/* Header Section */}
         <div className="mb-3">
+          {/* Communities Link */}
+          {instanceId && service?.getCommunities && (
+            <div className="mb-2">
+              <Button variant="outline" size="sm" asChild>
+                <Link
+                  to="/plugins/$pluginId/instances/$instanceId/communities"
+                  params={{ pluginId, instanceId }}
+                  className="flex items-center gap-2"
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                  <span>Browse Communities</span>
+                </Link>
+              </Button>
+            </div>
+          )}
+
           {/* Feed Type Tabs */}
           {data.feedTypes && data.feedTypes.length > 0 && (
             <div className="bg-card border rounded-lg p-1.5 mb-2">
@@ -70,8 +87,8 @@ const Feed: React.FC<FeedProps> = (props) => {
                     search={{ feedTypeId: feedType.id }}
                     className={`
                       flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all text-sm
-                      ${data.feedTypeId === feedType.id 
-                        ? 'bg-primary text-primary-foreground shadow-sm' 
+                      ${data.feedTypeId === feedType.id
+                        ? 'bg-primary text-primary-foreground shadow-sm'
                         : 'hover:bg-muted text-muted-foreground hover:text-foreground'
                       }
                     `}

@@ -1,6 +1,9 @@
 import {
+  Community,
   GetCommentsRequest,
   GetCommentsResponse,
+  GetCommunitiesRequest,
+  GetCommunitiesResponse,
   GetCommunityRequest,
   GetCommunityResponse,
   GetFeedRequest,
@@ -290,6 +293,42 @@ class ImageboardService implements ServiceType {
           name: `/${boardId}/`,
           instanceId: instanceId,
         },
+        items: [],
+        pageInfo: {},
+      };
+    }
+  }
+
+  /**
+   * Get list of all boards/communities for an imageboard instance
+   */
+  async getCommunities(request: GetCommunitiesRequest): Promise<GetCommunitiesResponse> {
+    const instanceId = request.instanceId || "4chan";
+
+    try {
+      const imageboard = this.getImageboard(instanceId);
+
+      // Check if imageboard supports getBoards
+      if (!imageboard.getBoards) {
+        throw new Error(`${instanceId} does not support getting boards`);
+      }
+
+      const boardsResponse = await imageboard.getBoards();
+      const boards = boardsResponse.boards || [];
+
+      const communities: Community[] = boards.map((board) => ({
+        apiId: board.id,
+        name: board.title || `/${board.id}/`,
+        instanceId: instanceId,
+      }));
+
+      return {
+        items: communities,
+        pageInfo: {},
+      };
+    } catch (error) {
+      console.error("Error fetching imageboard communities:", error);
+      return {
         items: [],
         pageInfo: {},
       };

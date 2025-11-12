@@ -122,6 +122,15 @@ export interface GetCommunityResponse {
   items: Post[];
 }
 
+export interface GetCommunitiesRequest {
+  instanceId?: string;
+  pageInfo?: PageInfo;
+}
+
+export interface GetCommunitiesResponse {
+  items: Community[];
+  pageInfo?: PageInfo;
+}
 
 export interface GetUserReponse {
   pageInfo?: PageInfo;
