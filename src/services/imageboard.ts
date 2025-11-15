@@ -219,9 +219,18 @@ class ImageboardService implements ServiceType {
    */
   async getFeed(request: GetFeedRequest): Promise<GetFeedResponse> {
     const instanceId = request.instanceId || "4chan";
-    const boardId = request.feedTypeId || "g"; // Default to /g/ (technology)
+    let boardId = request.feedTypeId;
 
     try {
+      // If no board specified, get the first available board from the instance
+      if (!boardId) {
+        const communitiesResponse = await this.getCommunities({ instanceId });
+        if (communitiesResponse.items.length === 0) {
+          throw new Error(`No boards available for ${instanceId}`);
+        }
+        boardId = communitiesResponse.items[0].apiId;
+      }
+
       const imageboard = this.getImageboard(instanceId);
 
       // Check if imageboard supports getThreads
