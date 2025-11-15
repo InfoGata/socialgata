@@ -111,16 +111,52 @@ const contentToHtml = (content: unknown): string => {
 };
 
 /**
+ * Get instance base URL by instanceId
+ */
+const getInstanceUrl = (instanceId: string): string | undefined => {
+  const instance = SUPPORTED_IMAGEBOARDS.find(ib => ib.apiId === instanceId);
+  return instance?.url;
+};
+
+/**
+ * Convert relative URL to absolute URL using instance base URL
+ */
+const toAbsoluteUrl = (url: string | undefined, instanceUrl: string | undefined): string | undefined => {
+  if (!url) return undefined;
+  if (!instanceUrl) return url;
+
+  // If URL is already absolute, return as-is
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+
+  // If URL is protocol-relative (starts with //), add https:
+  if (url.startsWith('//')) {
+    return `https:${url}`;
+  }
+
+  // If URL is relative, prepend instance base URL
+  if (url.startsWith('/')) {
+    return `${instanceUrl}${url}`;
+  }
+
+  // Otherwise assume it's a path without leading slash
+  return `${instanceUrl}/${url}`;
+};
+
+/**
  * Extract image/video URL from attachment
  */
-const getAttachmentUrl = (attachment: import("imageboard").Attachment): string | undefined => {
+const getAttachmentUrl = (attachment: import("imageboard").Attachment, instanceUrl: string | undefined): string | undefined => {
+  let url: string | undefined;
+
   if (attachment.type === "picture" && "picture" in attachment) {
-    return attachment.picture.url;
+    url = attachment.picture.url;
+  } else if (attachment.type === "video" && "video" in attachment) {
+    url = attachment.video.url;
   }
-  if (attachment.type === "video" && "video" in attachment) {
-    return attachment.video.url;
-  }
-  return undefined;
+
+  return toAbsoluteUrl(url, instanceUrl);
 };
 
 /**
@@ -130,13 +166,14 @@ const imageboardThreadToPost = (
   thread: Thread,
   instanceId: string
 ): Post => {
+  const instanceUrl = getInstanceUrl(instanceId);
   const firstComment = thread.comments?.[0];
 	const thumbnailAttachment = firstComment?.attachments &&
 			firstComment.attachments.filter(doesAttachmentHavePicture)[0]
   const thumbnail = thumbnailAttachment ? getAttachmentThumbnailSize(thumbnailAttachment) : undefined;
-  const thumbnailUrl = thumbnail ? thumbnail.url : undefined;
+  const thumbnailUrl = toAbsoluteUrl(thumbnail?.url, instanceUrl);
   const firstAttachment = firstComment?.attachments?.[0];
-  const attachmentUrl = firstAttachment ? getAttachmentUrl(firstAttachment) : undefined;
+  const attachmentUrl = firstAttachment ? getAttachmentUrl(firstAttachment, instanceUrl) : undefined;
 
   return {
     apiId: String(thread.id),
@@ -163,12 +200,13 @@ const imageboardCommentToPost = (
   comment: Comment,
   instanceId: string
 ): Post => {
+  const instanceUrl = getInstanceUrl(instanceId);
   const thumbnailAttachment = comment.attachments &&
     comment.attachments.filter(doesAttachmentHavePicture)[0];
   const thumbnail = thumbnailAttachment ? getAttachmentThumbnailSize(thumbnailAttachment) : undefined;
-  const thumbnailUrl = thumbnail ? thumbnail.url : undefined;
+  const thumbnailUrl = toAbsoluteUrl(thumbnail?.url, instanceUrl);
   const firstAttachment = comment.attachments?.[0];
-  const attachmentUrl = firstAttachment ? getAttachmentUrl(firstAttachment) : undefined;
+  const attachmentUrl = firstAttachment ? getAttachmentUrl(firstAttachment, instanceUrl) : undefined;
 
   const bodyHtml = contentToHtml(comment.content);
 
@@ -368,11 +406,12 @@ class ImageboardService implements ServiceType {
       });
 
       const thread = threadResponse.thread;
+      const instanceUrl = getInstanceUrl(instanceId);
 
       // First comment is the OP (original post)
       const opComment = thread.comments?.[0];
       const firstAttachment = opComment?.attachments?.[0];
-      const attachmentUrl = firstAttachment ? getAttachmentUrl(firstAttachment) : undefined;
+      const attachmentUrl = firstAttachment ? getAttachmentUrl(firstAttachment, instanceUrl) : undefined;
 
       const post: Post = {
         apiId: String(thread.id),
