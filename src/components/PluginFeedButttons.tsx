@@ -73,13 +73,15 @@ const PluginFeedButtons = ({ pluginId }: PluginFeedButtonsProps) => {
               Trending
             </Link>
           )}
-          <Link
-            className={buttonVariants({ variant: "default" })}
-            to={`/plugins/$pluginId/feed`}
-            params={{ pluginId }}
-          >
-            Feed
-          </Link>
+          {!hasInstances && (
+            <Link
+              className={buttonVariants({ variant: "default" })}
+              to={`/plugins/$pluginId/feed`}
+              params={{ pluginId }}
+            >
+              Feed
+            </Link>
+          )}
         </div>
       </div>
       {hasLogin && (
