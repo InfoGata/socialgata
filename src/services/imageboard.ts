@@ -288,8 +288,9 @@ class ImageboardService implements ServiceType {
       return {
         community: {
           apiId: boardId,
-          name: boardInfo?.title || `/${boardId}/`,
+          name: boardId,
           instanceId: instanceId,
+          description: boardInfo?.title || `/${boardId}/`,
         },
         items,
         pageInfo: {},
@@ -299,8 +300,9 @@ class ImageboardService implements ServiceType {
       return {
         community: {
           apiId: boardId,
-          name: `/${boardId}/`,
+          name: boardId,
           instanceId: instanceId,
+          description: `/${boardId}/`,
         },
         items: [],
         pageInfo: {},
@@ -327,8 +329,9 @@ class ImageboardService implements ServiceType {
 
       const communities: Community[] = boards.map((board) => ({
         apiId: board.id,
-        name: board.title || `/${board.id}/`,
+        name: board.id,
         instanceId: instanceId,
+        description: board.title || `/${board.id}/`,
       }));
 
       return {
@@ -399,8 +402,9 @@ class ImageboardService implements ServiceType {
         items,
         community: {
           apiId: boardId,
-          name: threadResponse.board?.title || `/${boardId}/`,
+          name: boardId,
           instanceId: instanceId,
+          description: threadResponse.board?.title || `/${boardId}/`,
         },
         pageInfo: {},
       };

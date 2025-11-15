@@ -59,6 +59,7 @@ export interface Community {
   apiId: string;
   name: string;
   instanceId?: string;
+  description?: string;
 }
 
 export interface Instance {

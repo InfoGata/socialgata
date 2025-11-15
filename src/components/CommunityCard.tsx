@@ -1,5 +1,5 @@
 import { Community } from "@/plugintypes";
-import { Card, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import { Link } from "@tanstack/react-router";
 
 interface CommunityCardProps {
@@ -25,6 +25,9 @@ const CommunityCard: React.FC<CommunityCardProps> = (props) => {
             {community.name}
           </Link>
         </CardTitle>
+        {community.description && (
+          <CardDescription>{community.description}</CardDescription>
+        )}
       </CardHeader>
     </Card>
   );

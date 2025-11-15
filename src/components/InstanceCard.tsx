@@ -2,7 +2,9 @@ import { Instance } from "@/plugintypes";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Link } from "@tanstack/react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { MessageSquareTextIcon, UsersIcon, MessagesSquareIcon } from "lucide-react"
+import { MessageSquareTextIcon, UsersIcon, MessagesSquareIcon } from "lucide-react";
+import { getService } from "@/services/selector-service";
+import { Button } from "./ui/button";
 interface InstanceCardProps {
   instance: Instance;
   pluginId: string;
@@ -11,6 +13,9 @@ interface InstanceCardProps {
 const InstanceCard: React.FC<InstanceCardProps> = (props) => {
   const { instance, pluginId } = props;
   const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
+  const service = getService(pluginId);
+  const hasCommunities = service && service.getCommunities;
+
   return (
     <Card className="flex flex-col">
       <CardHeader>
@@ -38,7 +43,7 @@ const InstanceCard: React.FC<InstanceCardProps> = (props) => {
         />
         <CardDescription>{props.instance.description}</CardDescription>
       </CardContent>
-      <CardFooter className="mt-auto">
+      <CardFooter className="mt-auto flex-col gap-2">
         <div className="flex gap-2 justify-between items-center w-full">
           {instance.usersCount && <div className="flex items-center gap-1">
             <UsersIcon className="size-4" />
@@ -53,6 +58,16 @@ const InstanceCard: React.FC<InstanceCardProps> = (props) => {
             <span>{numberFormatter.format(instance.commentsCount)}</span>
           </div>}
         </div>
+        {hasCommunities && (
+          <Button variant="outline" className="w-full" asChild>
+            <Link
+              to={`/plugins/$pluginId/instances/$instanceId/communities`}
+              params={{ pluginId, instanceId: instance.apiId }}
+            >
+              Browse Communities
+            </Link>
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );
