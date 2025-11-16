@@ -69,6 +69,7 @@ export interface Instance {
   apiId: string;
   iconUrl?: string;
   bannerUrl?: string;
+  bannerSvg?: string;
   usersCount?: number;
   postsCount?: number;
   commentsCount?: number;

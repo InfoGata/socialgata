@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { MessageSquareTextIcon, UsersIcon, MessagesSquareIcon } from "lucide-react";
 import { getService } from "@/services/selector-service";
 import { Button } from "./ui/button";
+import DOMPurify from "dompurify";
 interface InstanceCardProps {
   instance: Instance;
   pluginId: string;
@@ -35,12 +36,19 @@ const InstanceCard: React.FC<InstanceCardProps> = (props) => {
         </div>
       </CardHeader>
       <CardContent>
-        <img
-          loading="lazy"
-          src={instance.bannerUrl || instance.iconUrl}
-          alt={instance.name}
-          className="w-full h-48 bg-background object-contain"
-        />
+        {instance.bannerSvg ? (
+          <div
+            className="w-full h-48 bg-background flex items-center justify-center overflow-hidden [&>svg]:max-w-full [&>svg]:max-h-full [&>svg]:object-contain"
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(instance.bannerSvg) }}
+          />
+        ) : (
+          <img
+            loading="lazy"
+            src={instance.bannerUrl || instance.iconUrl}
+            alt={instance.name}
+            className="w-full h-48 bg-background object-contain"
+          />
+        )}
         <CardDescription>{props.instance.description}</CardDescription>
       </CardContent>
       <CardFooter className="mt-auto flex-col gap-2">
