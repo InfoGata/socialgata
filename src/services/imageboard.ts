@@ -279,6 +279,7 @@ class ImageboardService implements ServiceType {
       const threadsResponse = await imageboard.getThreads({
         boardId: boardId,
       });
+      console.log(threadsResponse);
 
       const threads = threadsResponse.threads || [];
       const items = threads.map((thread) =>
@@ -404,6 +405,7 @@ class ImageboardService implements ServiceType {
         boardId: boardId,
         threadId: Number(threadId),
       });
+      console.log(threadResponse);
 
       const thread = threadResponse.thread;
       const instanceUrl = getInstanceUrl(instanceId);

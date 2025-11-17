@@ -1,20 +1,12 @@
-import PostComponent from "@/components/PostComponent";
+import CommunityFeed from "@/components/CommunityFeed";
 import { getService } from "@/services/selector-service";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 const Community: React.FC = () => {
   const data = Route.useLoaderData();
-  const { pluginId } = Route.useParams();
-  const service = getService(pluginId);
-  const platformType = service?.platformType || "forum";
+  const { pluginId, instanceId } = Route.useParams();
 
-  return (
-    <div>
-      {data.map((p) => (
-        <PostComponent key={p.title} post={p} platformType={platformType} />
-      ))}
-    </div>
-  );
+  return <CommunityFeed posts={data} pluginId={pluginId} instanceId={instanceId} />;
 };
 
 export const Route = createFileRoute("/plugins/$pluginId/instances/$instanceId/community/$apiId/")({

@@ -1,49 +1,12 @@
-import PostComponent from "@/components/PostComponent";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationPrevious,
-  PaginationNext,
-} from "@/components/ui/pagination";
-import { usePagination } from "@/hooks/usePagination";
+import CommunityFeed from "@/components/CommunityFeed";
 import { getService } from "@/services/selector-service";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 const Community: React.FC = () => {
   const data = Route.useLoaderData();
   const { pluginId } = Route.useParams();
-  const service = getService(pluginId);
-  const platformType = service?.platformType || "forum";
-  const { nextPage, prevPage, hasNextPage, hasPreviousPage } = usePagination(data.pageInfo);
-  const posts = data.items;
-  return (
-    <div>
-      {posts.map((p) => (
-        <PostComponent key={p.apiId} post={p} platformType={platformType} />
-      ))}
-      <Pagination>
-        <PaginationContent>
-          {hasPreviousPage && (
-            <PaginationItem>
-              <PaginationPrevious
-                to="."
-                search={{ page: prevPage?.page }}
-              />
-            </PaginationItem>
-          )}
-          {hasNextPage && (
-            <PaginationItem>
-              <PaginationNext
-                to="."
-                search={{ page: nextPage?.page }}
-              />
-            </PaginationItem>
-          )}
-        </PaginationContent>
-      </Pagination>
-    </div>
-  );
+
+  return <CommunityFeed posts={data.items} pluginId={pluginId} pageInfo={data.pageInfo} />;
 };
 
 type CommunitySearch = {
