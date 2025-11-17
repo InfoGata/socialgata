@@ -21,10 +21,12 @@ const InstanceCard: React.FC<InstanceCardProps> = (props) => {
     <Card className="flex flex-col">
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Avatar>
-            <AvatarImage className="size-10" src={instance.iconUrl} />
-            <AvatarFallback>{instance.name.slice(0, 1)}</AvatarFallback>
-          </Avatar>
+          {instance.iconUrl && (
+            <Avatar>
+              <AvatarImage className="size-10" src={instance.iconUrl} />
+              <AvatarFallback>{instance.name.slice(0, 1)}</AvatarFallback>
+            </Avatar>
+          )}
           <CardTitle>
             <Link
               to={`/plugins/$pluginId/instances/$instanceId/feed`}
@@ -39,7 +41,9 @@ const InstanceCard: React.FC<InstanceCardProps> = (props) => {
         {instance.bannerSvg ? (
           <div
             className="w-full h-48 bg-background flex items-center justify-center overflow-hidden [&>svg]:max-w-full [&>svg]:max-h-full [&>svg]:object-contain"
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(instance.bannerSvg) }}
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(instance.bannerSvg),
+            }}
           />
         ) : (
           <img
@@ -53,18 +57,24 @@ const InstanceCard: React.FC<InstanceCardProps> = (props) => {
       </CardContent>
       <CardFooter className="mt-auto flex-col gap-2">
         <div className="flex gap-2 justify-between items-center w-full">
-          {instance.usersCount && <div className="flex items-center gap-1">
-            <UsersIcon className="size-4" />
-            <span>{numberFormatter.format(instance.usersCount)}</span>
-          </div>}
-          {instance.postsCount && <div className="flex items-center gap-1">
-            <MessageSquareTextIcon className="size-4" />
-            <span>{numberFormatter.format(instance.postsCount)}</span>
-          </div>}
-          {instance.commentsCount && <div className="flex items-center gap-1">
-            <MessagesSquareIcon className="size-4" />
-            <span>{numberFormatter.format(instance.commentsCount)}</span>
-          </div>}
+          {instance.usersCount && (
+            <div className="flex items-center gap-1">
+              <UsersIcon className="size-4" />
+              <span>{numberFormatter.format(instance.usersCount)}</span>
+            </div>
+          )}
+          {instance.postsCount && (
+            <div className="flex items-center gap-1">
+              <MessageSquareTextIcon className="size-4" />
+              <span>{numberFormatter.format(instance.postsCount)}</span>
+            </div>
+          )}
+          {instance.commentsCount && (
+            <div className="flex items-center gap-1">
+              <MessagesSquareIcon className="size-4" />
+              <span>{numberFormatter.format(instance.commentsCount)}</span>
+            </div>
+          )}
         </div>
         {hasCommunities && (
           <Button variant="outline" className="w-full" asChild>
