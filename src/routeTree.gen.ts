@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as SettingsImport } from './routes/settings'
+import { Route as FavoritesImport } from './routes/favorites'
 import { Route as IndexImport } from './routes/index'
 import { Route as PluginsPluginIdFeedImport } from './routes/plugins/$pluginId/feed'
 import { Route as PluginsPluginIdTrendingIndexImport } from './routes/plugins/$pluginId/trending.index'
@@ -31,6 +32,12 @@ import { Route as PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiI
 const SettingsRoute = SettingsImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const FavoritesRoute = FavoritesImport.update({
+  id: '/favorites',
+  path: '/favorites',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -132,6 +139,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/favorites': {
+      id: '/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof FavoritesImport
+      parentRoute: typeof rootRoute
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -230,6 +244,7 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/favorites': typeof FavoritesRoute
   '/settings': typeof SettingsRoute
   '/plugins/$pluginId/feed': typeof PluginsPluginIdFeedRoute
   '/plugins/$pluginId/post/$apiId': typeof PluginsPluginIdPostApiIdRoute
@@ -247,6 +262,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/favorites': typeof FavoritesRoute
   '/settings': typeof SettingsRoute
   '/plugins/$pluginId/feed': typeof PluginsPluginIdFeedRoute
   '/plugins/$pluginId/post/$apiId': typeof PluginsPluginIdPostApiIdRoute
@@ -265,6 +281,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/favorites': typeof FavoritesRoute
   '/settings': typeof SettingsRoute
   '/plugins/$pluginId/feed': typeof PluginsPluginIdFeedRoute
   '/plugins/$pluginId/post/$apiId': typeof PluginsPluginIdPostApiIdRoute
@@ -284,6 +301,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/favorites'
     | '/settings'
     | '/plugins/$pluginId/feed'
     | '/plugins/$pluginId/post/$apiId'
@@ -300,6 +318,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/favorites'
     | '/settings'
     | '/plugins/$pluginId/feed'
     | '/plugins/$pluginId/post/$apiId'
@@ -316,6 +335,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/favorites'
     | '/settings'
     | '/plugins/$pluginId/feed'
     | '/plugins/$pluginId/post/$apiId'
@@ -334,6 +354,7 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  FavoritesRoute: typeof FavoritesRoute
   SettingsRoute: typeof SettingsRoute
   PluginsPluginIdFeedRoute: typeof PluginsPluginIdFeedRoute
   PluginsPluginIdPostApiIdRoute: typeof PluginsPluginIdPostApiIdRoute
@@ -351,6 +372,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  FavoritesRoute: FavoritesRoute,
   SettingsRoute: SettingsRoute,
   PluginsPluginIdFeedRoute: PluginsPluginIdFeedRoute,
   PluginsPluginIdPostApiIdRoute: PluginsPluginIdPostApiIdRoute,
@@ -383,6 +405,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/favorites",
         "/settings",
         "/plugins/$pluginId/feed",
         "/plugins/$pluginId/post/$apiId",
@@ -400,6 +423,9 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/favorites": {
+      "filePath": "favorites.tsx"
     },
     "/settings": {
       "filePath": "settings.tsx"

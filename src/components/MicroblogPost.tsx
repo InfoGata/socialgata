@@ -10,6 +10,7 @@ import ImageThumbnail from "./ImageThumbnail";
 import parse from 'html-react-parser';
 import DOMPurify from "dompurify";
 import ExpandedMedia from "./ExpandedMedia";
+import { FavoriteButton } from "./FavoriteButton";
 
 type Props = {
   post: Post;
@@ -122,6 +123,16 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
                     {numberFormatter.format(post.score)}
                   </span>
                 </div>
+              )}
+
+              {post.pluginId && post.apiId && (
+                <FavoriteButton
+                  type="post"
+                  item={post}
+                  pluginId={post.pluginId}
+                  size="sm"
+                  className="h-8 w-8"
+                />
               )}
             </div>
           </div>

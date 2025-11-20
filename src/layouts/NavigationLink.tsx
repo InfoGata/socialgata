@@ -18,7 +18,7 @@ const NavigationLink: React.FC<NavigationLinkProps> = (props) => {
     <Link
       className={cn(
         buttonVariants({ variant: "ghost" }),
-        "w-full justify-start gap-8 text-md"
+        "w-full justify-start gap-8 text-md relative"
       )}
       activeProps={{ className: "bg-muted" }}
       onClick={onClose}

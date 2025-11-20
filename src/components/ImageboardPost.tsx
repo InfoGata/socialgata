@@ -9,6 +9,7 @@ import parse from 'html-react-parser';
 import DOMPurify from "dompurify";
 import ImageThumbnail from "./ImageThumbnail";
 import ExpandedMedia from "./ExpandedMedia";
+import { FavoriteButton } from "./FavoriteButton";
 
 type Props = {
   post: Post;
@@ -133,6 +134,16 @@ const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
                     {numberFormatter.format(post.numOfComments)} replies
                   </span>
                 </PostLink>
+              )}
+
+              {post.pluginId && post.apiId && (
+                <FavoriteButton
+                  type="post"
+                  item={post}
+                  pluginId={post.pluginId}
+                  size="sm"
+                  className="h-7 w-7"
+                />
               )}
             </div>
           </div>

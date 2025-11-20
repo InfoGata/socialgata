@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setIsNavigationMenuOpen } from "@/store/reducers/uiSlice";
 import { NavigationLinkItem } from "@/types";
 import { FaGear, FaHouse } from "react-icons/fa6";
+import { Star } from "lucide-react";
 
 const NavigationMenu: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -21,12 +22,16 @@ const NavigationMenu: React.FC = () => {
       icon: <FaHouse />
     },
     {
+      title: "Favorites",
+      link: { to: "/favorites" },
+      icon: <Star size={16} />,
+    },
+    {
       title: "Settings",
       link: { to: "/settings" },
       icon: <FaGear />
     }
   ]
-
 
   return (
     <Sheet open={isNavigationMenuOpen} onOpenChange={setOpen}>

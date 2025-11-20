@@ -8,6 +8,7 @@ import React from "react";
 import ImageThumbnail from "./ImageThumbnail";
 import ExpandedMedia from "./ExpandedMedia";
 import ReactTimeago from "react-timeago";
+import { FavoriteButton } from "./FavoriteButton";
 
 type Props = {
   comment: Post;
@@ -95,6 +96,19 @@ const CommentComponent: React.FC<Props> = (props) => {
                 </div>
               </div>
             )}
+
+            {/* Favorite Button */}
+            {comment.pluginId && comment.apiId && (
+              <div className="mt-2">
+                <FavoriteButton
+                  type="comment"
+                  item={comment}
+                  pluginId={comment.pluginId}
+                  size="sm"
+                  className="h-7 w-7"
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -125,7 +139,7 @@ const CommentComponent: React.FC<Props> = (props) => {
       <div>
         {parse(clean)}
       </div>
-      <div>
+      <div className="flex items-center gap-2">
         {comment.score && (
           <div className="flex items-center">
             <Button variant="ghost" size="icon">
@@ -136,6 +150,16 @@ const CommentComponent: React.FC<Props> = (props) => {
               <ArrowUpIcon />
             </Button>
           </div>
+        )}
+
+        {comment.pluginId && comment.apiId && (
+          <FavoriteButton
+            type="comment"
+            item={comment}
+            pluginId={comment.pluginId}
+            size="sm"
+            className="h-7 w-7"
+          />
         )}
       </div>
       <div className="ml-2">

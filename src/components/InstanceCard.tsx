@@ -6,6 +6,7 @@ import { MessageSquareTextIcon, UsersIcon, MessagesSquareIcon } from "lucide-rea
 import { getService } from "@/services/selector-service";
 import { Button } from "./ui/button";
 import DOMPurify from "dompurify";
+import { FavoriteButton } from "./FavoriteButton";
 interface InstanceCardProps {
   instance: Instance;
   pluginId: string;
@@ -20,21 +21,24 @@ const InstanceCard: React.FC<InstanceCardProps> = (props) => {
   return (
     <Card className="flex flex-col">
       <CardHeader>
-        <div className="flex items-center gap-2">
-          {instance.iconUrl && (
-            <Avatar>
-              <AvatarImage className="size-10" src={instance.iconUrl} />
-              <AvatarFallback>{instance.name.slice(0, 1)}</AvatarFallback>
-            </Avatar>
-          )}
-          <CardTitle>
-            <Link
-              to={`/plugins/$pluginId/instances/$instanceId/feed`}
-              params={{ pluginId, instanceId: instance.apiId }}
-            >
-              {props.instance.name}
-            </Link>
-          </CardTitle>
+        <div className="flex items-center gap-2 justify-between">
+          <div className="flex items-center gap-2">
+            {instance.iconUrl && (
+              <Avatar>
+                <AvatarImage className="size-10" src={instance.iconUrl} />
+                <AvatarFallback>{instance.name.slice(0, 1)}</AvatarFallback>
+              </Avatar>
+            )}
+            <CardTitle>
+              <Link
+                to={`/plugins/$pluginId/instances/$instanceId/feed`}
+                params={{ pluginId, instanceId: instance.apiId }}
+              >
+                {props.instance.name}
+              </Link>
+            </CardTitle>
+          </div>
+          <FavoriteButton type="instance" item={instance} pluginId={pluginId} size="sm" />
         </div>
       </CardHeader>
       <CardContent>

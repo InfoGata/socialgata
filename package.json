@@ -14,10 +14,17 @@
   },
   "dependencies": {
     "@atproto/api": "^0.17.0",
+    "@automerge/automerge": "^3.2.0",
+    "@automerge/automerge-repo": "^2.5.0",
+    "@automerge/automerge-repo-network-broadcastchannel": "^2.5.0",
+    "@automerge/automerge-repo-react-hooks": "^2.5.0",
+    "@automerge/automerge-repo-storage-indexeddb": "^2.5.0",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.1.2",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@radix-ui/react-visually-hidden": "^1.1.1",
     "@reduxjs/toolkit": "^2.6.1",
     "@tailwindcss/vite": "^4.1.12",
@@ -74,6 +81,8 @@
     "tailwindcss": "^4.1.12",
     "typescript": "^5.2.2",
     "vite": "^6.2.2",
+    "vite-plugin-top-level-await": "^1.6.0",
+    "vite-plugin-wasm": "^3.5.0",
     "vitest": "^3.2.4"
   }
 }
