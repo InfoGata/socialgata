@@ -5,13 +5,15 @@ import { Star, Inbox } from 'lucide-react';
 import {
   useFavoriteInstances,
   useFavoritePosts,
-  useFavoriteComments
+  useFavoriteComments,
+  useFavoriteCommunities
 } from '@/sync/useFavorites';
 import InstanceCard from '@/components/InstanceCard';
 import PostComponent from '@/components/PostComponent';
 import CommentComponent from '@/components/CommentComponent';
+import { Link } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/favorites' as any)({
+export const Route = createFileRoute('/favorites')({
   component: FavoritesPage
 });
 
@@ -19,8 +21,9 @@ function FavoritesPage() {
   const instancesArray = useFavoriteInstances();
   const postsArray = useFavoritePosts();
   const commentsArray = useFavoriteComments();
+  const communitiesArray = useFavoriteCommunities();
 
-  const totalCount = instancesArray.length + postsArray.length + commentsArray.length;
+  const totalCount = instancesArray.length + postsArray.length + commentsArray.length + communitiesArray.length;
 
   return (
     <div className="container mx-auto p-4 max-w-6xl">
@@ -30,17 +33,20 @@ function FavoritesPage() {
           <h1 className="text-3xl font-bold">Favorites</h1>
         </div>
         <p className="text-muted-foreground">
-          Your favorited instances, posts, and comments ({totalCount} total)
+          Your favorited instances, communities, posts, and comments ({totalCount} total)
         </p>
       </div>
 
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="all">
             All ({totalCount})
           </TabsTrigger>
           <TabsTrigger value="instances">
             Instances ({instancesArray.length})
+          </TabsTrigger>
+          <TabsTrigger value="communities">
+            Communities ({communitiesArray.length})
           </TabsTrigger>
           <TabsTrigger value="posts">
             Posts ({postsArray.length})
@@ -61,6 +67,33 @@ function FavoritesPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {instancesArray.map(({ key, pluginId, instance }) => (
                       <InstanceCard key={key} instance={instance} pluginId={pluginId} />
+                    ))}
+                  </div>
+                </Section>
+              )}
+
+              {communitiesArray.length > 0 && (
+                <Section title="Communities" count={communitiesArray.length}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {communitiesArray.map(({ key, pluginId, community }) => (
+                      <Card key={key} className="hover:bg-accent transition-colors">
+                        <CardHeader>
+                          <Link
+                            to="/plugins/$pluginId/community/$apiId"
+                            params={{ pluginId, apiId: community.apiId }}
+                            className="block group"
+                          >
+                            <CardTitle className="group-hover:text-primary transition-colors">
+                              {community.name}
+                            </CardTitle>
+                            {community.description && (
+                              <CardDescription className="mt-2 line-clamp-3">
+                                {community.description}
+                              </CardDescription>
+                            )}
+                          </Link>
+                        </CardHeader>
+                      </Card>
                     ))}
                   </div>
                 </Section>
@@ -99,6 +132,36 @@ function FavoritesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {instancesArray.map(({ key, pluginId, instance }) => (
                 <InstanceCard key={key} instance={instance} pluginId={pluginId} />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Communities Tab */}
+        <TabsContent value="communities">
+          {communitiesArray.length === 0 ? (
+            <EmptyState message="No favorited communities" />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {communitiesArray.map(({ key, pluginId, community }) => (
+                <Card key={key} className="hover:bg-accent transition-colors">
+                  <CardHeader>
+                    <Link
+                      to="/plugins/$pluginId/community/$apiId"
+                      params={{ pluginId, apiId: community.apiId }}
+                      className="block group"
+                    >
+                      <CardTitle className="group-hover:text-primary transition-colors">
+                        {community.name}
+                      </CardTitle>
+                      {community.description && (
+                        <CardDescription className="mt-2 line-clamp-3">
+                          {community.description}
+                        </CardDescription>
+                      )}
+                    </Link>
+                  </CardHeader>
+                </Card>
               ))}
             </div>
           )}

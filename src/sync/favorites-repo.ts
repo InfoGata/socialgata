@@ -1,5 +1,5 @@
 import { Repo, DocHandle, AutomergeUrl } from '@automerge/automerge-repo';
-import type { Instance, Post } from '@/plugintypes';
+import type { Instance, Post, Community } from '@/plugintypes';
 
 /**
  * Favorites document structure
@@ -9,6 +9,7 @@ export type FavoritesDoc = {
   instances: { [key: string]: Instance };
   posts: { [key: string]: Post };
   comments: { [key: string]: Post };
+  communities: { [key: string]: Community };
 };
 
 /**
@@ -37,6 +38,7 @@ export async function getOrCreateFavoritesHandle(repo: Repo): Promise<DocHandle<
       doc.instances = {};
       doc.posts = {};
       doc.comments = {};
+      doc.communities = {};
     });
 
     // Save the document URL to localStorage
@@ -92,9 +94,9 @@ function sanitizeForAutomerge<T>(obj: T): T {
  */
 export function toggleFavorite(
   handle: DocHandle<FavoritesDoc>,
-  type: 'instances' | 'posts' | 'comments',
+  type: 'instances' | 'posts' | 'comments' | 'communities',
   key: string,
-  data?: Instance | Post
+  data?: Instance | Post | Community
 ) {
   handle.change(doc => {
     if (!doc[type]) {
@@ -116,7 +118,7 @@ export function toggleFavorite(
  */
 export function isFavorite(
   doc: FavoritesDoc | undefined,
-  type: 'instances' | 'posts' | 'comments',
+  type: 'instances' | 'posts' | 'comments' | 'communities',
   key: string
 ): boolean {
   if (!doc) return false;
@@ -128,8 +130,8 @@ export function isFavorite(
  */
 export function getFavorites(
   doc: FavoritesDoc | undefined,
-  type: 'instances' | 'posts' | 'comments'
-): Record<string, Instance | Post> {
+  type: 'instances' | 'posts' | 'comments' | 'communities'
+): Record<string, Instance | Post | Community> {
   if (!doc) return {};
   return doc[type] || {};
 }

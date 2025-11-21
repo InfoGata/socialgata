@@ -8,18 +8,21 @@ import {
 } from "./ui/pagination";
 import { usePagination } from "@/hooks/usePagination";
 import { getService } from "@/services/selector-service";
-import { PageInfo, Post } from "@/plugintypes";
+import { PageInfo, Post, Community } from "@/plugintypes";
 import React from "react";
+import { FavoriteButton } from "./FavoriteButton";
+import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
 
 type CommunityFeedProps = {
   posts: Post[];
   pluginId: string;
   pageInfo?: PageInfo;
   instanceId?: string;
+  community?: Community;
 }
 
 const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
-  const { posts, pluginId, pageInfo, instanceId } = props;
+  const { posts, pluginId, pageInfo, instanceId, community } = props;
   const { nextPage, prevPage, hasNextPage, hasPreviousPage } = usePagination(pageInfo);
   const service = getService(pluginId);
   const platformType = service?.platformType || "forum";
@@ -27,6 +30,29 @@ const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto px-2 sm:px-4 py-2">
+        {/* Community Header */}
+        {community && (
+          <Card className="mb-4">
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <CardTitle className="text-2xl">{community.name}</CardTitle>
+                  {community.description && (
+                    <CardDescription className="mt-2">{community.description}</CardDescription>
+                  )}
+                </div>
+                <FavoriteButton
+                  type="community"
+                  item={community}
+                  pluginId={pluginId}
+                  size="lg"
+                  variant="icon"
+                />
+              </div>
+            </CardHeader>
+          </Card>
+        )}
+
         {/* Posts Section */}
         <div className="space-y-2">
           {/* Posts Grid */}

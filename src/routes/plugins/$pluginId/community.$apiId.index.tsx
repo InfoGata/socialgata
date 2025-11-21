@@ -6,7 +6,7 @@ const Community: React.FC = () => {
   const data = Route.useLoaderData();
   const { pluginId } = Route.useParams();
 
-  return <CommunityFeed posts={data.items} pluginId={pluginId} pageInfo={data.pageInfo} />;
+  return <CommunityFeed posts={data.items} pluginId={pluginId} pageInfo={data.pageInfo} community={data.community} />;
 };
 
 type CommunitySearch = {

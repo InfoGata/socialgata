@@ -51,8 +51,10 @@ Redux store with slices:
 - `src/sync/FavoritesContext.tsx` - React Context for favorites document
 - `src/sync/favorites-repo.ts` - CRDT operations (toggle, check, get favorites)
 - `src/sync/useFavorites.ts` - Custom hooks for favorites state
-- `src/components/FavoriteButton.tsx` - Star button component
+- `src/components/FavoriteButton.tsx` - Star button component (supports instances, communities, posts, comments)
 - `src/routes/favorites.tsx` - Favorites page with tabs
+- `src/components/CommunityFeed.tsx` - Displays community header with favorite button
+- Supported items: instances, communities, posts, comments
 - Storage: IndexedDB via `@automerge/automerge-repo-storage-indexeddb`
 - Sync: Cross-tab via BroadcastChannel, future cloud sync ready
 

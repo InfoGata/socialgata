@@ -11,16 +11,17 @@ import {
   useIsFavoriteInstance,
   useIsFavoritePost,
   useIsFavoriteComment,
+  useIsFavoriteCommunity,
   useFavoritesMutations
 } from '@/sync/useFavorites';
-import type { Instance, Post } from '@/plugintypes';
+import type { Instance, Post, Community } from '@/plugintypes';
 import { cn } from '@/lib/utils';
 
-type FavoriteType = 'instance' | 'post' | 'comment';
+type FavoriteType = 'instance' | 'post' | 'comment' | 'community';
 
 interface FavoriteButtonProps {
   type: FavoriteType;
-  item: Instance | Post;
+  item: Instance | Post | Community;
   pluginId: string;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'icon' | 'button';
@@ -29,7 +30,7 @@ interface FavoriteButtonProps {
 
 /**
  * FavoriteButton component for adding/removing favorites
- * Works with instances, posts, and comments
+ * Works with instances, posts, comments, and communities
  * Uses automerge-repo hooks directly (no Redux)
  */
 export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
@@ -49,10 +50,12 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   const isFavoriteInstance = useIsFavoriteInstance(pluginId, itemId || '');
   const isFavoritePost = useIsFavoritePost(pluginId, itemId || '');
   const isFavoriteComment = useIsFavoriteComment(pluginId, itemId || '');
+  const isFavoriteCommunity = useIsFavoriteCommunity(pluginId, itemId || '');
 
   const isFavorite = type === 'instance' ? isFavoriteInstance
     : type === 'post' ? isFavoritePost
-    : isFavoriteComment;
+    : type === 'comment' ? isFavoriteComment
+    : isFavoriteCommunity;
 
   // Handle toggle - directly mutate via automerge-repo
   const handleToggle = (e: React.MouseEvent) => {
@@ -70,6 +73,9 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
         break;
       case 'comment':
         mutations.toggleComment(pluginId, itemId, item as Post);
+        break;
+      case 'community':
+        mutations.toggleCommunity(pluginId, itemId, item as Community);
         break;
     }
   };

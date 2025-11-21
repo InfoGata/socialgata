@@ -1,15 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import { useRepo, useDocument } from '@automerge/automerge-repo-react-hooks';
 import type { DocHandle } from '@automerge/automerge-repo';
 import { getOrCreateFavoritesHandle, type FavoritesDoc } from './favorites-repo';
+import type { FavoritesContextValue } from './useFavoritesContext';
 
-interface FavoritesContextValue {
-  handle: DocHandle<FavoritesDoc>;
-  doc: FavoritesDoc | undefined;
-  isReady: boolean;
-}
-
-const FavoritesContext = createContext<FavoritesContextValue | null>(null);
+export const FavoritesContext = createContext<FavoritesContextValue | null>(null);
 
 /**
  * Provider that manages the favorites document and makes it available via hooks
@@ -51,14 +46,3 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     </FavoritesContext.Provider>
   );
 };
-
-/**
- * Hook to access the favorites context
- */
-export function useFavoritesContext(): FavoritesContextValue {
-  const context = useContext(FavoritesContext);
-  if (!context) {
-    throw new Error('useFavoritesContext must be used within FavoritesProvider');
-  }
-  return context;
-}

@@ -6,7 +6,7 @@ const Community: React.FC = () => {
   const data = Route.useLoaderData();
   const { pluginId, instanceId } = Route.useParams();
 
-  return <CommunityFeed posts={data} pluginId={pluginId} instanceId={instanceId} />;
+  return <CommunityFeed posts={data.items} pluginId={pluginId} instanceId={instanceId} community={data.community} pageInfo={data.pageInfo} />;
 };
 
 export const Route = createFileRoute("/plugins/$pluginId/instances/$instanceId/community/$apiId/")({
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/plugins/$pluginId/instances/$instanceId/c
         apiId: params.apiId,
         instanceId: params.instanceId,
       });
-      return response.items;
+      return response;
     } else {
       throw notFound();
     }
