@@ -322,8 +322,12 @@ class ImageboardService implements ServiceType {
       );
 
       // Use board info from response if available
-      const boardInfo = threadsResponse.board;
-      console.log(threadsResponse);
+      let boardInfo = threadsResponse.board;
+      // If no board info, get it from the imageboard
+      if (!boardInfo) {
+        const boardsResponse = await imageboard.getBoards();
+        boardInfo = boardsResponse.boards.find(board => board.id === boardId);
+      }
 
       return {
         community: {
