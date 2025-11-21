@@ -323,6 +323,7 @@ class ImageboardService implements ServiceType {
 
       // Use board info from response if available
       const boardInfo = threadsResponse.board;
+      console.log(threadsResponse);
 
       return {
         community: {

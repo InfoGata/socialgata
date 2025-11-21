@@ -12,6 +12,7 @@ import { PageInfo, Post, Community } from "@/plugintypes";
 import React from "react";
 import { FavoriteButton } from "./FavoriteButton";
 import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import BrowseCommunitiesButton from "./BrowseCommunitiesButton";
 
 type CommunityFeedProps = {
   posts: Post[];
@@ -30,6 +31,9 @@ const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto px-2 sm:px-4 py-2">
+        {/* Browse Communities Button */}
+        <BrowseCommunitiesButton pluginId={pluginId} instanceId={instanceId} />
+
         {/* Community Header */}
         {community && (
           <Card className="mb-4">

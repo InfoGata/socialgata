@@ -2,11 +2,11 @@ import { usePagination } from "@/hooks/usePagination";
 import PostComponent from "./PostComponent";
 import { GetFeedResponse, PageInfo } from "@/plugintypes";
 import { PaginationNext, PaginationPrevious, Pagination, PaginationContent, PaginationItem } from "./ui/pagination";
-import { Loader2, TrendingUp, Clock, Award, Inbox, LayoutGrid } from "lucide-react";
+import { Loader2, TrendingUp, Clock, Award, Inbox } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import React from "react";
 import { getService } from "@/services/selector-service";
-import { Button } from "./ui/button";
+import BrowseCommunitiesButton from "./BrowseCommunitiesButton";
 
 type FeedProps = {
   feedTypeId?: string;
@@ -60,20 +60,7 @@ const Feed: React.FC<FeedProps> = (props) => {
         {/* Header Section */}
         <div className="mb-3">
           {/* Communities Link */}
-          {instanceId && service?.getCommunities && (
-            <div className="mb-2">
-              <Button variant="outline" size="sm" asChild>
-                <Link
-                  to="/plugins/$pluginId/instances/$instanceId/communities"
-                  params={{ pluginId, instanceId }}
-                  className="flex items-center gap-2"
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                  <span>Browse Communities</span>
-                </Link>
-              </Button>
-            </div>
-          )}
+          <BrowseCommunitiesButton pluginId={pluginId} instanceId={instanceId} />
 
           {/* Feed Type Tabs */}
           {data.feedTypes && data.feedTypes.length > 0 && (
