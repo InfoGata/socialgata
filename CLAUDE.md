@@ -45,5 +45,16 @@ Redux store with slices:
 - `authSlice.ts` - Authentication state
 - `uiSlice.ts` - UI preferences (theme, etc.)
 
+**Favorites System** (uses React Context instead of Redux):
+- **automerge-repo** for offline-first CRDT-based favorites
+- `src/sync/FavoritesRepoProvider.tsx` - Sets up automerge-repo with IndexedDB storage
+- `src/sync/FavoritesContext.tsx` - React Context for favorites document
+- `src/sync/favorites-repo.ts` - CRDT operations (toggle, check, get favorites)
+- `src/sync/useFavorites.ts` - Custom hooks for favorites state
+- `src/components/FavoriteButton.tsx` - Star button component
+- `src/routes/favorites.tsx` - Favorites page with tabs
+- Storage: IndexedDB via `@automerge/automerge-repo-storage-indexeddb`
+- Sync: Cross-tab via BroadcastChannel, future cloud sync ready
+
 ### Testing
 Vitest with jsdom environment, testing utilities in `src/test/`
