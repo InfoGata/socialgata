@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropbox Authentication</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .success {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <h2>Connecting to Dropbox...</h2>
+            <p>Please wait while we complete the authorization</p>
+        </div>
+
+        <div id="success" style="display: none;">
+            <div class="success">✓</div>
+            <h2>Successfully Connected!</h2>
+            <p>You can close this window now</p>
+        </div>
+
+        <div id="error" style="display: none;">
+            <h2>Connection Failed</h2>
+            <div class="error">
+                <p id="error-message"></p>
+            </div>
+            <p style="margin-top: 1rem;">You can close this window and try again</p>
+        </div>
+    </div>
+
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const error = urlParams.get('error');
+        const errorDescription = urlParams.get('error_description');
+
+        // Show loading state
+        document.getElementById('loading').style.display = 'block';
+
+        if (error) {
+            // OAuth error from Dropbox
+            showError(`Authorization failed: ${errorDescription || error}`);
+        } else if (code) {
+            // Success - send code to opener window
+            try {
+                if (window.opener && !window.opener.closed) {
+                    // Post message to parent window with the authorization code
+                    window.opener.postMessage({
+                        type: 'dropbox-auth-success',
+                        code: code
+                    }, window.location.origin);
+
+                    // Show success message
+                    showSuccess();
+
+                    // Close popup after 2 seconds
+                    setTimeout(() => {
+                        window.close();
+                    }, 2000);
+                } else {
+                    showError('Could not communicate with parent window');
+                }
+            } catch (err) {
+                showError('Failed to send authorization code: ' + err.message);
+            }
+        } else {
+            showError('No authorization code received from Dropbox');
+        }
+
+        function showSuccess() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('success').style.display = 'block';
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error-message').textContent = message;
+        }
+    </script>
+</body>
+</html>

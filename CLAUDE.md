@@ -43,12 +43,12 @@ The app aggregates social media content through a plugin system:
 ### State Management
 Redux store with slices:
 - `authSlice.ts` - Authentication state
-- `uiSlice.ts` - UI preferences (theme, etc.)
+- `uiSlice.ts` - UI preferences (theme, cloud sync settings, etc.)
 
 **Favorites System** (uses React Context instead of Redux):
 - **automerge-repo** for offline-first CRDT-based favorites
 - `src/sync/FavoritesRepoProvider.tsx` - Sets up automerge-repo with IndexedDB storage
-- `src/sync/FavoritesContext.tsx` - React Context for favorites document
+- `src/sync/FavoritesContext.tsx` - React Context for favorites document + CloudSyncManager integration
 - `src/sync/favorites-repo.ts` - CRDT operations (toggle, check, get favorites)
 - `src/sync/useFavorites.ts` - Custom hooks for favorites state
 - `src/components/FavoriteButton.tsx` - Star button component (supports instances, communities, posts, comments)
@@ -56,7 +56,22 @@ Redux store with slices:
 - `src/components/CommunityFeed.tsx` - Displays community header with favorite button
 - Supported items: instances, communities, posts, comments
 - Storage: IndexedDB via `@automerge/automerge-repo-storage-indexeddb`
-- Sync: Cross-tab via BroadcastChannel, future cloud sync ready
+- Local sync: Cross-tab via BroadcastChannel
+- Cloud sync: Dropbox (with Google Drive, OneDrive planned)
+
+**Cloud Sync Architecture** (Hybrid Approach):
+- **Primary storage**: IndexedDB (fast, offline-first)
+- **Cloud backup**: Periodic uploads to cloud storage providers
+- **Conflict resolution**: Automerge CRDT automatically merges changes
+- `src/sync/cloud/CloudSyncProvider.ts` - Interface for all cloud providers
+- `src/sync/cloud/CloudSyncManager.ts` - Orchestrates sync operations (periodic uploads, downloads, CRDT merging)
+- `src/sync/cloud/DropboxSyncProvider.ts` - Dropbox OAuth + file upload/download implementation
+- `src/routes/auth/dropbox/callback.tsx` - OAuth callback handler
+- `src/components/Settings/CloudSyncSettings.tsx` - Settings UI for connecting providers
+- `src/components/SyncStatusIndicator.tsx` - Optional status indicator for header
+- Settings stored in Redux `uiSlice.cloudSync`: provider, enabled, autoSync, syncIntervalSeconds
+- Environment variables: `VITE_DROPBOX_CLIENT_ID`, `VITE_DROPBOX_REDIRECT_URI`
+- Setup docs: `docs/CLOUD_SYNC_SETUP.md`
 
 ### Testing
 Vitest with jsdom environment, testing utilities in `src/test/`
