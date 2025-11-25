@@ -23,16 +23,41 @@ React 18 + TypeScript application using:
 - **Vite** as build tool with `@/` path alias for `src/`
 
 ### Plugin Architecture
-The app aggregates social media content through a plugin system:
+The app aggregates social media content through a hybrid plugin system supporting both built-in and dynamic plugins.
+
+**Built-in Plugins** (static):
 - Each platform has a service file in `src/services/` (reddit.ts, lemmy.ts, mastodon.ts, hackernews.ts, bluesky.ts, twitter.ts, imageboard.ts)
-- Routes support plugin-based URLs: `/plugins/$pluginId/feed`
+- Implement the `ServiceType` interface from `src/types.ts`
+- `src/services/selector-service.ts` - Factory for resolving plugin services by ID
+
+**Dynamic Plugin System** (runtime-loadable):
+- Modeled after ReaderGata's plugin architecture
+- `src/contexts/PluginsContext.tsx` - Plugin management context (load, add, update, delete)
+- `src/hooks/usePlugins.ts` - Hook to access plugin context
+- `src/database.ts` - IndexedDB storage via Dexie for plugins and auth
+- `src/services/plugin-service-adapter.ts` - Wraps dynamic plugins to implement ServiceType
+- `src/plugin-utils.ts` - Utilities for loading plugins from URL/FileList, ID generation
+- `src/components/PluginServiceSync.tsx` - Syncs plugin context with service selector
+- `public/pluginframe.html` - Sandboxed iframe entry point for plugin execution
+- Uses `plugin-frame` library for secure iframe communication
+- Plugins stored in IndexedDB with `PluginInfo` schema (id, name, script, manifest, options)
+- Plugin authentication stored separately in `pluginAuths` table
+
+**Plugin Loading Flow**:
+1. PluginsProvider loads all plugins from IndexedDB on app startup
+2. Each plugin script executes in sandboxed iframe (10s timeout)
+3. PluginServiceAdapter wraps plugin to match ServiceType interface
+4. Service selector checks dynamic plugins first, falls back to built-in
+
+**Routes** support plugin-based URLs: `/plugins/$pluginId/feed`
 - Platform-specific instances: `/plugins/$pluginId/instances/$instanceId/feed`
-- Platform-specific post components:
-  - `ForumPost.tsx` - For forum-style platforms (Reddit, Lemmy)
-  - `MicroblogPost.tsx` - For microblogging platforms (Twitter, Mastodon, Bluesky)
-  - `ImageboardPost.tsx` - For imageboards (4chan, etc.)
-  - `PostComponent.tsx` - Main component that routes to platform-specific components
-  - `PostWithComments.tsx` - Displays posts with their comment threads
+
+**Platform-specific post components**:
+- `ForumPost.tsx` - For forum-style platforms (Reddit, Lemmy)
+- `MicroblogPost.tsx` - For microblogging platforms (Twitter, Mastodon, Bluesky)
+- `ImageboardPost.tsx` - For imageboards (4chan, etc.)
+- `PostComponent.tsx` - Main component that routes to platform-specific components
+- `PostWithComments.tsx` - Displays posts with their comment threads
 
 ### Key Technical Patterns
 - **Theme System**: Custom CSS variables with Tailwind, managed by ThemeProvider
