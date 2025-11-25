@@ -1,6 +1,7 @@
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import Spinner from "./components/Spinner";
+import { PluginServiceSync } from "./components/PluginServiceSync";
 
 export interface MyRouterContext {
   accessToken: string;
@@ -21,7 +22,10 @@ declare module "@tanstack/react-router" {
 
 const Router: React.FC = () => {
   return (
-    <RouterProvider router={router} />
+    <>
+      <PluginServiceSync />
+      <RouterProvider router={router} />
+    </>
   );
 };
 

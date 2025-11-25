@@ -8,6 +8,7 @@ import Router from "./router";
 import "./i18n";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ExtensionProvider } from "./contexts/ExtensionContext";
+import { PluginsProvider } from "./contexts/PluginsContext";
 import { FavoritesRepoProvider } from "./sync/FavoritesRepoProvider";
 import { FavoritesProvider } from "./sync/FavoritesContext";
 import { PostHogProvider } from "posthog-js/react";
@@ -25,20 +26,22 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       }}
     >
       <Provider store={store}>
-        <FavoritesRepoProvider>
-          <FavoritesProvider>
-            <ThemeProvider defaultTheme="light">
-              <ExtensionProvider>
-                <HelmetProvider>
-                  <Helmet>
-                    <title>SocialGata</title>
-                  </Helmet>
-                  <Router />
-                </HelmetProvider>
-              </ExtensionProvider>
-            </ThemeProvider>
-          </FavoritesProvider>
-        </FavoritesRepoProvider>
+        <PluginsProvider>
+          <FavoritesRepoProvider>
+            <FavoritesProvider>
+              <ThemeProvider defaultTheme="light">
+                <ExtensionProvider>
+                  <HelmetProvider>
+                    <Helmet>
+                      <title>SocialGata</title>
+                    </Helmet>
+                    <Router />
+                  </HelmetProvider>
+                </ExtensionProvider>
+              </ThemeProvider>
+            </FavoritesProvider>
+          </FavoritesRepoProvider>
+        </PluginsProvider>
       </Provider>
     </PostHogProvider>
   </React.StrictMode>

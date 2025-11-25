@@ -33,6 +33,16 @@ declare global {
   }
 }
 
+export interface DirectoryFile extends File {
+  webkitRelativePath: string;
+}
+
+export interface PluginAuthentication {
+  pluginId: string;
+  headers: Record<string, string>;
+  domainHeaders?: Record<string, Record<string, string>>;
+}
+
 export type PlatformType = "forum" | "microblog" | "imageboard";
 
 export interface ServiceType {

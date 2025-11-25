@@ -1,3 +1,16 @@
+export interface PluginInfo {
+  id?: string;
+  name: string;
+  script: string;
+  version?: string;
+  description?: string;
+  optionsHtml?: string;
+  optionsSameOrigin?: boolean;
+  manifestUrl?: string;
+  homepage?: string;
+  manifest?: Manifest;
+}
+
 export interface Manifest {
   name: string;
   script: string;
