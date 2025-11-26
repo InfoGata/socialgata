@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ExtensionProvider } from "@/contexts/ExtensionContext";
-import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ThemeProvider } from "@infogata/shadcn-vite-theme-provider";
 import { Root } from "@/routes/__root";
 import {
   RouterProvider,

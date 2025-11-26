@@ -6,7 +6,7 @@ import { Provider } from "react-redux";
 import { store } from "./store/store";
 import Router from "./router";
 import "./i18n";
-import { ThemeProvider } from "./contexts/ThemeContext";
+import { ThemeProvider } from "@infogata/shadcn-vite-theme-provider";
 import { ExtensionProvider } from "./contexts/ExtensionContext";
 import { PluginsProvider } from "./contexts/PluginsContext";
 import { FavoritesRepoProvider } from "./sync/FavoritesRepoProvider";

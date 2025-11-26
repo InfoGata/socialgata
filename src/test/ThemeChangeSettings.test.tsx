@@ -1,15 +1,19 @@
 import { screen, waitFor, cleanup } from "@testing-library/react";
 import { renderWithProviders } from "./renderWithProviders";
 import ThemeChangeSettings from "@/components/Settings/ThemeChangeSettings";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@infogata/shadcn-vite-theme-provider";
 import { describe, it, expect, vi, beforeEach, afterEach, Mock } from "vitest";
 import userEvent from "@testing-library/user-event";
 import '@testing-library/jest-dom/vitest';
 
 // Mock the useTheme hook
-vi.mock("@/hooks/useTheme", () => ({
-  useTheme: vi.fn(),
-}));
+vi.mock("@infogata/shadcn-vite-theme-provider", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@infogata/shadcn-vite-theme-provider")>();
+  return {
+    ...actual,
+    useTheme: vi.fn(),
+  };
+});
 
 // Mock the translation function
 vi.mock("react-i18next", async (importOriginal) => {

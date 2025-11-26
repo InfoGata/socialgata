@@ -178,8 +178,6 @@ export interface LoginRequest {
   apiSecret: string;
 }
 
-export type Theme = "light" | "dark" | "system";
-
 export interface GetCommentRepliesRequest {
   apiId: string;
   communityApiId?: string;

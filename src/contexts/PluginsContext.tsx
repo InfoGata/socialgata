@@ -25,8 +25,8 @@ import {
   GetInstancesResponse,
   LoginRequest,
   PluginInfo,
-  Theme,
 } from "../plugintypes";
+import { Theme } from "@infogata/shadcn-vite-theme-provider";
 import { NetworkRequest } from "../types";
 import {
   getPlugin,
