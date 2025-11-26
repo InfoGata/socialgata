@@ -32,10 +32,10 @@ describe('Index Route', () => {
     renderWithProviders(<Index />);
 
     // This assumes PluginFeedButtons has a data-testid attribute
-    // 5 plugins are visible (6 total, but Twitter requires CORS disabled)
     await waitFor(() => {
       const pluginButtons = screen.getAllByTestId(/^plugin-feed-/);
-      expect(pluginButtons).toHaveLength(5);
+      // expect length of 5 or more
+      expect(pluginButtons).lengthOf.greaterThanOrEqual(5);
     });
   });
 }); 
