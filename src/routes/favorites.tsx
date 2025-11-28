@@ -1,13 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Star, Inbox } from 'lucide-react';
+import { Star, Inbox, User as UserIcon } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FavoriteButton } from '@/components/FavoriteButton';
 import {
   useFavoriteInstances,
   useFavoritePosts,
   useFavoriteComments,
-  useFavoriteCommunities
+  useFavoriteCommunities,
+  useFavoriteUsers
 } from '@/sync/useFavorites';
 import InstanceCard from '@/components/InstanceCard';
 import PostComponent from '@/components/PostComponent';
@@ -23,8 +25,9 @@ function FavoritesPage() {
   const postsArray = useFavoritePosts();
   const commentsArray = useFavoriteComments();
   const communitiesArray = useFavoriteCommunities();
+  const usersArray = useFavoriteUsers();
 
-  const totalCount = instancesArray.length + postsArray.length + commentsArray.length + communitiesArray.length;
+  const totalCount = instancesArray.length + postsArray.length + commentsArray.length + communitiesArray.length + usersArray.length;
 
   return (
     <div className="container mx-auto p-4 max-w-6xl">
@@ -34,12 +37,12 @@ function FavoritesPage() {
           <h1 className="text-3xl font-bold">Favorites</h1>
         </div>
         <p className="text-muted-foreground">
-          Your favorited instances, communities, posts, and comments ({totalCount} total)
+          Your favorited instances, communities, posts, comments, and users ({totalCount} total)
         </p>
       </div>
 
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="all">
             All ({totalCount})
           </TabsTrigger>
@@ -48,6 +51,9 @@ function FavoritesPage() {
           </TabsTrigger>
           <TabsTrigger value="communities">
             Communities ({communitiesArray.length})
+          </TabsTrigger>
+          <TabsTrigger value="users">
+            Users ({usersArray.length})
           </TabsTrigger>
           <TabsTrigger value="posts">
             Posts ({postsArray.length})
@@ -97,6 +103,44 @@ function FavoritesPage() {
                             <FavoriteButton
                               type="community"
                               item={community}
+                              pluginId={pluginId}
+                              size="sm"
+                            />
+                          </div>
+                        </CardHeader>
+                      </Card>
+                    ))}
+                  </div>
+                </Section>
+              )}
+
+              {usersArray.length > 0 && (
+                <Section title="Users" count={usersArray.length}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {usersArray.map(({ key, pluginId, user }) => (
+                      <Card key={key} className="hover:bg-accent transition-colors">
+                        <CardHeader>
+                          <div className="flex items-start justify-between gap-2">
+                            <Link
+                              to="/plugins/$pluginId/user/$apiId"
+                              params={{ pluginId, apiId: user.apiId }}
+                              className="block group flex-1 min-w-0"
+                            >
+                              <div className="flex items-center gap-3">
+                                <Avatar className="h-10 w-10">
+                                  <AvatarImage src={user.avatar} alt={user.name} />
+                                  <AvatarFallback>
+                                    <UserIcon className="h-5 w-5" />
+                                  </AvatarFallback>
+                                </Avatar>
+                                <CardTitle className="group-hover:text-primary transition-colors">
+                                  {user.name}
+                                </CardTitle>
+                              </div>
+                            </Link>
+                            <FavoriteButton
+                              type="user"
+                              item={user}
                               pluginId={pluginId}
                               size="sm"
                             />
@@ -173,6 +217,47 @@ function FavoritesPage() {
                       <FavoriteButton
                         type="community"
                         item={community}
+                        pluginId={pluginId}
+                        size="sm"
+                      />
+                    </div>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Users Tab */}
+        <TabsContent value="users">
+          {usersArray.length === 0 ? (
+            <EmptyState message="No favorited users" />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {usersArray.map(({ key, pluginId, user }) => (
+                <Card key={key} className="hover:bg-accent transition-colors">
+                  <CardHeader>
+                    <div className="flex items-start justify-between gap-2">
+                      <Link
+                        to="/plugins/$pluginId/user/$apiId"
+                        params={{ pluginId, apiId: user.apiId }}
+                        className="block group flex-1 min-w-0"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={user.avatar} alt={user.name} />
+                            <AvatarFallback>
+                              <UserIcon className="h-5 w-5" />
+                            </AvatarFallback>
+                          </Avatar>
+                          <CardTitle className="group-hover:text-primary transition-colors">
+                            {user.name}
+                          </CardTitle>
+                        </div>
+                      </Link>
+                      <FavoriteButton
+                        type="user"
+                        item={user}
                         pluginId={pluginId}
                         size="sm"
                       />

@@ -230,6 +230,10 @@ class HackerNewsService implements ServiceType {
     const json: AlgoriaSearch = await response.json();
     const items = json.hits.map(h => "title" in h ? algoliaStoryHitToPost(h) : algoliaCommentHitToPost(h));
     return {
+      user: {
+        apiId: request.apiId,
+        name: request.apiId,
+      },
       items
     }
   }

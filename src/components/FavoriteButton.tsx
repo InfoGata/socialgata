@@ -12,16 +12,17 @@ import {
   useIsFavoritePost,
   useIsFavoriteComment,
   useIsFavoriteCommunity,
+  useIsFavoriteUser,
   useFavoritesMutations
 } from '@/sync/useFavorites';
-import type { Instance, Post, Community } from '@/plugintypes';
+import type { Instance, Post, Community, User } from '@/plugintypes';
 import { cn } from '@/lib/utils';
 
-type FavoriteType = 'instance' | 'post' | 'comment' | 'community';
+type FavoriteType = 'instance' | 'post' | 'comment' | 'community' | 'user';
 
 interface FavoriteButtonProps {
   type: FavoriteType;
-  item: Instance | Post | Community;
+  item: Instance | Post | Community | User;
   pluginId: string;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'icon' | 'button';
@@ -51,11 +52,13 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   const isFavoritePost = useIsFavoritePost(pluginId, itemId || '');
   const isFavoriteComment = useIsFavoriteComment(pluginId, itemId || '');
   const isFavoriteCommunity = useIsFavoriteCommunity(pluginId, itemId || '');
+  const isFavoriteUser = useIsFavoriteUser(pluginId, itemId || '');
 
   const isFavorite = type === 'instance' ? isFavoriteInstance
     : type === 'post' ? isFavoritePost
     : type === 'comment' ? isFavoriteComment
-    : isFavoriteCommunity;
+    : type === 'community' ? isFavoriteCommunity
+    : isFavoriteUser;
 
   // Handle toggle - directly mutate via automerge-repo
   const handleToggle = (e: React.MouseEvent) => {
@@ -76,6 +79,9 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
         break;
       case 'community':
         mutations.toggleCommunity(pluginId, itemId, item as Community);
+        break;
+      case 'user':
+        mutations.toggleUser(pluginId, itemId, item as User);
         break;
     }
   };

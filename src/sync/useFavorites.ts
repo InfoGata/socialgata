@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { Instance, Post, Community } from '@/plugintypes';
+import type { Instance, Post, Community, User } from '@/plugintypes';
 import { useFavoritesContext } from './useFavoritesContext';
 import {
   createFavoriteKey,
@@ -43,6 +43,15 @@ export function useIsFavoriteCommunity(pluginId: string, communityId: string): b
   const { doc } = useFavoritesContext();
   const key = createFavoriteKey(pluginId, communityId);
   return isFavorite(doc, 'communities', key);
+}
+
+/**
+ * Hook to check if a user is favorited
+ */
+export function useIsFavoriteUser(pluginId: string, userId: string): boolean {
+  const { doc } = useFavoritesContext();
+  const key = createFavoriteKey(pluginId, userId);
+  return isFavorite(doc, 'users', key);
 }
 
 /**
@@ -106,6 +115,21 @@ export function useFavoriteCommunities() {
 }
 
 /**
+ * Hook to get all favorite users
+ */
+export function useFavoriteUsers() {
+  const { doc } = useFavoritesContext();
+  return useMemo(() => {
+    const users = getFavorites(doc, 'users') as Record<string, User>;
+    return Object.entries(users).map(([key, user]) => ({
+      key,
+      ...parseFavoriteKey(key),
+      user
+    }));
+  }, [doc]);
+}
+
+/**
  * Hook to get favorites mutation functions
  */
 export function useFavoritesMutations() {
@@ -130,6 +154,11 @@ export function useFavoritesMutations() {
     toggleCommunity: (pluginId: string, communityId: string, community?: Community) => {
       const key = createFavoriteKey(pluginId, communityId);
       toggleFavorite(handle, 'communities', key, community);
+    },
+
+    toggleUser: (pluginId: string, userId: string, user?: User) => {
+      const key = createFavoriteKey(pluginId, userId);
+      toggleFavorite(handle, 'users', key, user);
     }
   }), [handle]);
 }
