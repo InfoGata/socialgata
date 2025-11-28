@@ -1,4 +1,4 @@
-import { GetCommentsRequest, GetCommentsResponse, GetCommunityRequest, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetInstancesRequest, GetInstancesResponse, GetUserReponse, GetUserRequest, Post } from "@/plugintypes";
+import { GetCommentsRequest, GetCommentsResponse, GetCommunityRequest, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetInstancesRequest, GetInstancesResponse, GetUserResponse, GetUserRequest, Post } from "@/plugintypes";
 import { ServiceType } from "@/types";
 import { GetComments, GetPersonDetails, GetPosts, LemmyHttp, PostView, Comment } from "lemmy-js-client";
 import { Converter } from "showdown";
@@ -218,7 +218,7 @@ class LemmyService implements ServiceType {
     }
   }
 
-  async getUser(request: GetUserRequest): Promise<GetUserReponse> {
+  async getUser(request: GetUserRequest): Promise<GetUserResponse> {
 
     const client = new LemmyHttp(baseUrl);
     const perPage = 30;

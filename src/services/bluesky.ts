@@ -4,7 +4,7 @@ import {
   GetFeedRequest,
   GetFeedResponse,
   GetUserRequest,
-  GetUserReponse,
+  GetUserResponse,
   LoginRequest,
   Post,
   SearchRequest,
@@ -83,7 +83,7 @@ class BlueskyService implements ServiceType {
     }
   }
 
-  async getUser(request: GetUserRequest): Promise<GetUserReponse> {
+  async getUser(request: GetUserRequest): Promise<GetUserResponse> {
     try {
       const did = await this.agent.resolveHandle({ handle: request.apiId });
       const profile = await this.agent.getProfile({ actor: did.data.did });

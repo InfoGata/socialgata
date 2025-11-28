@@ -1,6 +1,6 @@
 import { createRestAPIClient } from "masto";
 import { ServiceType } from "../types";
-import { Post, GetUserReponse, GetFeedResponse, GetUserRequest, GetTrendingTopicsRequest, GetTrendingTopicsResponse, TrendingTopic, GetTrendingTopicFeedRequest, GetTrendingTopicFeedResponse } from "../plugintypes";
+import { Post, GetUserResponse, GetFeedResponse, GetUserRequest, GetTrendingTopicsRequest, GetTrendingTopicsResponse, TrendingTopic, GetTrendingTopicFeedRequest, GetTrendingTopicFeedResponse } from "../plugintypes";
 
 const pluginName = "mastodon";
 const baseUrl = "https://mastodon.social";
@@ -32,7 +32,7 @@ class MastodonService implements ServiceType {
     };
   }
 
-  async getUser(request: GetUserRequest): Promise<GetUserReponse> {
+  async getUser(request: GetUserRequest): Promise<GetUserResponse> {
     const statuses = await masto.v1.accounts.$select(request.apiId).statuses.list({ limit: 30});
     const items = statuses.map(statusToPost);
     return {

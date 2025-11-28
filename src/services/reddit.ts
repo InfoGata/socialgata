@@ -1,4 +1,4 @@
-import { GetCommentsRequest, GetCommentsResponse, GetCommunityRequest, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetUserReponse, GetUserRequest, LoginRequest, Post, SearchRequest, SearchResponse } from "@/plugintypes";
+import { GetCommentsRequest, GetCommentsResponse, GetCommunityRequest, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetUserResponse, GetUserRequest, LoginRequest, Post, SearchRequest, SearchResponse } from "@/plugintypes";
 import { ServiceType } from "@/types";
 
 const pluginName = "reddit";
@@ -393,7 +393,7 @@ class RedditService implements ServiceType {
     }
   }
 
-  getUser = async (request: GetUserRequest): Promise<GetUserReponse> => {
+  getUser = async (request: GetUserRequest): Promise<GetUserResponse> => {
     const headers = this.getHeaders();
     const baseUrl = this.getBaseUrl();
     const url = `${baseUrl}/user/${request.apiId}/overview.json`;

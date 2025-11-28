@@ -11,7 +11,7 @@ import {
   GetCommentRepliesRequest,
   GetCommentRepliesResponse,
   GetUserRequest,
-  GetUserReponse,
+  GetUserResponse,
   SearchRequest,
   SearchResponse,
   GetTrendingTopicsRequest,
@@ -77,7 +77,7 @@ export class PluginServiceAdapter implements ServiceType {
     return { items: [] };
   }
 
-  async getUser(request: GetUserRequest): Promise<GetUserReponse> {
+  async getUser(request: GetUserRequest): Promise<GetUserResponse> {
     if (await this.plugin.hasDefined.onGetUser()) {
       return this.plugin.remote.onGetUser(request);
     }

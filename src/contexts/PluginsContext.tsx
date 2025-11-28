@@ -14,7 +14,7 @@ import {
   GetCommentRepliesRequest,
   GetCommentRepliesResponse,
   GetUserRequest,
-  GetUserReponse,
+  GetUserResponse,
   SearchRequest,
   SearchResponse,
   GetTrendingTopicsRequest,
@@ -50,7 +50,7 @@ export interface PluginMethodInterface {
   onGetCommunities(request: GetCommunitiesRequest): Promise<GetCommunitiesResponse>;
   onGetComments(request: GetCommentsRequest): Promise<GetCommentsResponse>;
   onGetCommentReplies(request: GetCommentRepliesRequest): Promise<GetCommentRepliesResponse>;
-  onGetUser(request: GetUserRequest): Promise<GetUserReponse>;
+  onGetUser(request: GetUserRequest): Promise<GetUserResponse>;
   onSearch(request: SearchRequest): Promise<SearchResponse>;
   onGetTrendingTopics(request?: GetTrendingTopicsRequest): Promise<GetTrendingTopicsResponse>;
   onGetTrendingTopicFeed(request: GetTrendingTopicFeedRequest): Promise<GetTrendingTopicFeedResponse>;

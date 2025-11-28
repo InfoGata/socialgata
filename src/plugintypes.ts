@@ -147,7 +147,7 @@ export interface GetCommunitiesResponse {
   pageInfo?: PageInfo;
 }
 
-export interface GetUserReponse {
+export interface GetUserResponse {
   pageInfo?: PageInfo;
   user?: User;
   items: Post[]

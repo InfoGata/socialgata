@@ -2,7 +2,7 @@ import { ServiceType } from "@/types";
 import {
   GetFeedResponse,
   GetUserRequest,
-  GetUserReponse,
+  GetUserResponse,
   Post,
   SearchRequest,
   SearchResponse,
@@ -121,7 +121,7 @@ class TwitterService implements ServiceType {
     }
   }
 
-  async getUser(request: GetUserRequest): Promise<GetUserReponse> {
+  async getUser(request: GetUserRequest): Promise<GetUserResponse> {
     try {
       const url = `${TWSTALKER_BASE_URL}/${request.apiId}`;
       const doc = await this.fetchHTML(url);
