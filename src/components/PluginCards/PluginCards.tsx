@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { PluginDescription, defaultPlugins } from "../../default-plugins";
+import { defaultPlugins } from "../../default-plugins";
+import { PluginDescription } from "../../types";
 import { usePlugins } from "../../hooks/usePlugins";
 import {
   generatePluginId,
@@ -20,6 +21,7 @@ const PluginCards: React.FC = () => {
   const navigate = useNavigate();
 
   const onAddPlugin = async (description: PluginDescription) => {
+    if (!description.url) return;
     setBackdropOpen(true);
     const fileType = getFileTypeFromPluginUrl(description.url);
 

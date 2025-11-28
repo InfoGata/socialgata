@@ -69,3 +69,12 @@ export interface NavigationLinkItem {
   link: LinkRouterProps;
   icon: JSX.Element;
 }
+
+export interface PluginDescription {
+  id: string;
+  name: string;
+  url?: string;
+  description?: string;
+  preinstall?: boolean;
+  requiresCorsDisabled?: boolean;
+}

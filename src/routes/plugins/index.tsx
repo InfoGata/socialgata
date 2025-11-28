@@ -9,6 +9,7 @@ import ConfirmPluginDialog from "../../components/Plugins/ConfirmPluginDialog";
 import { usePlugins } from "../../hooks/usePlugins";
 import { PluginInfo } from "../../plugintypes";
 import { directoryProps, generatePluginId, getPlugin, FileType } from "../../plugin-utils";
+import PluginCards from "@/components/PluginCards/PluginCards";
 
 const Plugins: React.FC = () => {
   const { plugins, deletePlugin, pluginsFailed, reloadPlugins } = usePlugins();
@@ -87,6 +88,7 @@ const Plugins: React.FC = () => {
       <div className="flex flex-col gap-4 mt-4">
         {pluginComponents}
       </div>
+      <PluginCards />
       <ConfirmPluginDialog
         open={Boolean(pendingPlugin)}
         plugins={pendingPlugin ? [pendingPlugin] : []}

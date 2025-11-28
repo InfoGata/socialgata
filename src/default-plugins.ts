@@ -1,21 +1,11 @@
-export interface PluginDescription {
-  id: string;
-  name: string;
-  url: string;
-  description: string;
-  preinstall?: boolean;
-  requiresCorsDisabled?: boolean;
-}
+import { PluginDescription } from "./types";
 
 export const defaultPlugins: PluginDescription[] = [
-  // Add installable plugins here as they become available
-  // Example:
   {
-    id: "example-plugin-id",
-    name: "Example Plugin",
-    description: "Description of what this plugin does",
-    url: "https://example.com/plugins/example/manifest.json",
-    preinstall: false,
+    id: "2XJix5oj3Xqd",
+    name: "Reddit Plugin for SocialGata",
+    description: "Browse Reddit feeds, communities, and comments",
+    url: "https://cdn.jsdelivr.net/gh/InfoGata/reddit-socialgata@latest/manifest.json",
   },
 ];
 

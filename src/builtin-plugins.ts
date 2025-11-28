@@ -1,20 +1,6 @@
-export interface PluginDescription {
-  id: string;
-  name: string;
-  url?: string;
-  description?: string;
-  preinstall?: boolean;
-  requiresCorsDisabled?: boolean;
-}
+import { PluginDescription } from "./types";
 
 export const builtinPlugins: PluginDescription[] = [
-  {
-    id: "reddit",
-    name: "Reddit",
-    description: "Browse Reddit communities and posts",
-    // url: "https://example.com/plugins/reddit/manifest.json", // TODO: Add when plugins are published
-    preinstall: false,
-  },
   {
     id: "mastodon",
     name: "Mastodon",

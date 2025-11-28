@@ -5,7 +5,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import React from "react";
 import { isCorsDisabled } from "@/utils";
 import { useExtension } from "@/hooks/useExtension";
-// import PluginCards from "@/components/PluginCards/PluginCards";
+import PluginCards from "@/components/PluginCards/PluginCards";
 
 export const Index: React.FC = () => {
   const corsDisabled = isCorsDisabled();
@@ -28,7 +28,7 @@ export const Index: React.FC = () => {
           <PluginFeedButtons key={plugin.id} pluginId={plugin.id} />
         ))}
       </div>
-      {/* <PluginCards /> */}
+      <PluginCards />
     </>
   );
 };
