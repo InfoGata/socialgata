@@ -12,7 +12,7 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import React, { useState, useEffect } from "react";
-import { defaultPlugins } from "@/default-plugins";
+import { builtinPlugins } from "@/builtin-plugins";
 import { getService } from "@/services/selector-service";
 
 export const TopBar: React.FC = () => {
@@ -22,7 +22,7 @@ export const TopBar: React.FC = () => {
   const isNavigationMenuOpen = useAppSelector((state) => state.ui.isNavigationMenuOpen);
 
   const searchSources = React.useMemo(() => {
-    return defaultPlugins
+    return builtinPlugins
       .map(plugin => {
         const service = getService(plugin.id);
         if (service && service.search) {

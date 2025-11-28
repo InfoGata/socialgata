@@ -3,12 +3,35 @@
     "settings": "Settings",
     "extensionMessage": "Get the InfoGata extension for enhanced plugin functionality",
     "installExtension": "Install Extension",
-    "close": "Close"
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
   },
   "settings": {
     "theme": "Theme",
     "light": "Light",
     "dark": "Dark",
     "system": "System"
+  },
+  "plugins": {
+    "addPlugin": "Add Plugin",
+    "addPluginCount": "Add {{count}} Plugin(s)",
+    "installPluginFromUrl": "Install a plugin from a URL",
+    "manifestUrl": "Manifest URL",
+    "advancedOptions": "Advanced Options",
+    "headerKey": "Header Key",
+    "headerValue": "Header Value",
+    "loadPluginFromFolder": "Load Plugin From Folder",
+    "loadPluginFromUrl": "Load Plugin From URL",
+    "failedPlugins": "Failed Plugins",
+    "clickReload": "Click to Reload",
+    "installedPlugins": "Installed Plugins",
+    "viewFeed": "View Feed",
+    "openMenu": "Open Menu",
+    "deletePlugin": "Delete Plugin",
+    "confirmDelete": "Are you sure you want to delete this plugin?",
+    "updateManifestUrl": "Update Manifest URL",
+    "availablePlugins": "Available Plugins",
+    "addPluginSuccess": "Plugin added successfully"
   }
 }

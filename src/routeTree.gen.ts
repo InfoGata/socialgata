@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as SettingsImport } from './routes/settings'
 import { Route as FavoritesImport } from './routes/favorites'
 import { Route as IndexImport } from './routes/index'
+import { Route as PluginsIndexImport } from './routes/plugins/index'
 import { Route as PluginsPluginIdFeedImport } from './routes/plugins/$pluginId/feed'
 import { Route as PluginsPluginIdTrendingIndexImport } from './routes/plugins/$pluginId/trending.index'
 import { Route as PluginsPluginIdInstancesIndexImport } from './routes/plugins/$pluginId/instances/index'
@@ -44,6 +45,12 @@ const FavoritesRoute = FavoritesImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PluginsIndexRoute = PluginsIndexImport.update({
+  id: '/plugins/',
+  path: '/plugins/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -153,6 +160,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsImport
       parentRoute: typeof rootRoute
     }
+    '/plugins/': {
+      id: '/plugins/'
+      path: '/plugins'
+      fullPath: '/plugins'
+      preLoaderRoute: typeof PluginsIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/plugins/$pluginId/feed': {
       id: '/plugins/$pluginId/feed'
       path: '/plugins/$pluginId/feed'
@@ -246,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/favorites': typeof FavoritesRoute
   '/settings': typeof SettingsRoute
+  '/plugins': typeof PluginsIndexRoute
   '/plugins/$pluginId/feed': typeof PluginsPluginIdFeedRoute
   '/plugins/$pluginId/post/$apiId': typeof PluginsPluginIdPostApiIdRoute
   '/plugins/$pluginId/trending/$topicName': typeof PluginsPluginIdTrendingTopicNameRoute
@@ -264,6 +279,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/favorites': typeof FavoritesRoute
   '/settings': typeof SettingsRoute
+  '/plugins': typeof PluginsIndexRoute
   '/plugins/$pluginId/feed': typeof PluginsPluginIdFeedRoute
   '/plugins/$pluginId/post/$apiId': typeof PluginsPluginIdPostApiIdRoute
   '/plugins/$pluginId/trending/$topicName': typeof PluginsPluginIdTrendingTopicNameRoute
@@ -283,6 +299,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/favorites': typeof FavoritesRoute
   '/settings': typeof SettingsRoute
+  '/plugins/': typeof PluginsIndexRoute
   '/plugins/$pluginId/feed': typeof PluginsPluginIdFeedRoute
   '/plugins/$pluginId/post/$apiId': typeof PluginsPluginIdPostApiIdRoute
   '/plugins/$pluginId/trending/$topicName': typeof PluginsPluginIdTrendingTopicNameRoute
@@ -303,6 +320,7 @@ export interface FileRouteTypes {
     | '/'
     | '/favorites'
     | '/settings'
+    | '/plugins'
     | '/plugins/$pluginId/feed'
     | '/plugins/$pluginId/post/$apiId'
     | '/plugins/$pluginId/trending/$topicName'
@@ -320,6 +338,7 @@ export interface FileRouteTypes {
     | '/'
     | '/favorites'
     | '/settings'
+    | '/plugins'
     | '/plugins/$pluginId/feed'
     | '/plugins/$pluginId/post/$apiId'
     | '/plugins/$pluginId/trending/$topicName'
@@ -337,6 +356,7 @@ export interface FileRouteTypes {
     | '/'
     | '/favorites'
     | '/settings'
+    | '/plugins/'
     | '/plugins/$pluginId/feed'
     | '/plugins/$pluginId/post/$apiId'
     | '/plugins/$pluginId/trending/$topicName'
@@ -356,6 +376,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FavoritesRoute: typeof FavoritesRoute
   SettingsRoute: typeof SettingsRoute
+  PluginsIndexRoute: typeof PluginsIndexRoute
   PluginsPluginIdFeedRoute: typeof PluginsPluginIdFeedRoute
   PluginsPluginIdPostApiIdRoute: typeof PluginsPluginIdPostApiIdRoute
   PluginsPluginIdTrendingTopicNameRoute: typeof PluginsPluginIdTrendingTopicNameRoute
@@ -374,6 +395,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FavoritesRoute: FavoritesRoute,
   SettingsRoute: SettingsRoute,
+  PluginsIndexRoute: PluginsIndexRoute,
   PluginsPluginIdFeedRoute: PluginsPluginIdFeedRoute,
   PluginsPluginIdPostApiIdRoute: PluginsPluginIdPostApiIdRoute,
   PluginsPluginIdTrendingTopicNameRoute: PluginsPluginIdTrendingTopicNameRoute,
@@ -407,6 +429,7 @@ export const routeTree = rootRoute
         "/",
         "/favorites",
         "/settings",
+        "/plugins/",
         "/plugins/$pluginId/feed",
         "/plugins/$pluginId/post/$apiId",
         "/plugins/$pluginId/trending/$topicName",
@@ -429,6 +452,9 @@ export const routeTree = rootRoute
     },
     "/settings": {
       "filePath": "settings.tsx"
+    },
+    "/plugins/": {
+      "filePath": "plugins/index.tsx"
     },
     "/plugins/$pluginId/feed": {
       "filePath": "plugins/$pluginId/feed.tsx"

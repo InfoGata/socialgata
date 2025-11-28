@@ -1,7 +1,7 @@
 import { PluginInterface, PluginFrame } from "plugin-frame";
 import React from "react";
 import { db } from "../database";
-import { defaultPlugins } from "../default-plugins";
+import { builtinPlugins } from "../builtin-plugins";
 import {
   GetFeedRequest,
   GetFeedResponse,
@@ -328,7 +328,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
   React.useEffect(() => {
     const preinstall = async () => {
       if (pluginsLoaded && !preinstallComplete) {
-        const preinstallPlugins = defaultPlugins.filter((p) => !!p.preinstall);
+        const preinstallPlugins = builtinPlugins.filter((p) => !!p.preinstall);
         const existingPluginIds = pluginFrames.map((p) => p.id);
         const newPlugins = preinstallPlugins.filter(
           (p) => !existingPluginIds.includes(p.id)

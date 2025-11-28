@@ -1,16 +1,17 @@
 import { ExtensionBanner } from "@/components/ExtensionBanner";
 import PluginFeedButtons from "@/components/PluginFeedButttons";
-import { defaultPlugins } from "@/default-plugins";
+import { builtinPlugins } from "@/builtin-plugins";
 import { createFileRoute } from "@tanstack/react-router";
 import React from "react";
 import { isCorsDisabled } from "@/utils";
 import { useExtension } from "@/hooks/useExtension";
+// import PluginCards from "@/components/PluginCards/PluginCards";
 
 export const Index: React.FC = () => {
   const corsDisabled = isCorsDisabled();
   const { extensionDetected } = useExtension();
 
-  const visiblePlugins = defaultPlugins.filter((plugin) => {
+  const visiblePlugins = builtinPlugins.filter((plugin) => {
     // If plugin requires CORS to be disabled, only show it if CORS is actually disabled
     if (plugin.requiresCorsDisabled) {
       return corsDisabled || extensionDetected;
@@ -27,6 +28,7 @@ export const Index: React.FC = () => {
           <PluginFeedButtons key={plugin.id} pluginId={plugin.id} />
         ))}
       </div>
+      {/* <PluginCards /> */}
     </>
   );
 };
