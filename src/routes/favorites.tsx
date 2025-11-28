@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Star, Inbox } from 'lucide-react';
+import { FavoriteButton } from '@/components/FavoriteButton';
 import {
   useFavoriteInstances,
   useFavoritePosts,
@@ -78,20 +79,28 @@ function FavoritesPage() {
                     {communitiesArray.map(({ key, pluginId, community }) => (
                       <Card key={key} className="hover:bg-accent transition-colors">
                         <CardHeader>
-                          <Link
-                            to="/plugins/$pluginId/community/$apiId"
-                            params={{ pluginId, apiId: community.apiId }}
-                            className="block group"
-                          >
-                            <CardTitle className="group-hover:text-primary transition-colors">
-                              {community.name}
-                            </CardTitle>
-                            {community.description && (
-                              <CardDescription className="mt-2 line-clamp-3">
-                                {community.description}
-                              </CardDescription>
-                            )}
-                          </Link>
+                          <div className="flex items-start justify-between gap-2">
+                            <Link
+                              to="/plugins/$pluginId/community/$apiId"
+                              params={{ pluginId, apiId: community.apiId }}
+                              className="block group flex-1 min-w-0"
+                            >
+                              <CardTitle className="group-hover:text-primary transition-colors">
+                                {community.name}
+                              </CardTitle>
+                              {community.description && (
+                                <CardDescription className="mt-2 line-clamp-3">
+                                  {community.description}
+                                </CardDescription>
+                              )}
+                            </Link>
+                            <FavoriteButton
+                              type="community"
+                              item={community}
+                              pluginId={pluginId}
+                              size="sm"
+                            />
+                          </div>
                         </CardHeader>
                       </Card>
                     ))}
@@ -146,20 +155,28 @@ function FavoritesPage() {
               {communitiesArray.map(({ key, pluginId, community }) => (
                 <Card key={key} className="hover:bg-accent transition-colors">
                   <CardHeader>
-                    <Link
-                      to="/plugins/$pluginId/community/$apiId"
-                      params={{ pluginId, apiId: community.apiId }}
-                      className="block group"
-                    >
-                      <CardTitle className="group-hover:text-primary transition-colors">
-                        {community.name}
-                      </CardTitle>
-                      {community.description && (
-                        <CardDescription className="mt-2 line-clamp-3">
-                          {community.description}
-                        </CardDescription>
-                      )}
-                    </Link>
+                    <div className="flex items-start justify-between gap-2">
+                      <Link
+                        to="/plugins/$pluginId/community/$apiId"
+                        params={{ pluginId, apiId: community.apiId }}
+                        className="block group flex-1 min-w-0"
+                      >
+                        <CardTitle className="group-hover:text-primary transition-colors">
+                          {community.name}
+                        </CardTitle>
+                        {community.description && (
+                          <CardDescription className="mt-2 line-clamp-3">
+                            {community.description}
+                          </CardDescription>
+                        )}
+                      </Link>
+                      <FavoriteButton
+                        type="community"
+                        item={community}
+                        pluginId={pluginId}
+                        size="sm"
+                      />
+                    </div>
                   </CardHeader>
                 </Card>
               ))}
