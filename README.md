@@ -4,7 +4,7 @@ A unified social media aggregator that brings together content from multiple pla
 
 ## Features
 
-- **Multi-Platform Support**: Aggregate content from Reddit, Lemmy, Mastodon, and Hacker News
+- **Multi-Platform Support**: Aggregate content from Lemmy, Mastodon, Bluesky, Hacker News, and more via plugins
 - **Plugin Architecture**: Extensible system for adding new social media platforms
 - **Instance Support**: Connect to different instances of federated platforms (Lemmy, Mastodon)
 - **Dark/Light Theme**: Customizable UI with theme support
@@ -74,10 +74,10 @@ src/
 │   ├── plugins/      # Plugin-specific routes
 │   └── ...
 ├── services/         # Platform service implementations
-│   ├── reddit.ts
 │   ├── lemmy.ts
 │   ├── mastodon.ts
-│   └── hackernews.ts
+│   ├── hackernews.ts
+│   └── bluesky.ts
 ├── store/            # Redux store and slices
 │   ├── authSlice.ts
 │   └── uiSlice.ts

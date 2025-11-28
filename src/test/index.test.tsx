@@ -18,7 +18,7 @@ describe('Index Route', () => {
     renderWithProviders(<Index />);
 
     // Check for all plugin buttons (excluding Twitter which requires CORS disabled)
-    const pluginIds = ['reddit', 'mastodon', 'lemmy', 'hackernews', 'bluesky'];
+    const pluginIds = ['mastodon', 'lemmy', 'hackernews', 'bluesky'];
 
     await waitFor(() => {
       pluginIds.forEach(pluginId => {
