@@ -38,7 +38,7 @@ export const TopBar: React.FC = () => {
   }, []);
 
   const [selectedSearchSource, setSelectedSearchSource] = useState<string>(
-    searchSources[0]?.id || 'reddit'
+    searchSources[0]?.id
   );
 
   const onToggleNavigationMenu = () => {

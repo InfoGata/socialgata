@@ -5,7 +5,8 @@
     "installExtension": "Install Extension",
     "close": "Close",
     "cancel": "Cancel",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "notFound": "Not found"
   },
   "settings": {
     "theme": "Theme",
@@ -28,6 +29,8 @@
     "installedPlugins": "Installed Plugins",
     "viewFeed": "View Feed",
     "openMenu": "Open Menu",
+    "options": "Options",
+    "pluginOptions": "{{pluginName}} Options",
     "deletePlugin": "Delete Plugin",
     "confirmDelete": "Are you sure you want to delete this plugin?",
     "updateManifestUrl": "Update Manifest URL",

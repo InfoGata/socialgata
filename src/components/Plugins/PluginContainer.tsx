@@ -1,7 +1,7 @@
 import Alert from "@/components/Alert";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { MoreHorizontalIcon } from "lucide-react";
+import { MoreHorizontalIcon, Settings } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { FaTrash } from "react-icons/fa6";
@@ -58,6 +58,17 @@ const PluginContainer: React.FC<PluginContainerProps> = (props) => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {plugin.hasOptions && (
+                <DropdownMenuItem className="cursor-pointer" asChild>
+                  <Link
+                    to="/plugins/$pluginId/options"
+                    params={{ pluginId: plugin.id || "" }}
+                  >
+                    <Settings />
+                    <span>{t("options")}</span>
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem className="cursor-pointer" onClick={onDelete}>
                 <FaTrash />
                 <span>{t("deletePlugin")}</span>
