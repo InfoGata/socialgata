@@ -26,7 +26,7 @@ import {
   LoginRequest,
   PluginInfo,
 } from "../plugintypes";
-import { Theme } from "@infogata/shadcn-vite-theme-provider";
+import { Theme, useTheme } from "@infogata/shadcn-vite-theme-provider";
 import { NetworkRequest } from "../types";
 import {
   getPlugin,
@@ -108,6 +108,9 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
   const [preinstallComplete, setPreinstallComplete] = React.useState(false);
 
   const corsProxyUrl = "";  // TODO: Add CORS proxy support if needed
+  const theme = useTheme();
+  const themeRef = React.useRef(theme.theme);
+  themeRef.current = theme.theme;
 
   const loadPlugin = React.useCallback(
     async (plugin: PluginInfo, pluginFiles?: FileList) => {
@@ -175,7 +178,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
           }
           return false;
         },
-        getTheme: async () => "system" as Theme,
+        getTheme: async () => themeRef.current
       };
 
       const srcUrl = getPluginUrl(plugin.id!, "/pluginframe.html");

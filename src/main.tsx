@@ -21,15 +21,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
         defaults: '2025-05-24',
         capture_exceptions: true,
-        debug: import.meta.env.MODE === "development",
         cookieless_mode: "always"
       }}
     >
       <Provider store={store}>
-        <PluginsProvider>
-          <FavoritesRepoProvider>
-            <FavoritesProvider>
-              <ThemeProvider defaultTheme="light">
+        <ThemeProvider defaultTheme="light">
+          <PluginsProvider>
+            <FavoritesRepoProvider>
+              <FavoritesProvider>
                 <ExtensionProvider>
                   <HelmetProvider>
                     <Helmet>
@@ -38,10 +37,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Router />
                   </HelmetProvider>
                 </ExtensionProvider>
-              </ThemeProvider>
-            </FavoritesProvider>
-          </FavoritesRepoProvider>
-        </PluginsProvider>
+              </FavoritesProvider>
+            </FavoritesRepoProvider>
+          </PluginsProvider>
+        </ThemeProvider>
       </Provider>
     </PostHogProvider>
   </React.StrictMode>
