@@ -14,12 +14,6 @@ export const builtinPlugins: PluginDescription[] = [
     preinstall: false,
   },
   {
-    id: "hackernews",
-    name: "Hacker News",
-    description: "Browse Hacker News posts and comments",
-    preinstall: false,
-  },
-  {
     id: "bluesky",
     name: "Bluesky",
     description: "Browse Bluesky posts and profiles",
@@ -30,12 +24,6 @@ export const builtinPlugins: PluginDescription[] = [
     name: "Twitter",
     description: "Browse Twitter posts (requires InfoGata extension)",
     requiresCorsDisabled: true,
-    preinstall: false,
-  },
-  {
-    id: "imageboard",
-    name: "Imageboard",
-    description: "Browse imageboards like 4chan",
     preinstall: false,
   },
 ];

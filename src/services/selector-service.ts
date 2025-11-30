@@ -1,10 +1,8 @@
 import { ServiceType } from "@/types";
 import { lemmy } from "./lemmy";
 import { mastodon } from "./mastodon";
-import { hackerNews } from "./hackernews";
 import { bluesky } from "./bluesky";
 import { twitter } from "./twitter";
-import imageboard from "./imageboard";
 import { PluginServiceAdapter } from "./plugin-service-adapter";
 import { PluginFrameContainer } from "@/contexts/PluginsContext";
 
@@ -37,14 +35,10 @@ export const getService = (serviceName: string): ServiceType | null => {
       return mastodon;
     case "lemmy":
       return lemmy;
-    case "hackernews":
-      return hackerNews;
     case "bluesky":
       return bluesky;
     case "twitter":
       return twitter;
-    case "imageboard":
-      return imageboard;
   }
   return null;
 }

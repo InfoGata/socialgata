@@ -26,7 +26,7 @@ React 18 + TypeScript application using:
 The app aggregates social media content through a hybrid plugin system supporting both built-in and dynamic plugins.
 
 **Built-in Plugins** (static):
-- Each platform has a service file in `src/services/` (lemmy.ts, mastodon.ts, hackernews.ts, bluesky.ts, twitter.ts, imageboard.ts)
+- Each platform has a service file in `src/services/` (lemmy.ts, mastodon.ts, bluesky.ts, twitter.ts)
 - Implement the `ServiceType` interface from `src/types.ts`
 - `src/services/selector-service.ts` - Factory for resolving plugin services by ID
 
