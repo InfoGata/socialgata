@@ -33,6 +33,7 @@ import {
   getPluginUrl,
   isAuthorizedDomain,
 } from "../plugin-utils";
+import { hasExtension } from "@/utils";
 
 interface ApplicationPluginInterface extends PluginInterface {
   networkRequest(input: string, init?: RequestInit): Promise<NetworkRequest>;
@@ -116,6 +117,9 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
     async (plugin: PluginInfo, pluginFiles?: FileList) => {
       const api: ApplicationPluginInterface = {
         networkRequest: async (input: string, init?: RequestInit) => {
+          if (hasExtension() && window.InfoGata?.networkRequest) {
+            return await window.InfoGata.networkRequest(input, init);
+          }
           const pluginAuth = plugin?.id
             ? await db.pluginAuths.get(plugin.id)
             : undefined;
