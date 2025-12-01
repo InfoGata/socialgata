@@ -5,7 +5,7 @@ import React from "react";
 import { Helmet } from "react-helmet-async";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader } from "./ui/card";
-import { getService } from "@/services/selector-service";
+import { usePlugins } from "@/hooks/usePlugins";
 import { MessageCircleIcon, Users2Icon } from "lucide-react";
 
 interface Props {
@@ -16,21 +16,21 @@ interface Props {
 const PostWithComments: React.FC<Props> = (props) => {
   const { data, pluginId } = props;
   const [replies, setReplies] = React.useState<Post[] | null>(null);
-  const service = pluginId ? getService(pluginId) : null;
-  const platformType = service?.platformType || "forum";
+  const { plugins } = usePlugins();
+  const plugin = pluginId ? plugins.find(p => p.id === pluginId) : null;
+  const platformType = plugin?.platformType || "forum";
 
   const getReplies = async () => {
-    if (!pluginId || !data.post?.moreRepliesId) return;
+    if (!pluginId || !data.post?.moreRepliesId || !plugin) return;
 
-    const service = getService(pluginId);
-    if (!service || !service.getCommentReplies) return;
-    const replies = await service.getCommentReplies({
+    if (!await plugin.hasDefined.onGetCommentReplies()) return;
+    const repliesResponse = await plugin.remote.onGetCommentReplies({
       apiId: data.post.moreRepliesId,
       instanceId: data.post.instanceId,
       communityApiId: data.post.communityApiId,
       postApiId: data.post.apiId,
     });
-    setReplies(replies.items);
+    setReplies(repliesResponse.items);
   }
 
 

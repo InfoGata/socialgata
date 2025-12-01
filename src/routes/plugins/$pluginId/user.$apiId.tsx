@@ -1,7 +1,7 @@
 import PostComponent from "@/components/PostComponent";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getService } from "@/services/selector-service";
+import { usePlugins } from "@/hooks/usePlugins";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { User as UserIcon } from "lucide-react";
 import React from "react";
@@ -9,8 +9,9 @@ import React from "react";
 const UserOverview: React.FC = () => {
   const { user, items } = Route.useLoaderData();
   const { pluginId } = Route.useParams();
-  const service = getService(pluginId);
-  const platformType = service?.platformType || "forum";
+  const { plugins } = usePlugins();
+  const plugin = plugins.find(p => p.id === pluginId);
+  const platformType = plugin?.platformType || "forum";
 
   return (
     <div className="space-y-4">
@@ -47,11 +48,11 @@ const UserOverview: React.FC = () => {
 
 export const Route = createFileRoute("/plugins/$pluginId/user/$apiId")({
   component: UserOverview,
-  loader: async ({ params }) => {
-    const service = getService(params.pluginId);
-    if (service) {
-      if (service.getUser) {
-        const response = await service.getUser({ apiId: params.apiId });
+  loader: async ({ params, context }) => {
+    const plugin = context.plugins.find(p => p.id === params.pluginId);
+    if (plugin) {
+      if (await plugin.hasDefined.onGetUser()) {
+        const response = await plugin.remote.onGetUser({ apiId: params.apiId });
         return { user: response.user, items: response.items };
       } else {
         return { user: undefined, items: [] };

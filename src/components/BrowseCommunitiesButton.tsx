@@ -1,7 +1,7 @@
 import { Button } from "./ui/button";
 import { Link } from "@tanstack/react-router";
 import { LayoutGrid } from "lucide-react";
-import { getService } from "@/services/selector-service";
+import { usePlugins } from "@/hooks/usePlugins";
 import React from "react";
 
 type BrowseCommunitiesButtonProps = {
@@ -10,9 +10,22 @@ type BrowseCommunitiesButtonProps = {
 }
 
 const BrowseCommunitiesButton: React.FC<BrowseCommunitiesButtonProps> = ({ pluginId, instanceId }) => {
-  const service = getService(pluginId);
+  const { plugins } = usePlugins();
+  const plugin = plugins.find(p => p.id === pluginId);
+  const [hasCommunities, setHasCommunities] = React.useState(false);
 
-  if (!instanceId || !service?.getCommunities) {
+  React.useEffect(() => {
+    const checkCommunities = async () => {
+      if (plugin && await plugin.hasDefined.onGetCommunities()) {
+        setHasCommunities(true);
+      } else {
+        setHasCommunities(false);
+      }
+    };
+    checkCommunities();
+  }, [plugin]);
+
+  if (!instanceId || !hasCommunities) {
     return null;
   }
 

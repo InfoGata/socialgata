@@ -1,7 +1,7 @@
 import React from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { getService } from "@/services/selector-service";
+import { usePlugins } from "@/hooks/usePlugins";
 
 interface PluginLoginProps {
   pluginId: string;
@@ -25,6 +25,8 @@ function usePersistedState(
 
 const PluginLogin = (props: PluginLoginProps) => {
   const { pluginId, isLoggedIn, setIsLoggedIn } = props;
+  const { plugins } = usePlugins();
+  const plugin = plugins.find(p => p.id === pluginId);
 
   const [apiKey, setApiKey] = usePersistedState(`${pluginId}key`, "");
   const [apiSecret, setApiSecret] = usePersistedState(`${pluginId}secret`, "");
@@ -38,20 +40,18 @@ const PluginLogin = (props: PluginLoginProps) => {
   };
 
   const login = async () => {
-    const service = getService(pluginId);
-    if (service && service.login) {
-      await service.login({ apiKey: apiKey, apiSecret: apiSecret });
-      if (service.isLoggedIn) {
-        setIsLoggedIn(await service.isLoggedIn());
+    if (plugin && await plugin.hasDefined.onLogin()) {
+      await plugin.remote.onLogin({ apiKey: apiKey, apiSecret: apiSecret });
+      if (await plugin.hasDefined.onIsLoggedIn()) {
+        setIsLoggedIn(await plugin.remote.onIsLoggedIn());
       }
     }
   };
 
   const logout = async () => {
-    const service = getService(pluginId);
-    if (service && service.logout && service.isLoggedIn) {
-      await service.logout();
-      setIsLoggedIn(await service.isLoggedIn());
+    if (plugin && await plugin.hasDefined.onLogout() && await plugin.hasDefined.onIsLoggedIn()) {
+      await plugin.remote.onLogout();
+      setIsLoggedIn(await plugin.remote.onIsLoggedIn());
     }
   };
 
@@ -72,7 +72,7 @@ const PluginLogin = (props: PluginLoginProps) => {
       {isLoggedIn ? (
         <Button onClick={logout}>Logout</Button>
       ) : (
-        <Button onClick={login}>Login to {pluginId}</Button>
+        <Button onClick={login}>Login to {plugin?.name}</Button>
       )}
     </div>
   );

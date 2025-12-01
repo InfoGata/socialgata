@@ -1,5 +1,4 @@
 import CommunityFeed from "@/components/CommunityFeed";
-import { getService } from "@/services/selector-service";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 const Community: React.FC = () => {
@@ -16,10 +15,10 @@ type CommunitySearch = {
 export const Route = createFileRoute("/plugins/$pluginId/community/$apiId/")({
   component: Community,
   loaderDeps: ({search}) => ({page: search.page}),
-  loader: async ({ params, deps: { page } }) => {
-    const service = getService(params.pluginId);
-    if (service && service.getCommunity) {
-      const response = await service.getCommunity({
+  loader: async ({ params, deps: { page }, context }) => {
+    const plugin = context.plugins.find(p => p.id === params.pluginId);
+    if (plugin && await plugin.hasDefined.onGetCommunity()) {
+      const response = await plugin.remote.onGetCommunity({
         apiId: params.apiId,
         pageInfo: { page: page },
       });

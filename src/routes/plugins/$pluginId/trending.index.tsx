@@ -1,4 +1,3 @@
-import { getService } from '@/services/selector-service';
 import { TrendingTopic } from '@/plugintypes';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -44,10 +43,10 @@ const TrendingTopics: React.FC = () => {
 
 export const Route = createFileRoute('/plugins/$pluginId/trending/')({
   component: TrendingTopics,
-  loader: async ({ params }) => {
-    const service = getService(params.pluginId);
-    if (service && service.getTrendingTopics) {
-      const response = await service.getTrendingTopics();
+  loader: async ({ params, context }) => {
+    const plugin = context.plugins.find(p => p.id === params.pluginId);
+    if (plugin && await plugin.hasDefined.onGetTrendingTopics()) {
+      const response = await plugin.remote.onGetTrendingTopics();
       return response;
     }
     throw notFound();

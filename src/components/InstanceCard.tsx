@@ -3,10 +3,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Link } from "@tanstack/react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { MessageSquareTextIcon, UsersIcon, MessagesSquareIcon } from "lucide-react";
-import { getService } from "@/services/selector-service";
+import { usePlugins } from "@/hooks/usePlugins";
 import { Button } from "./ui/button";
 import DOMPurify from "dompurify";
 import { FavoriteButton } from "./FavoriteButton";
+import React from "react";
+
 interface InstanceCardProps {
   instance: Instance;
   pluginId: string;
@@ -15,8 +17,20 @@ interface InstanceCardProps {
 const InstanceCard: React.FC<InstanceCardProps> = (props) => {
   const { instance, pluginId } = props;
   const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
-  const service = getService(pluginId);
-  const hasCommunities = service && service.getCommunities;
+  const { plugins } = usePlugins();
+  const plugin = plugins.find(p => p.id === pluginId);
+  const [hasCommunities, setHasCommunities] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkCommunities = async () => {
+      if (plugin && await plugin.hasDefined.onGetCommunities()) {
+        setHasCommunities(true);
+      } else {
+        setHasCommunities(false);
+      }
+    };
+    checkCommunities();
+  }, [plugin]);
 
   return (
     <Card className="flex flex-col">

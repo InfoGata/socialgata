@@ -7,7 +7,7 @@ import {
   PaginationNext,
 } from "./ui/pagination";
 import { usePagination } from "@/hooks/usePagination";
-import { getService } from "@/services/selector-service";
+import { usePlugins } from "@/hooks/usePlugins";
 import { PageInfo, Post, Community } from "@/plugintypes";
 import React from "react";
 import { FavoriteButton } from "./FavoriteButton";
@@ -25,8 +25,9 @@ type CommunityFeedProps = {
 const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
   const { posts, pluginId, pageInfo, instanceId, community } = props;
   const { nextPage, prevPage, hasNextPage, hasPreviousPage } = usePagination(pageInfo);
-  const service = getService(pluginId);
-  const platformType = service?.platformType || "forum";
+  const { plugins } = usePlugins();
+  const plugin = plugins.find(p => p.id === pluginId);
+  const platformType = plugin?.platformType || "forum";
 
   return (
     <div className="min-h-screen bg-background">

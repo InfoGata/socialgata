@@ -1,5 +1,4 @@
 import Feed from '@/components/Feed';
-import { getService } from '@/services/selector-service';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 
 const TrendingTopicFeed: React.FC = () => {
@@ -29,10 +28,10 @@ type FeedSearch = {
 export const Route = createFileRoute('/plugins/$pluginId/trending/$topicName')({
   component: TrendingTopicFeed,
   loaderDeps: ({ search }) => ({ page: search.page }),
-  loader: async ({ params, deps: { page } }) => {
-    const service = getService(params.pluginId);
-    if (service && service.getTrendingTopicFeed) {
-      const response = await service.getTrendingTopicFeed({
+  loader: async ({ params, deps: { page }, context }) => {
+    const plugin = context.plugins.find(p => p.id === params.pluginId);
+    if (plugin && await plugin.hasDefined.onGetTrendingTopicFeed()) {
+      const response = await plugin.remote.onGetTrendingTopicFeed({
         topicName: decodeURIComponent(params.topicName),
         pageInfo: { page }
       });

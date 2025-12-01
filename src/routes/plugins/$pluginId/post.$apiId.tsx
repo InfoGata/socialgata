@@ -1,5 +1,4 @@
 import PostWithComments from '@/components/PostWithComments';
-import { getService } from '@/services/selector-service';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import React from 'react';
 
@@ -11,10 +10,10 @@ const PostComments: React.FC = () => {
 
 export const Route = createFileRoute('/plugins/$pluginId/post/$apiId')({
   component: PostComments,
-  loader: async ({ params }) => {
-    const service = getService(params.pluginId);
-    if (service && service.getComments) {
-      const response = await service.getComments({
+  loader: async ({ params, context }) => {
+    const plugin = context.plugins.find(p => p.id === params.pluginId);
+    if (plugin && await plugin.hasDefined.onGetComments()) {
+      const response = await plugin.remote.onGetComments({
         apiId: params.apiId,
       });
       return response;

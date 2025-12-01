@@ -1,5 +1,4 @@
 import Feed from '@/components/Feed';
-import { getService } from '@/services/selector-service';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 
 const PluginFeed: React.FC = () => {
@@ -7,7 +6,7 @@ const PluginFeed: React.FC = () => {
   const params = Route.useParams();
   const search = Route.useSearch();
   const feedTypeId = search.feedTypeId;
-  
+
   return (
     <Feed
       feedTypeId={feedTypeId}
@@ -27,20 +26,20 @@ type FeedSearch = {
 export const Route = createFileRoute('/plugins/$pluginId/feed')({
   component: PluginFeed,
   loaderDeps: ({search}) => ({page: search.page, feedTypeId: search.feedTypeId, q: search.q}),
-  loader: async ({ params, deps: { page, feedTypeId, q } }) => {
-    const service = getService(params.pluginId);
-    if (service) {
-      // If there's a search query and the service supports search, use search
-      if (q && service.search) {
-        const response = await service.search({
+  loader: async ({ params, deps: { page, feedTypeId, q }, context }) => {
+    const plugin = context.plugins.find(p => p.id === params.pluginId);
+    if (plugin) {
+      // If there's a search query and the plugin supports search, use search
+      if (q && await plugin.hasDefined.onSearch()) {
+        const response = await plugin.remote.onSearch({
           query: q,
           pageInfo: { page },
         });
         return response;
       }
       // Otherwise, use regular feed
-      else if (service.getFeed) {
-        const response = await service.getFeed({
+      else if (await plugin.hasDefined.onGetFeed()) {
+        const response = await plugin.remote.onGetFeed({
           pageInfo: { page },
           feedTypeId: feedTypeId,
         });

@@ -1,5 +1,4 @@
 import InstanceCard from '@/components/InstanceCard';
-import { getService } from '@/services/selector-service';
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
 const Instances: React.FC = () => {
@@ -14,10 +13,10 @@ const Instances: React.FC = () => {
 
 export const Route = createFileRoute('/plugins/$pluginId/instances/')({
   component: Instances,
-  loader: async ({ params }) => {
-    const service = getService(params.pluginId);
-    if (service && service.getInstances) {
-      const response = await service.getInstances();
+  loader: async ({ params, context }) => {
+    const plugin = context.plugins.find(p => p.id === params.pluginId);
+    if (plugin && await plugin.hasDefined.onGetInstances()) {
+      const response = await plugin.remote.onGetInstances();
       return response;
     } else {
       throw notFound();

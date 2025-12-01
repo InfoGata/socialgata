@@ -1,6 +1,7 @@
+import { PluginFrameContainer } from "@/contexts/PluginsContext";
 import NavigationMenu from "@/layouts/NavigationMenu";
 import { TopBar } from "@/layouts/TopBar";
-import { Outlet, createRootRoute } from "@tanstack/react-router";
+import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 import React from "react";
 
 export const Root: React.FC = () => {
@@ -14,7 +15,10 @@ export const Root: React.FC = () => {
     </div>
   );
 };
+interface MyRouterContext {
+  plugins: PluginFrameContainer[];
+}
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: Root,
 });

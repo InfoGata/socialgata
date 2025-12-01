@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import React, { useState } from "react";
 import { buttonVariants } from "./ui/button";
-import { getService } from "@/services/selector-service";
+import { usePlugins } from "@/hooks/usePlugins";
 
 type Props = {
   pluginId: string;
@@ -10,17 +10,19 @@ type Props = {
 const LogginedIn: React.FC<Props> = (props) => {
   const [hasInstances, setHasInstances] = useState(false);
   const { pluginId } = props;
+  const { plugins } = usePlugins();
+  const plugin = plugins.find(p => p.id === pluginId);
+
   React.useEffect(() => {
     const getInstances = async () => {
-      const service = getService(pluginId);
-      if (service && service.getInstances) {
+      if (plugin && await plugin.hasDefined.onGetInstances()) {
         setHasInstances(true);
       } else {
         setHasInstances(false);
       }
     };
     getInstances();
-  }, [pluginId]);
+  }, [plugin]);
   return (
     <div className="flex gap-2">
       <Link

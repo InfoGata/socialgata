@@ -1,5 +1,4 @@
 import CommunityCard from '@/components/CommunityCard';
-import { getService } from '@/services/selector-service';
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
 const Communities: React.FC = () => {
@@ -26,10 +25,10 @@ const Communities: React.FC = () => {
 
 export const Route = createFileRoute('/plugins/$pluginId/instances/$instanceId/communities')({
   component: Communities,
-  loader: async ({ params }) => {
-    const service = getService(params.pluginId);
-    if (service && service.getCommunities) {
-      const response = await service.getCommunities({ instanceId: params.instanceId });
+  loader: async ({ params, context }) => {
+    const plugin = context.plugins.find(p => p.id === params.pluginId);
+    if (plugin && await plugin.hasDefined.onGetCommunities()) {
+      const response = await plugin.remote.onGetCommunities({ instanceId: params.instanceId });
       return response;
     } else {
       throw notFound();

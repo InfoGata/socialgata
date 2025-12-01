@@ -1,4 +1,4 @@
-import { getService } from "@/services/selector-service";
+import { usePlugins } from "@/hooks/usePlugins";
 import { Link } from "@tanstack/react-router";
 import React from "react";
 import { useState } from "react";
@@ -14,46 +14,46 @@ const PluginFeedButtons = ({ pluginId }: PluginFeedButtonsProps) => {
   const [hasTrending, setHasTrending] = useState(false);
   const [hasLogin, setHasLogin] = React.useState(false);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const { plugins } = usePlugins();
+  const plugin = plugins.find(p => p.id === pluginId);
 
   React.useEffect(() => {
     const getLoginStatus = async () => {
-      const service = getService(pluginId);
-      if (service) {
-        setHasLogin(!!service.login);
-        if (service.isLoggedIn) {
-          setIsLoggedIn(await service.isLoggedIn());
+      if (plugin) {
+        setHasLogin(await plugin.hasDefined.onLogin());
+        if (await plugin.hasDefined.onIsLoggedIn()) {
+          setIsLoggedIn(await plugin.remote.onIsLoggedIn());
         }
       }
     };
     getLoginStatus();
-  }, [pluginId]);
+  }, [plugin]);
+
   React.useEffect(() => {
     const getInstances = async () => {
-      const service = getService(pluginId);
-      if (service && service.getInstances) {
+      if (plugin && await plugin.hasDefined.onGetInstances()) {
         setHasInstances(true);
       } else {
         setHasInstances(false);
       }
     };
     getInstances();
-  }, [pluginId]);
+  }, [plugin]);
 
   React.useEffect(() => {
     const checkTrending = async () => {
-      const service = getService(pluginId);
-      if (service && service.getTrendingTopics) {
+      if (plugin && await plugin.hasDefined.onGetTrendingTopics()) {
         setHasTrending(true);
       } else {
         setHasTrending(false);
       }
     };
     checkTrending();
-  }, [pluginId]);
+  }, [plugin]);
   return (
     <div data-testid={`plugin-feed-${pluginId}`}>
       <div className="flex gap-2 justify-between border p-2 items-center">
-        {pluginId}
+        {plugin?.name}
         <div className="flex gap-2">
           {hasInstances && (
             <Link

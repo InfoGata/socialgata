@@ -1,6 +1,5 @@
 import Feed from '@/components/Feed';
 import { PageInfo } from '@/plugintypes';
-import { getService } from '@/services/selector-service';
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
 const InstanceFeed: React.FC = () => {
@@ -22,10 +21,10 @@ const InstanceFeed: React.FC = () => {
 export const Route = createFileRoute('/plugins/$pluginId/instances/$instanceId/feed')({
   component: InstanceFeed,
   loaderDeps: ({search}) => ({pageInfo: search.pageInfo, feedTypeId: search.feedTypeId}),
-  loader: async ({ params }) => {
-    const service = getService(params.pluginId);
-    if (service && service.getFeed) {
-      const response = await service.getFeed({instanceId: params.instanceId});
+  loader: async ({ params, context }) => {
+    const plugin = context.plugins.find(p => p.id === params.pluginId);
+    if (plugin && await plugin.hasDefined.onGetFeed()) {
+      const response = await plugin.remote.onGetFeed({instanceId: params.instanceId});
       return response;
     } else {
       throw notFound();

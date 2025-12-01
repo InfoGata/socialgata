@@ -5,7 +5,7 @@ import { PaginationNext, PaginationPrevious, Pagination, PaginationContent, Pagi
 import { Loader2, TrendingUp, Clock, Award, Inbox } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import React from "react";
-import { getService } from "@/services/selector-service";
+import { usePlugins } from "@/hooks/usePlugins";
 import BrowseCommunitiesButton from "./BrowseCommunitiesButton";
 
 type FeedProps = {
@@ -20,8 +20,9 @@ type FeedProps = {
 const Feed: React.FC<FeedProps> = (props) => {
   const { feedTypeId, data, pageInfo, pluginId, instanceId, isLoading } = props;
   const { nextPage, prevPage, hasNextPage, hasPreviousPage } = usePagination(pageInfo);
-  const service = getService(pluginId);
-  const platformType = service?.platformType || "forum";
+  const { plugins } = usePlugins();
+  const plugin = plugins.find(p => p.id === pluginId);
+  const platformType = plugin?.platformType || "forum";
 
   const getFeedIcon = (feedTypeId?: string) => {
     switch(feedTypeId?.toLowerCase()) {
