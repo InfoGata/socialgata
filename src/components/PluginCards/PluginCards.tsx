@@ -15,8 +15,7 @@ import { useNavigate } from "@tanstack/react-router";
 
 const PluginCards: React.FC = () => {
   const { t } = useTranslation("plugins");
-  const { plugins, addPlugin, pluginsLoaded, preinstallComplete } =
-    usePlugins();
+  const { plugins, addPlugin, pluginsLoaded } = usePlugins();
   const [backdropOpen, setBackdropOpen] = React.useState(false);
   const navigate = useNavigate();
 
@@ -41,7 +40,6 @@ const PluginCards: React.FC = () => {
     .filter(
       (dp) =>
         !plugins.some((p) => dp.id === p.id) &&
-        (preinstallComplete || !dp.preinstall) &&
         (!dp.requiresCorsDisabled || isCorsDisabled())
     )
     .map((dp) => (

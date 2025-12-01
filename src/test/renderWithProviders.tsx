@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ExtensionProvider } from "@/contexts/ExtensionContext";
+import { PluginsProvider } from "@/contexts/PluginsContext";
 import { ThemeProvider } from "@infogata/shadcn-vite-theme-provider";
 import { Root } from "@/routes/__root";
 import {
@@ -35,9 +36,11 @@ export function renderWithProviders(ui: React.ReactElement) {
       <Provider store={store}>
         <I18nextProvider i18n={i18n}>
           <ThemeProvider defaultTheme="dark">
-            <ExtensionProvider>
-              <RouterProvider router={router as any} />
-            </ExtensionProvider>
+            <PluginsProvider>
+              <ExtensionProvider>
+                <RouterProvider router={router as any} />
+              </ExtensionProvider>
+            </PluginsProvider>
           </ThemeProvider>
         </I18nextProvider>
       </Provider>

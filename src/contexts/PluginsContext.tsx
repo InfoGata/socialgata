@@ -1,7 +1,6 @@
 import { PluginInterface, PluginFrame } from "plugin-frame";
 import React from "react";
 import { db } from "../database";
-import { builtinPlugins } from "../builtin-plugins";
 import {
   GetFeedRequest,
   GetFeedResponse,
@@ -29,7 +28,6 @@ import {
 import { Theme, useTheme } from "@infogata/shadcn-vite-theme-provider";
 import { NetworkRequest } from "../types";
 import {
-  getPlugin,
   getPluginUrl,
   isAuthorizedDomain,
 } from "../plugin-utils";
@@ -95,7 +93,6 @@ export interface PluginContextInterface {
   pluginMessage?: PluginMessage;
   pluginsLoaded: boolean;
   pluginsFailed: boolean;
-  preinstallComplete: boolean;
   reloadPlugins: () => Promise<void>;
 }
 
@@ -106,7 +103,6 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
   const [pluginsFailed, setPluginsFailed] = React.useState(false);
   const [pluginFrames, setPluginFrames] = React.useState<PluginFrameContainer[]>([]);
   const [pluginMessage, setPluginMessage] = React.useState<PluginMessage>();
-  const [preinstallComplete, setPreinstallComplete] = React.useState(false);
 
   const corsProxyUrl = "";  // TODO: Add CORS proxy support if needed
   const theme = useTheme();
@@ -331,37 +327,6 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
     reloadPlugins();
   }, [reloadPlugins]);
 
-  // Pre-install default plugins
-  React.useEffect(() => {
-    const preinstall = async () => {
-      if (pluginsLoaded && !preinstallComplete) {
-        const preinstallPlugins = builtinPlugins.filter((p) => !!p.preinstall);
-        const existingPluginIds = pluginFrames.map((p) => p.id);
-        const newPlugins = preinstallPlugins.filter(
-          (p) => !existingPluginIds.includes(p.id)
-        );
-
-        for (const defaultPlugin of newPlugins) {
-          try {
-            if (!defaultPlugin.url) continue;
-            const fileType = { url: { url: defaultPlugin.url } };
-            const plugin = await getPlugin(fileType, true);
-            if (plugin) {
-              plugin.id = defaultPlugin.id;
-              await addPlugin(plugin);
-            }
-          } catch (error) {
-            console.error(`Failed to preinstall plugin ${defaultPlugin.name}:`, error);
-          }
-        }
-
-        setPreinstallComplete(true);
-      }
-    };
-
-    preinstall();
-  }, [pluginsLoaded, preinstallComplete, pluginFrames, addPlugin]);
-
   const value: PluginContextInterface = {
     addPlugin,
     updatePlugin,
@@ -370,7 +335,6 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
     pluginMessage,
     pluginsLoaded,
     pluginsFailed,
-    preinstallComplete,
     reloadPlugins,
   };
 

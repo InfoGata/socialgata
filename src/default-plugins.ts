@@ -19,6 +19,31 @@ export const defaultPlugins: PluginDescription[] = [
     description: "Browse Hacker News posts and comments",
     url: "https://cdn.jsdelivr.net/gh/InfoGata/hackernews-socialgata@latest/manifest.json",
   },
+  {
+    "id": "3YKmz8pL4Rwd",
+    "name": "Lemmy Plugin for SocialGata",
+    "description": "Browse Lemmy feeds, communities, and comments across multiple instances",
+    url: "https://cdn.jsdelivr.net/gh/InfoGata/lemmy-socialgata@latest/manifest.json",
+  },
+  {
+    "id": "bsky-7k9m2x5p",
+    "name": "Bluesky Plugin for SocialGata",
+    "description": "Browse Bluesky feeds, profiles, and posts",
+    url: "https://cdn.jsdelivr.net/gh/InfoGata/bluesky-socialgata@latest/manifest.json",
+  },
+  {
+    "id": "a7f3e9b2c1d4",
+    "name": "Twitter Plugin for SocialGata",
+    "description": "Browse Twitter/X feeds, trending topics, and user profiles via TWstalker",
+    url: "https://cdn.jsdelivr.net/gh/InfoGata/twitter-socialgata@latest/manifest.json",
+    requiresCorsDisabled: true,
+  },
+  {
+    "id": "x7k9m2p4q8r1w5",
+    "name": "Mastodon Plugin for SocialGata",
+    "description": "Browse Mastodon feeds, users, and trending topics",
+    url: "https://cdn.jsdelivr.net/gh/InfoGata/mastodon-socialgata@latest/manifest.json",
+  }
 ];
 
 export const defaultPluginMap = new Map(defaultPlugins.map((p) => [p.id, p]));

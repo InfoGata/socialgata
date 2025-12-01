@@ -1,8 +1,4 @@
 import { ServiceType } from "@/types";
-import { lemmy } from "./lemmy";
-import { mastodon } from "./mastodon";
-import { bluesky } from "./bluesky";
-import { twitter } from "./twitter";
 import { PluginServiceAdapter } from "./plugin-service-adapter";
 import { PluginFrameContainer } from "@/contexts/PluginsContext";
 
@@ -19,7 +15,7 @@ export const setDynamicPlugins = (plugins: PluginFrameContainer[]) => {
 };
 
 export const getService = (serviceName: string): ServiceType | null => {
-  // First, check if we have a dynamic plugin with this ID
+  // Check if we have a dynamic plugin with this ID
   const dynamicPlugin = dynamicPlugins.find((p) => p.id === serviceName);
   if (dynamicPlugin) {
     // Return cached adapter or create new one
@@ -29,16 +25,5 @@ export const getService = (serviceName: string): ServiceType | null => {
     return pluginServiceCache.get(serviceName)!;
   }
 
-  // Fall back to built-in services
-  switch (serviceName) {
-    case "mastodon":
-      return mastodon;
-    case "lemmy":
-      return lemmy;
-    case "bluesky":
-      return bluesky;
-    case "twitter":
-      return twitter;
-  }
   return null;
 }

@@ -4,8 +4,8 @@ A unified social media aggregator that brings together content from multiple pla
 
 ## Features
 
-- **Multi-Platform Support**: Aggregate content from Lemmy, Mastodon, Bluesky, and more via plugins
-- **Plugin Architecture**: Extensible system for adding new social media platforms
+- **Multi-Platform Support**: Aggregate content from Lemmy, Mastodon, Bluesky, and more via installable plugins
+- **Dynamic Plugin System**: Install and manage plugins at runtime from a curated list or custom URLs
 - **Instance Support**: Connect to different instances of federated platforms (Lemmy, Mastodon)
 - **Dark/Light Theme**: Customizable UI with theme support
 - **Internationalization**: Multi-language support with i18next
@@ -70,14 +70,11 @@ src/
 ├── components/        # React components
 │   ├── ui/           # shadcn/ui components
 │   └── ...           # Feature components
+├── contexts/         # React contexts (PluginsContext, etc.)
 ├── routes/           # File-based routing (TanStack Router)
 │   ├── plugins/      # Plugin-specific routes
 │   └── ...
-├── services/         # Platform service implementations
-│   ├── lemmy.ts
-│   ├── mastodon.ts
-│   ├── bluesky.ts
-│   └── twitter.ts
+├── services/         # Service implementations and adapters
 ├── store/            # Redux store and slices
 │   ├── authSlice.ts
 │   └── uiSlice.ts

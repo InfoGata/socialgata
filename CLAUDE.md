@@ -23,21 +23,16 @@ React 18 + TypeScript application using:
 - **Vite** as build tool with `@/` path alias for `src/`
 
 ### Plugin Architecture
-The app aggregates social media content through a hybrid plugin system supporting both built-in and dynamic plugins.
-
-**Built-in Plugins** (static):
-- Each platform has a service file in `src/services/` (lemmy.ts, mastodon.ts, bluesky.ts, twitter.ts)
-- Implement the `ServiceType` interface from `src/types.ts`
-- `src/services/selector-service.ts` - Factory for resolving plugin services by ID
+The app aggregates social media content through a dynamic plugin system.
 
 **Dynamic Plugin System** (runtime-loadable):
-- Modeled after ReaderGata's plugin architecture
+- Modeled after InfoGata's plugin architecture
 - `src/contexts/PluginsContext.tsx` - Plugin management context (load, add, update, delete)
 - `src/hooks/usePlugins.ts` - Hook to access plugin context
 - `src/database.ts` - IndexedDB storage via Dexie for plugins and auth
 - `src/services/plugin-service-adapter.ts` - Wraps dynamic plugins to implement ServiceType
 - `src/plugin-utils.ts` - Utilities for loading plugins from URL/FileList, ID generation
-- `src/components/PluginServiceSync.tsx` - Syncs plugin context with service selector
+- `src/default-plugins.ts` - List of available plugins users can install
 - `public/pluginframe.html` - Sandboxed iframe entry point for plugin execution
 - Uses `plugin-frame` library for secure iframe communication
 - Plugins stored in IndexedDB with `PluginInfo` schema (id, name, script, manifest, options)
@@ -47,7 +42,7 @@ The app aggregates social media content through a hybrid plugin system supportin
 1. PluginsProvider loads all plugins from IndexedDB on app startup
 2. Each plugin script executes in sandboxed iframe (10s timeout)
 3. PluginServiceAdapter wraps plugin to match ServiceType interface
-4. Service selector checks dynamic plugins first, falls back to built-in
+4. Components use `usePlugins()` hook to access loaded plugins
 
 **Routes** support plugin-based URLs: `/plugins/$pluginId/feed`
 - Platform-specific instances: `/plugins/$pluginId/instances/$instanceId/feed`
