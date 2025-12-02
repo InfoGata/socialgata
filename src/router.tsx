@@ -24,7 +24,12 @@ declare module "@tanstack/react-router" {
 }
 
 const Router: React.FC = () => {
-  const { plugins } = usePlugins();
+  const { plugins, pluginsLoaded } = usePlugins();
+
+  if (!pluginsLoaded) {
+    return <Spinner />;
+  }
+
   return <RouterProvider router={router} context={{ plugins }} />;
 };
 
