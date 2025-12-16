@@ -13,7 +13,6 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@atproto/api": "^0.17.0",
     "@automerge/automerge": "^3.2.0",
     "@automerge/automerge-repo": "^2.5.0",
     "@automerge/automerge-repo-network-broadcastchannel": "^2.5.0",
@@ -38,14 +37,10 @@
     "concurrently": "^9.1.2",
     "dexie": "^4.2.1",
     "dompurify": "^3.2.4",
-    "firebase": "^11.4.0",
     "html-react-parser": "^5.2.2",
     "i18next": "^24.2.3",
-    "imageboard": "^0.11.5",
-    "lemmy-js-client": "^0.19.4-alpha.18",
     "loadable-image": "^3.3.0",
     "lucide-react": "^0.378.0",
-    "masto": "^6.7.7",
     "nanoid": "^5.1.6",
     "plugin-frame": "^1.0.0",
     "posthog-js": "^1.297.0",
