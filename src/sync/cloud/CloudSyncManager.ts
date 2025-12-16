@@ -174,47 +174,6 @@ export class CloudSyncManager {
   }
 
   /**
-   * Force upload local document to cloud
-   */
-  async uploadNow(): Promise<void> {
-    if (!this.provider || !this.handle) {
-      throw new Error('Provider or handle not set');
-    }
-
-    const docUrl = this.handle.url;
-    const localDoc = this.handle.docSync();
-
-    if (localDoc) {
-      const localData = save(localDoc);
-      await this.provider.upload(docUrl, localData);
-      this.lastSyncTime = new Date();
-    }
-  }
-
-  /**
-   * Force download remote document from cloud
-   */
-  async downloadNow(): Promise<void> {
-    if (!this.provider || !this.handle) {
-      throw new Error('Provider or handle not set');
-    }
-
-    const docUrl = this.handle.url;
-    const remoteData = await this.provider.download(docUrl);
-
-    if (remoteData) {
-      const remoteDoc = load<FavoritesDoc>(remoteData);
-      this.handle.change((doc) => {
-        Object.assign(doc.instances, remoteDoc.instances);
-        Object.assign(doc.posts, remoteDoc.posts);
-        Object.assign(doc.comments, remoteDoc.comments);
-        Object.assign(doc.communities, remoteDoc.communities);
-      });
-      this.lastSyncTime = new Date();
-    }
-  }
-
-  /**
    * Clean up resources
    */
   dispose() {

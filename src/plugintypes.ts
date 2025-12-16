@@ -240,14 +240,6 @@ export interface GetTrendingTopicFeedResponse {
 // ============================================
 
 /**
- * Information about a plugin's sync provider capability
- */
-export interface SyncProviderInfo {
-  providerId: string;
-  providerName: string;
-}
-
-/**
  * Request to upload document data to cloud storage
  */
 export interface SyncUploadRequest {
@@ -275,14 +267,5 @@ export interface SyncDownloadRequest {
  */
 export interface SyncDownloadResponse {
   data: string | null; // Base64-encoded Uint8Array, or null if not found
-  error?: string;
-}
-
-/**
- * Response from authentication operation
- */
-export interface SyncAuthenticateResponse {
-  success: boolean;
-  accessToken?: string; // Optional, plugin may store internally
   error?: string;
 }

@@ -29,9 +29,7 @@ export interface CloudSyncProvider {
 export class CloudSyncError extends Error {
   constructor(
     message: string,
-    public readonly provider: string,
-    public readonly code?: string,
-    public readonly originalError?: Error
+    public readonly pluginId: string
   ) {
     super(message);
     this.name = 'CloudSyncError';

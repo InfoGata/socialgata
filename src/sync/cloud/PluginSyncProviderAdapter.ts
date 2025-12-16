@@ -7,10 +7,10 @@ import type { PluginFrameContainer } from "@/contexts/PluginsContext";
  * Allows plugins to be used as cloud sync providers.
  */
 export class PluginSyncProviderAdapter implements CloudSyncProvider {
-  readonly providerId: string;
+  readonly pluginId: string;
 
   constructor(private plugin: PluginFrameContainer) {
-    this.providerId = plugin.id || "unknown";
+    this.pluginId = plugin.id || "unknown";
   }
 
   async upload(docUrl: string, data: Uint8Array): Promise<void> {
@@ -51,7 +51,7 @@ export class PluginSyncProviderAdapter implements CloudSyncProvider {
   }
 
   private createError(message: string): CloudSyncError {
-    return new CloudSyncError(message, this.providerId);
+    return new CloudSyncError(message, this.pluginId);
   }
 
   private uint8ArrayToBase64(data: Uint8Array): string {
