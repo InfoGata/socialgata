@@ -88,7 +88,6 @@ Redux store with slices:
 - `src/sync/cloud/DropboxSyncProvider.ts` - Dropbox OAuth + file upload/download implementation
 - `src/routes/auth/dropbox/callback.tsx` - OAuth callback handler
 - `src/components/Settings/CloudSyncSettings.tsx` - Settings UI for connecting providers
-- `src/components/SyncStatusIndicator.tsx` - Optional status indicator for header
 - Settings stored in Redux `uiSlice.cloudSync`: provider, enabled, autoSync, syncIntervalSeconds
 - Environment variables: `VITE_DROPBOX_CLIENT_ID`, `VITE_DROPBOX_REDIRECT_URI`
 - Setup docs: `docs/CLOUD_SYNC_SETUP.md`

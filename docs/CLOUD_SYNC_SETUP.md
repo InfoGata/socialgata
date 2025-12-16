@@ -148,13 +148,6 @@ Users can:
 - View sync status (syncing, synced, error)
 - See last sync time
 
-### Sync Status Indicator
-
-Optional component (`SyncStatusIndicator`) can be added to the header/toolbar:
-- Shows current sync status icon
-- Tooltip displays last sync time or error
-- Only visible when sync is enabled
-
 ## Adding New Cloud Providers
 
 To add Google Drive or OneDrive support:

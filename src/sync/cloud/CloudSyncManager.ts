@@ -112,11 +112,6 @@ export class CloudSyncManager {
       return;
     }
 
-    if (!this.provider.isAuthenticated()) {
-      console.warn('CloudSyncManager: Provider not authenticated');
-      return;
-    }
-
     if (this.isSyncing) {
       console.log('CloudSyncManager: Sync already in progress, skipping');
       return;
@@ -186,10 +181,6 @@ export class CloudSyncManager {
       throw new Error('Provider or handle not set');
     }
 
-    if (!this.provider.isAuthenticated()) {
-      throw new Error('Provider not authenticated');
-    }
-
     const docUrl = this.handle.url;
     const localDoc = this.handle.docSync();
 
@@ -206,10 +197,6 @@ export class CloudSyncManager {
   async downloadNow(): Promise<void> {
     if (!this.provider || !this.handle) {
       throw new Error('Provider or handle not set');
-    }
-
-    if (!this.provider.isAuthenticated()) {
-      throw new Error('Provider not authenticated');
     }
 
     const docUrl = this.handle.url;

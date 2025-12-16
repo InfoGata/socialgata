@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Cloud, CloudOff, RefreshCw, Check, AlertCircle } from 'lucide-react';
+import { Cloud, RefreshCw, Check, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
-  setCloudSyncProvider,
-  setCloudSyncEnabled,
   setCloudSyncAutoSync,
-  disconnectCloudSync,
-  type CloudProvider,
 } from '@/store/reducers/uiSlice';
 import type { RootState } from '@/store/store';
 import { cloudSyncManager } from '@/sync/cloudSyncManager';
-import { DropboxSyncProvider } from '@/sync/cloud/DropboxSyncProvider';
 import type { SyncStatus } from '@/sync/cloud/CloudSyncProvider';
+import { usePlugins } from '@/hooks/usePlugins';
+import type { PluginFrameContainer } from '@/contexts/PluginsContext';
 
 /**
  * Cloud Sync Settings Component
@@ -23,7 +20,24 @@ const CloudSyncSettings: React.FC = () => {
   const cloudSync = useSelector((state: RootState) => state.ui.cloudSync);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
-  const [isConnecting, setIsConnecting] = useState(false);
+  const { plugins } = usePlugins();
+  const [syncCapablePlugins, setSyncCapablePlugins] = useState<PluginFrameContainer[]>([]);
+
+  // Check which plugins have sync capabilities (onSyncUpload and onSyncDownload defined)
+  useEffect(() => {
+    const checkSyncCapabilities = async () => {
+      const capable: PluginFrameContainer[] = [];
+      for (const plugin of plugins) {
+        const hasUpload = await plugin.hasDefined.onSyncUpload();
+        const hasDownload = await plugin.hasDefined.onSyncDownload();
+        if (hasUpload && hasDownload) {
+          capable.push(plugin);
+        }
+      }
+      setSyncCapablePlugins(capable);
+    };
+    checkSyncCapabilities();
+  }, [plugins]);
 
   // Subscribe to sync status changes
   useEffect(() => {
@@ -38,59 +52,6 @@ const CloudSyncSettings: React.FC = () => {
 
     return unsubscribe;
   }, []);
-
-  // Handle connecting to a cloud provider
-  const handleConnect = async (provider: CloudProvider) => {
-    if (!provider) return;
-
-    setIsConnecting(true);
-    try {
-      let syncProvider;
-      switch (provider) {
-        case 'dropbox':
-          syncProvider = new DropboxSyncProvider();
-          await syncProvider.authenticate();
-          break;
-        // Future providers
-        // case 'googledrive':
-        //   syncProvider = new GoogleDriveSyncProvider();
-        //   await syncProvider.authenticate();
-        //   break;
-        default:
-          console.error('Unknown provider:', provider);
-          return;
-      }
-
-      dispatch(setCloudSyncProvider(provider));
-      dispatch(setCloudSyncEnabled(true));
-    } catch (error) {
-      console.error('Failed to connect to cloud provider:', error);
-    } finally {
-      setIsConnecting(false);
-    }
-  };
-
-  // Handle disconnecting from cloud provider
-  const handleDisconnect = async () => {
-    if (!cloudSync.provider) return;
-
-    try {
-      let syncProvider;
-      switch (cloudSync.provider) {
-        case 'dropbox':
-          syncProvider = new DropboxSyncProvider();
-          await syncProvider.signOut();
-          break;
-        // Future providers
-        default:
-          break;
-      }
-
-      dispatch(disconnectCloudSync());
-    } catch (error) {
-      console.error('Failed to disconnect from cloud provider:', error);
-    }
-  };
 
   // Handle manual sync
   const handleManualSync = async () => {
@@ -145,41 +106,20 @@ const CloudSyncSettings: React.FC = () => {
       {!cloudSync.enabled ? (
         // Not connected - show provider options
         <div className="space-y-4">
-          <div className="grid gap-3">
-            <Button
-              onClick={() => handleConnect('dropbox')}
-              disabled={isConnecting}
-              className="justify-start"
-              variant="outline"
-            >
-              <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M6 1.807L0 5.629l6 3.822 6.001-3.822L6 1.807zM18 1.807l-6 3.822 6 3.822 6-3.822-6-3.822zM0 13.274l6 3.822 6.001-3.822L6 9.452l-6 3.822zM18 9.452l-6 3.822 6 3.822 6-3.822-6-3.822zM6 18.371l6.001 3.822 6-3.822-6-3.822L6 18.371z"/>
-              </svg>
-              Connect Dropbox
-            </Button>
-
-            {/* <Button
-              disabled
-              className="justify-start"
-              variant="outline"
-            >
-              <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12.09 13.119c-.936 1.932-2.217 3.588-3.654 4.72-.95.75-1.953 1.161-2.937 1.161-.984 0-1.987-.411-2.937-1.161-1.437-1.132-2.718-2.788-3.654-4.72-.901-1.857-1.408-3.805-1.408-5.619 0-1.814.507-3.762 1.408-5.619C-1.021 2.949.26 1.293 1.697.161 2.647-.589 3.65-1 4.634-1c.984 0 1.987.411 2.937 1.161 1.437 1.132 2.718 2.788 3.654 4.72.901 1.857 1.408 3.805 1.408 5.619 0 1.814-.507 3.762-1.408 5.619zm11.46-6.119c0 1.814-.507 3.762-1.408 5.619-.936 1.932-2.217 3.588-3.654 4.72-.95.75-1.953 1.161-2.937 1.161-.984 0-1.987-.411-2.937-1.161-1.437-1.132-2.718-2.788-3.654-4.72-.901-1.857-1.408-3.805-1.408-5.619 0-1.814.507-3.762 1.408-5.619.936-1.932 2.217-3.588 3.654-4.72.95-.75 1.953-1.161 2.937-1.161.984 0 1.987.411 2.937 1.161 1.437 1.132 2.718 2.788 3.654 4.72.901 1.857 1.408 3.805 1.408 5.619z"/>
-              </svg>
-              Google Drive (Coming Soon)
-            </Button>
-
-            <Button
-              disabled
-              className="justify-start"
-              variant="outline"
-            >
-              <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M13.5 1.5v6h6l-6-6zM3 0h9l9 9v12a3 3 0 01-3 3H6a3 3 0 01-3-3V3a3 3 0 013-3H3z"/>
-              </svg>
-              OneDrive (Coming Soon)
-            </Button> */}
-          </div>
+          {syncCapablePlugins.length > 0 ? (
+            <div className="grid gap-3">
+              {syncCapablePlugins.map(plugin => (
+                <>
+                  <Cloud className="mr-2 h-5 w-5" />
+                  {plugin.name}
+                </>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No sync providers available. Install a plugin with sync capabilities to enable cloud sync.
+            </p>
+          )}
         </div>
       ) : (
         // Connected - show sync settings
@@ -189,17 +129,11 @@ const CloudSyncSettings: React.FC = () => {
               <Cloud className="h-8 w-8 text-primary" />
               <div>
                 <p className="font-medium">
-                  {cloudSync.provider === 'dropbox' && 'Dropbox'}
-                  {cloudSync.provider === 'googledrive' && 'Google Drive'}
-                  {cloudSync.provider === 'onedrive' && 'OneDrive'}
+                  {plugins.find(p => p.id === cloudSync.pluginId)?.name || 'Sync Provider'}
                 </p>
                 <p className="text-sm text-muted-foreground">Connected</p>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={handleDisconnect}>
-              <CloudOff className="mr-2 h-4 w-4" />
-              Disconnect
-            </Button>
           </div>
 
           <div className="space-y-4">

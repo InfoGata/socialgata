@@ -2,13 +2,11 @@ import { PayloadAction } from "@reduxjs/toolkit";
 
 import { createSlice } from "@reduxjs/toolkit";
 
-export type CloudProvider = 'dropbox' | 'googledrive' | 'onedrive' | null;
-
 interface CloudSyncSettings {
-  provider: CloudProvider;
   enabled: boolean;
   autoSync: boolean;
   syncIntervalSeconds: number;
+  pluginId?: string;
 }
 
 interface UiState {
@@ -19,7 +17,6 @@ interface UiState {
 const initialState: UiState = {
   isNavigationMenuOpen: false,
   cloudSync: {
-    provider: null,
     enabled: false,
     autoSync: true,
     syncIntervalSeconds: 30,
@@ -33,9 +30,6 @@ export const uiSlice = createSlice({
     setIsNavigationMenuOpen: (state, action: PayloadAction<boolean>) => {
       state.isNavigationMenuOpen = action.payload;
     },
-    setCloudSyncProvider: (state, action: PayloadAction<CloudProvider>) => {
-      state.cloudSync.provider = action.payload;
-    },
     setCloudSyncEnabled: (state, action: PayloadAction<boolean>) => {
       state.cloudSync.enabled = action.payload;
     },
@@ -45,19 +39,22 @@ export const uiSlice = createSlice({
     setCloudSyncInterval: (state, action: PayloadAction<number>) => {
       state.cloudSync.syncIntervalSeconds = action.payload;
     },
+    setCloudSyncPluginProvider: (state, action: PayloadAction<{ pluginId: string }>) => {
+      state.cloudSync.pluginId = action.payload.pluginId;
+    },
     disconnectCloudSync: (state) => {
-      state.cloudSync.provider = null;
       state.cloudSync.enabled = false;
+      state.cloudSync.pluginId = undefined;
     }
   }
 })
 
 export const {
   setIsNavigationMenuOpen,
-  setCloudSyncProvider,
   setCloudSyncEnabled,
   setCloudSyncAutoSync,
   setCloudSyncInterval,
+  setCloudSyncPluginProvider,
   disconnectCloudSync
 } = uiSlice.actions;
 export default uiSlice.reducer;

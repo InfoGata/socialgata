@@ -24,6 +24,12 @@ import {
   GetInstancesResponse,
   LoginRequest,
   PluginInfo,
+  SyncProviderInfo,
+  SyncUploadRequest,
+  SyncUploadResponse,
+  SyncDownloadRequest,
+  SyncDownloadResponse,
+  SyncAuthenticateResponse,
 } from "../plugintypes";
 import { Theme, useTheme } from "@infogata/shadcn-vite-theme-provider";
 import { NetworkRequest } from "../types";
@@ -62,6 +68,13 @@ export interface PluginMethodInterface {
   onPostLogout(): Promise<void>;
   onChangeTheme(theme: Theme): Promise<void>;
   onGetPlatformType(): Promise<"forum" | "microblog" | "imageboard">;
+  // Cloud Sync Provider Methods (optional)
+  onGetSyncProviderInfo(): Promise<SyncProviderInfo>;
+  onIsSyncAuthenticated(): Promise<boolean>;
+  onSyncAuthenticate(): Promise<SyncAuthenticateResponse>;
+  onSyncSignOut(): Promise<void>;
+  onSyncUpload(request: SyncUploadRequest): Promise<SyncUploadResponse>;
+  onSyncDownload(request: SyncDownloadRequest): Promise<SyncDownloadResponse>;
 }
 
 export interface PluginMessage {
@@ -178,7 +191,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
           }
           return false;
         },
-        getTheme: async () => themeRef.current
+        getTheme: async () => themeRef.current,
       };
 
       const srcUrl = getPluginUrl(plugin.id!, "/pluginframe.html");

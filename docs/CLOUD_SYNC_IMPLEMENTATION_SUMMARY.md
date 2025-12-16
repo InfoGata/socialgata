@@ -68,13 +68,6 @@ Successfully implemented **Option C (Hybrid Approach)** for syncing Automerge fa
 - Error message display
 - Integrated into `/settings` route
 
-**SyncStatusIndicator Component** (`src/components/SyncStatusIndicator.tsx`)
-- Optional header/toolbar component
-- Shows current sync status icon
-- Tooltip with details (last sync time, errors)
-- Only visible when sync is enabled
-- Can be added to app header or favorites page
-
 ### 6. Documentation
 
 **Setup Guide** (`docs/CLOUD_SYNC_SETUP.md`)
@@ -109,9 +102,6 @@ src/routes/auth/dropbox/
 
 src/components/Settings/
 └── CloudSyncSettings.tsx       # Settings UI
-
-src/components/
-└── SyncStatusIndicator.tsx     # Status indicator
 
 docs/
 ├── CLOUD_SYNC_SETUP.md         # Setup guide
@@ -309,19 +299,6 @@ Same pattern as Google Drive but with OneDrive API.
 ✅ TypeScript compilation passed
 ✅ All routes generated correctly
 ✅ No linting errors
-
-## Dependencies Added
-
-- `dropbox` (v11.x) - Dropbox SDK with TypeScript support
-
-## Next Steps
-
-1. **Test thoroughly** with Dropbox account
-2. **Add SyncStatusIndicator** to app header (optional)
-3. **Implement Google Drive** provider (if desired)
-4. **Implement OneDrive** provider (if desired)
-5. **User testing** and feedback collection
-6. **Performance monitoring** of sync operations
 
 ## Summary
 
