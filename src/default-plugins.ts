@@ -43,6 +43,12 @@ export const defaultPlugins: PluginDescription[] = [
     "name": "Mastodon Plugin for SocialGata",
     "description": "Browse Mastodon feeds, users, and trending topics",
     url: "https://cdn.jsdelivr.net/gh/InfoGata/mastodon-socialgata@latest/manifest.json",
+  },
+  {
+    "id": "f7a3e9c2-4b8d-11ef-9e3a-0242ac130002",
+    "name": "Dropbox Sync Plugin for SocialGata",
+    "description": "Sync favorites and settings to Dropbox cloud storage",
+    url: "https://cdn.jsdelivr.net/gh/InfoGata/dropbox-socialgata@latest/manifest.json",
   }
 ];
 
