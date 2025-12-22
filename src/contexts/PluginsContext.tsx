@@ -1,5 +1,6 @@
 import { PluginInterface, PluginFrame } from "plugin-frame";
 import React from "react";
+import { toast } from "sonner";
 import { db } from "../database";
 import {
   GetFeedRequest,
@@ -28,6 +29,7 @@ import {
   SyncUploadResponse,
   SyncDownloadRequest,
   SyncDownloadResponse,
+  NotificationMessage,
 } from "../plugintypes";
 import { Theme, useTheme } from "@infogata/shadcn-vite-theme-provider";
 import { NetworkRequest } from "../types";
@@ -44,6 +46,7 @@ interface ApplicationPluginInterface extends PluginInterface {
   getCorsProxy(): Promise<string | undefined>;
   isLoggedIn(): Promise<boolean>;
   getTheme(): Promise<Theme>;
+  createNotification(notification: NotificationMessage): Promise<void>;
 }
 
 export interface PluginMethodInterface {
@@ -186,6 +189,24 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
           return false;
         },
         getTheme: async () => themeRef.current,
+        createNotification: async (notification: NotificationMessage) => {
+          let toaster = toast.message;
+          switch (notification.type) {
+            case "error":
+              toaster = toast.error;
+              break;
+            case "success":
+              toaster = toast.success;
+              break;
+            case "info":
+              toaster = toast.info;
+              break;
+            case "warning":
+              toaster = toast.warning;
+              break;
+          }
+          toaster(notification.message);
+        },
       };
 
       const srcUrl = getPluginUrl(plugin.id!, "/pluginframe.html");

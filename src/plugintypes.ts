@@ -269,3 +269,8 @@ export interface SyncDownloadResponse {
   data: string | null; // Base64-encoded Uint8Array, or null if not found
   error?: string;
 }
+
+export interface NotificationMessage {
+  message: string;
+  type?: "default" | "success" | "error" | "warning" | "info";
+}
