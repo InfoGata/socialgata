@@ -18,6 +18,7 @@
     "@automerge/automerge-repo-network-broadcastchannel": "^2.5.0",
     "@automerge/automerge-repo-react-hooks": "^2.5.0",
     "@automerge/automerge-repo-storage-indexeddb": "^2.5.0",
+    "@infogata/extension-components": "^0.1.0",
     "@infogata/shadcn-vite-theme-provider": "^0.1.0",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
