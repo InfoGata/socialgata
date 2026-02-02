@@ -18,7 +18,7 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "../i18n";
 
 export function renderWithProviders(ui: React.ReactElement) {
-  function Wrapper({ children }: PropsWithChildren<unknown>): JSX.Element {
+  function Wrapper({ children }: PropsWithChildren<unknown>): React.JSX.Element {
     const rootRoute = createRootRoute({
       component: Root,
     });

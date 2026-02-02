@@ -8,288 +8,143 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as FavoritesRouteImport } from './routes/favorites'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as PluginsIndexRouteImport } from './routes/plugins/index'
+import { Route as PluginsPluginIdOptionsRouteImport } from './routes/plugins/$pluginId/options'
+import { Route as PluginsPluginIdFeedRouteImport } from './routes/plugins/$pluginId/feed'
+import { Route as PluginsPluginIdTrendingIndexRouteImport } from './routes/plugins/$pluginId/trending.index'
+import { Route as PluginsPluginIdInstancesIndexRouteImport } from './routes/plugins/$pluginId/instances/index'
+import { Route as PluginsPluginIdUserApiIdRouteImport } from './routes/plugins/$pluginId/user.$apiId'
+import { Route as PluginsPluginIdTrendingTopicNameRouteImport } from './routes/plugins/$pluginId/trending.$topicName'
+import { Route as PluginsPluginIdPostApiIdRouteImport } from './routes/plugins/$pluginId/post.$apiId'
+import { Route as PluginsPluginIdCommunityApiIdIndexRouteImport } from './routes/plugins/$pluginId/community.$apiId.index'
+import { Route as PluginsPluginIdInstancesInstanceIdFeedRouteImport } from './routes/plugins/$pluginId/instances/$instanceId/feed'
+import { Route as PluginsPluginIdInstancesInstanceIdCommunitiesRouteImport } from './routes/plugins/$pluginId/instances/$instanceId/communities'
+import { Route as PluginsPluginIdCommunityCommunityIdPostApiIdRouteImport } from './routes/plugins/$pluginId/community.$communityId.post.$apiId'
+import { Route as PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexRouteImport } from './routes/plugins/$pluginId/instances/$instanceId/community.$apiId.index'
+import { Route as PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdRouteImport } from './routes/plugins/$pluginId/instances/$instanceId/community.$communityId.post.$apiId'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as SettingsImport } from './routes/settings'
-import { Route as FavoritesImport } from './routes/favorites'
-import { Route as IndexImport } from './routes/index'
-import { Route as PluginsIndexImport } from './routes/plugins/index'
-import { Route as PluginsPluginIdOptionsImport } from './routes/plugins/$pluginId/options'
-import { Route as PluginsPluginIdFeedImport } from './routes/plugins/$pluginId/feed'
-import { Route as PluginsPluginIdTrendingIndexImport } from './routes/plugins/$pluginId/trending.index'
-import { Route as PluginsPluginIdInstancesIndexImport } from './routes/plugins/$pluginId/instances/index'
-import { Route as PluginsPluginIdUserApiIdImport } from './routes/plugins/$pluginId/user.$apiId'
-import { Route as PluginsPluginIdTrendingTopicNameImport } from './routes/plugins/$pluginId/trending.$topicName'
-import { Route as PluginsPluginIdPostApiIdImport } from './routes/plugins/$pluginId/post.$apiId'
-import { Route as PluginsPluginIdCommunityApiIdIndexImport } from './routes/plugins/$pluginId/community.$apiId.index'
-import { Route as PluginsPluginIdInstancesInstanceIdFeedImport } from './routes/plugins/$pluginId/instances/$instanceId/feed'
-import { Route as PluginsPluginIdInstancesInstanceIdCommunitiesImport } from './routes/plugins/$pluginId/instances/$instanceId/communities'
-import { Route as PluginsPluginIdCommunityCommunityIdPostApiIdImport } from './routes/plugins/$pluginId/community.$communityId.post.$apiId'
-import { Route as PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexImport } from './routes/plugins/$pluginId/instances/$instanceId/community.$apiId.index'
-import { Route as PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdImport } from './routes/plugins/$pluginId/instances/$instanceId/community.$communityId.post.$apiId'
-
-// Create/Update Routes
-
-const SettingsRoute = SettingsImport.update({
+const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const FavoritesRoute = FavoritesImport.update({
+const FavoritesRoute = FavoritesRouteImport.update({
   id: '/favorites',
   path: '/favorites',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const PluginsIndexRoute = PluginsIndexImport.update({
+const PluginsIndexRoute = PluginsIndexRouteImport.update({
   id: '/plugins/',
   path: '/plugins/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const PluginsPluginIdOptionsRoute = PluginsPluginIdOptionsImport.update({
+const PluginsPluginIdOptionsRoute = PluginsPluginIdOptionsRouteImport.update({
   id: '/plugins/$pluginId/options',
   path: '/plugins/$pluginId/options',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const PluginsPluginIdFeedRoute = PluginsPluginIdFeedImport.update({
+const PluginsPluginIdFeedRoute = PluginsPluginIdFeedRouteImport.update({
   id: '/plugins/$pluginId/feed',
   path: '/plugins/$pluginId/feed',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
 const PluginsPluginIdTrendingIndexRoute =
-  PluginsPluginIdTrendingIndexImport.update({
+  PluginsPluginIdTrendingIndexRouteImport.update({
     id: '/plugins/$pluginId/trending/',
     path: '/plugins/$pluginId/trending/',
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => rootRouteImport,
   } as any)
-
 const PluginsPluginIdInstancesIndexRoute =
-  PluginsPluginIdInstancesIndexImport.update({
+  PluginsPluginIdInstancesIndexRouteImport.update({
     id: '/plugins/$pluginId/instances/',
     path: '/plugins/$pluginId/instances/',
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => rootRouteImport,
   } as any)
-
-const PluginsPluginIdUserApiIdRoute = PluginsPluginIdUserApiIdImport.update({
-  id: '/plugins/$pluginId/user/$apiId',
-  path: '/plugins/$pluginId/user/$apiId',
-  getParentRoute: () => rootRoute,
-} as any)
-
+const PluginsPluginIdUserApiIdRoute =
+  PluginsPluginIdUserApiIdRouteImport.update({
+    id: '/plugins/$pluginId/user/$apiId',
+    path: '/plugins/$pluginId/user/$apiId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const PluginsPluginIdTrendingTopicNameRoute =
-  PluginsPluginIdTrendingTopicNameImport.update({
+  PluginsPluginIdTrendingTopicNameRouteImport.update({
     id: '/plugins/$pluginId/trending/$topicName',
     path: '/plugins/$pluginId/trending/$topicName',
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => rootRouteImport,
   } as any)
-
-const PluginsPluginIdPostApiIdRoute = PluginsPluginIdPostApiIdImport.update({
-  id: '/plugins/$pluginId/post/$apiId',
-  path: '/plugins/$pluginId/post/$apiId',
-  getParentRoute: () => rootRoute,
-} as any)
-
+const PluginsPluginIdPostApiIdRoute =
+  PluginsPluginIdPostApiIdRouteImport.update({
+    id: '/plugins/$pluginId/post/$apiId',
+    path: '/plugins/$pluginId/post/$apiId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const PluginsPluginIdCommunityApiIdIndexRoute =
-  PluginsPluginIdCommunityApiIdIndexImport.update({
+  PluginsPluginIdCommunityApiIdIndexRouteImport.update({
     id: '/plugins/$pluginId/community/$apiId/',
     path: '/plugins/$pluginId/community/$apiId/',
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => rootRouteImport,
   } as any)
-
 const PluginsPluginIdInstancesInstanceIdFeedRoute =
-  PluginsPluginIdInstancesInstanceIdFeedImport.update({
+  PluginsPluginIdInstancesInstanceIdFeedRouteImport.update({
     id: '/plugins/$pluginId/instances/$instanceId/feed',
     path: '/plugins/$pluginId/instances/$instanceId/feed',
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => rootRouteImport,
   } as any)
-
 const PluginsPluginIdInstancesInstanceIdCommunitiesRoute =
-  PluginsPluginIdInstancesInstanceIdCommunitiesImport.update({
+  PluginsPluginIdInstancesInstanceIdCommunitiesRouteImport.update({
     id: '/plugins/$pluginId/instances/$instanceId/communities',
     path: '/plugins/$pluginId/instances/$instanceId/communities',
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => rootRouteImport,
   } as any)
-
 const PluginsPluginIdCommunityCommunityIdPostApiIdRoute =
-  PluginsPluginIdCommunityCommunityIdPostApiIdImport.update({
+  PluginsPluginIdCommunityCommunityIdPostApiIdRouteImport.update({
     id: '/plugins/$pluginId/community/$communityId/post/$apiId',
     path: '/plugins/$pluginId/community/$communityId/post/$apiId',
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => rootRouteImport,
   } as any)
-
 const PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexRoute =
-  PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexImport.update({
+  PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexRouteImport.update({
     id: '/plugins/$pluginId/instances/$instanceId/community/$apiId/',
     path: '/plugins/$pluginId/instances/$instanceId/community/$apiId/',
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => rootRouteImport,
   } as any)
-
 const PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdRoute =
-  PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdImport.update({
-    id: '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId',
-    path: '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId',
-    getParentRoute: () => rootRoute,
-  } as any)
-
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/favorites': {
-      id: '/favorites'
-      path: '/favorites'
-      fullPath: '/favorites'
-      preLoaderRoute: typeof FavoritesImport
-      parentRoute: typeof rootRoute
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsImport
-      parentRoute: typeof rootRoute
-    }
-    '/plugins/': {
-      id: '/plugins/'
-      path: '/plugins'
-      fullPath: '/plugins'
-      preLoaderRoute: typeof PluginsIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/plugins/$pluginId/feed': {
-      id: '/plugins/$pluginId/feed'
-      path: '/plugins/$pluginId/feed'
-      fullPath: '/plugins/$pluginId/feed'
-      preLoaderRoute: typeof PluginsPluginIdFeedImport
-      parentRoute: typeof rootRoute
-    }
-    '/plugins/$pluginId/options': {
-      id: '/plugins/$pluginId/options'
-      path: '/plugins/$pluginId/options'
-      fullPath: '/plugins/$pluginId/options'
-      preLoaderRoute: typeof PluginsPluginIdOptionsImport
-      parentRoute: typeof rootRoute
-    }
-    '/plugins/$pluginId/post/$apiId': {
-      id: '/plugins/$pluginId/post/$apiId'
-      path: '/plugins/$pluginId/post/$apiId'
-      fullPath: '/plugins/$pluginId/post/$apiId'
-      preLoaderRoute: typeof PluginsPluginIdPostApiIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/plugins/$pluginId/trending/$topicName': {
-      id: '/plugins/$pluginId/trending/$topicName'
-      path: '/plugins/$pluginId/trending/$topicName'
-      fullPath: '/plugins/$pluginId/trending/$topicName'
-      preLoaderRoute: typeof PluginsPluginIdTrendingTopicNameImport
-      parentRoute: typeof rootRoute
-    }
-    '/plugins/$pluginId/user/$apiId': {
-      id: '/plugins/$pluginId/user/$apiId'
-      path: '/plugins/$pluginId/user/$apiId'
-      fullPath: '/plugins/$pluginId/user/$apiId'
-      preLoaderRoute: typeof PluginsPluginIdUserApiIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/plugins/$pluginId/instances/': {
-      id: '/plugins/$pluginId/instances/'
-      path: '/plugins/$pluginId/instances'
-      fullPath: '/plugins/$pluginId/instances'
-      preLoaderRoute: typeof PluginsPluginIdInstancesIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/plugins/$pluginId/trending/': {
-      id: '/plugins/$pluginId/trending/'
-      path: '/plugins/$pluginId/trending'
-      fullPath: '/plugins/$pluginId/trending'
-      preLoaderRoute: typeof PluginsPluginIdTrendingIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/plugins/$pluginId/instances/$instanceId/communities': {
-      id: '/plugins/$pluginId/instances/$instanceId/communities'
-      path: '/plugins/$pluginId/instances/$instanceId/communities'
-      fullPath: '/plugins/$pluginId/instances/$instanceId/communities'
-      preLoaderRoute: typeof PluginsPluginIdInstancesInstanceIdCommunitiesImport
-      parentRoute: typeof rootRoute
-    }
-    '/plugins/$pluginId/instances/$instanceId/feed': {
-      id: '/plugins/$pluginId/instances/$instanceId/feed'
-      path: '/plugins/$pluginId/instances/$instanceId/feed'
-      fullPath: '/plugins/$pluginId/instances/$instanceId/feed'
-      preLoaderRoute: typeof PluginsPluginIdInstancesInstanceIdFeedImport
-      parentRoute: typeof rootRoute
-    }
-    '/plugins/$pluginId/community/$apiId/': {
-      id: '/plugins/$pluginId/community/$apiId/'
-      path: '/plugins/$pluginId/community/$apiId'
-      fullPath: '/plugins/$pluginId/community/$apiId'
-      preLoaderRoute: typeof PluginsPluginIdCommunityApiIdIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/plugins/$pluginId/community/$communityId/post/$apiId': {
-      id: '/plugins/$pluginId/community/$communityId/post/$apiId'
-      path: '/plugins/$pluginId/community/$communityId/post/$apiId'
-      fullPath: '/plugins/$pluginId/community/$communityId/post/$apiId'
-      preLoaderRoute: typeof PluginsPluginIdCommunityCommunityIdPostApiIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/plugins/$pluginId/instances/$instanceId/community/$apiId/': {
-      id: '/plugins/$pluginId/instances/$instanceId/community/$apiId/'
-      path: '/plugins/$pluginId/instances/$instanceId/community/$apiId'
-      fullPath: '/plugins/$pluginId/instances/$instanceId/community/$apiId'
-      preLoaderRoute: typeof PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId': {
-      id: '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId'
-      path: '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId'
-      fullPath: '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId'
-      preLoaderRoute: typeof PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdImport
-      parentRoute: typeof rootRoute
-    }
-  }
-}
-
-// Create and export the route tree
+  PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdRouteImport.update(
+    {
+      id: '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId',
+      path: '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId',
+      getParentRoute: () => rootRouteImport,
+    } as any,
+  )
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/favorites': typeof FavoritesRoute
   '/settings': typeof SettingsRoute
-  '/plugins': typeof PluginsIndexRoute
+  '/plugins/': typeof PluginsIndexRoute
   '/plugins/$pluginId/feed': typeof PluginsPluginIdFeedRoute
   '/plugins/$pluginId/options': typeof PluginsPluginIdOptionsRoute
   '/plugins/$pluginId/post/$apiId': typeof PluginsPluginIdPostApiIdRoute
   '/plugins/$pluginId/trending/$topicName': typeof PluginsPluginIdTrendingTopicNameRoute
   '/plugins/$pluginId/user/$apiId': typeof PluginsPluginIdUserApiIdRoute
-  '/plugins/$pluginId/instances': typeof PluginsPluginIdInstancesIndexRoute
-  '/plugins/$pluginId/trending': typeof PluginsPluginIdTrendingIndexRoute
+  '/plugins/$pluginId/instances/': typeof PluginsPluginIdInstancesIndexRoute
+  '/plugins/$pluginId/trending/': typeof PluginsPluginIdTrendingIndexRoute
   '/plugins/$pluginId/instances/$instanceId/communities': typeof PluginsPluginIdInstancesInstanceIdCommunitiesRoute
   '/plugins/$pluginId/instances/$instanceId/feed': typeof PluginsPluginIdInstancesInstanceIdFeedRoute
-  '/plugins/$pluginId/community/$apiId': typeof PluginsPluginIdCommunityApiIdIndexRoute
+  '/plugins/$pluginId/community/$apiId/': typeof PluginsPluginIdCommunityApiIdIndexRoute
   '/plugins/$pluginId/community/$communityId/post/$apiId': typeof PluginsPluginIdCommunityCommunityIdPostApiIdRoute
-  '/plugins/$pluginId/instances/$instanceId/community/$apiId': typeof PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexRoute
+  '/plugins/$pluginId/instances/$instanceId/community/$apiId/': typeof PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexRoute
   '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId': typeof PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdRoute
 }
-
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/favorites': typeof FavoritesRoute
@@ -309,9 +164,8 @@ export interface FileRoutesByTo {
   '/plugins/$pluginId/instances/$instanceId/community/$apiId': typeof PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexRoute
   '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId': typeof PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdRoute
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute
+  __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/favorites': typeof FavoritesRoute
   '/settings': typeof SettingsRoute
@@ -330,26 +184,25 @@ export interface FileRoutesById {
   '/plugins/$pluginId/instances/$instanceId/community/$apiId/': typeof PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexRoute
   '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId': typeof PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/favorites'
     | '/settings'
-    | '/plugins'
+    | '/plugins/'
     | '/plugins/$pluginId/feed'
     | '/plugins/$pluginId/options'
     | '/plugins/$pluginId/post/$apiId'
     | '/plugins/$pluginId/trending/$topicName'
     | '/plugins/$pluginId/user/$apiId'
-    | '/plugins/$pluginId/instances'
-    | '/plugins/$pluginId/trending'
+    | '/plugins/$pluginId/instances/'
+    | '/plugins/$pluginId/trending/'
     | '/plugins/$pluginId/instances/$instanceId/communities'
     | '/plugins/$pluginId/instances/$instanceId/feed'
-    | '/plugins/$pluginId/community/$apiId'
+    | '/plugins/$pluginId/community/$apiId/'
     | '/plugins/$pluginId/community/$communityId/post/$apiId'
-    | '/plugins/$pluginId/instances/$instanceId/community/$apiId'
+    | '/plugins/$pluginId/instances/$instanceId/community/$apiId/'
     | '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -391,7 +244,6 @@ export interface FileRouteTypes {
     | '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FavoritesRoute: typeof FavoritesRoute
@@ -410,6 +262,130 @@ export interface RootRouteChildren {
   PluginsPluginIdCommunityCommunityIdPostApiIdRoute: typeof PluginsPluginIdCommunityCommunityIdPostApiIdRoute
   PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexRoute: typeof PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexRoute
   PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdRoute: typeof PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdRoute
+}
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favorites': {
+      id: '/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof FavoritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plugins/': {
+      id: '/plugins/'
+      path: '/plugins'
+      fullPath: '/plugins/'
+      preLoaderRoute: typeof PluginsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plugins/$pluginId/options': {
+      id: '/plugins/$pluginId/options'
+      path: '/plugins/$pluginId/options'
+      fullPath: '/plugins/$pluginId/options'
+      preLoaderRoute: typeof PluginsPluginIdOptionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plugins/$pluginId/feed': {
+      id: '/plugins/$pluginId/feed'
+      path: '/plugins/$pluginId/feed'
+      fullPath: '/plugins/$pluginId/feed'
+      preLoaderRoute: typeof PluginsPluginIdFeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plugins/$pluginId/trending/': {
+      id: '/plugins/$pluginId/trending/'
+      path: '/plugins/$pluginId/trending'
+      fullPath: '/plugins/$pluginId/trending/'
+      preLoaderRoute: typeof PluginsPluginIdTrendingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plugins/$pluginId/instances/': {
+      id: '/plugins/$pluginId/instances/'
+      path: '/plugins/$pluginId/instances'
+      fullPath: '/plugins/$pluginId/instances/'
+      preLoaderRoute: typeof PluginsPluginIdInstancesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plugins/$pluginId/user/$apiId': {
+      id: '/plugins/$pluginId/user/$apiId'
+      path: '/plugins/$pluginId/user/$apiId'
+      fullPath: '/plugins/$pluginId/user/$apiId'
+      preLoaderRoute: typeof PluginsPluginIdUserApiIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plugins/$pluginId/trending/$topicName': {
+      id: '/plugins/$pluginId/trending/$topicName'
+      path: '/plugins/$pluginId/trending/$topicName'
+      fullPath: '/plugins/$pluginId/trending/$topicName'
+      preLoaderRoute: typeof PluginsPluginIdTrendingTopicNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plugins/$pluginId/post/$apiId': {
+      id: '/plugins/$pluginId/post/$apiId'
+      path: '/plugins/$pluginId/post/$apiId'
+      fullPath: '/plugins/$pluginId/post/$apiId'
+      preLoaderRoute: typeof PluginsPluginIdPostApiIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plugins/$pluginId/community/$apiId/': {
+      id: '/plugins/$pluginId/community/$apiId/'
+      path: '/plugins/$pluginId/community/$apiId'
+      fullPath: '/plugins/$pluginId/community/$apiId/'
+      preLoaderRoute: typeof PluginsPluginIdCommunityApiIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plugins/$pluginId/instances/$instanceId/feed': {
+      id: '/plugins/$pluginId/instances/$instanceId/feed'
+      path: '/plugins/$pluginId/instances/$instanceId/feed'
+      fullPath: '/plugins/$pluginId/instances/$instanceId/feed'
+      preLoaderRoute: typeof PluginsPluginIdInstancesInstanceIdFeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plugins/$pluginId/instances/$instanceId/communities': {
+      id: '/plugins/$pluginId/instances/$instanceId/communities'
+      path: '/plugins/$pluginId/instances/$instanceId/communities'
+      fullPath: '/plugins/$pluginId/instances/$instanceId/communities'
+      preLoaderRoute: typeof PluginsPluginIdInstancesInstanceIdCommunitiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plugins/$pluginId/community/$communityId/post/$apiId': {
+      id: '/plugins/$pluginId/community/$communityId/post/$apiId'
+      path: '/plugins/$pluginId/community/$communityId/post/$apiId'
+      fullPath: '/plugins/$pluginId/community/$communityId/post/$apiId'
+      preLoaderRoute: typeof PluginsPluginIdCommunityCommunityIdPostApiIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plugins/$pluginId/instances/$instanceId/community/$apiId/': {
+      id: '/plugins/$pluginId/instances/$instanceId/community/$apiId/'
+      path: '/plugins/$pluginId/instances/$instanceId/community/$apiId'
+      fullPath: '/plugins/$pluginId/instances/$instanceId/community/$apiId/'
+      preLoaderRoute: typeof PluginsPluginIdInstancesInstanceIdCommunityApiIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId': {
+      id: '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId'
+      path: '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId'
+      fullPath: '/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId'
+      preLoaderRoute: typeof PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -437,87 +413,6 @@ const rootRouteChildren: RootRouteChildren = {
   PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdRoute:
     PluginsPluginIdInstancesInstanceIdCommunityCommunityIdPostApiIdRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/favorites",
-        "/settings",
-        "/plugins/",
-        "/plugins/$pluginId/feed",
-        "/plugins/$pluginId/options",
-        "/plugins/$pluginId/post/$apiId",
-        "/plugins/$pluginId/trending/$topicName",
-        "/plugins/$pluginId/user/$apiId",
-        "/plugins/$pluginId/instances/",
-        "/plugins/$pluginId/trending/",
-        "/plugins/$pluginId/instances/$instanceId/communities",
-        "/plugins/$pluginId/instances/$instanceId/feed",
-        "/plugins/$pluginId/community/$apiId/",
-        "/plugins/$pluginId/community/$communityId/post/$apiId",
-        "/plugins/$pluginId/instances/$instanceId/community/$apiId/",
-        "/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/favorites": {
-      "filePath": "favorites.tsx"
-    },
-    "/settings": {
-      "filePath": "settings.tsx"
-    },
-    "/plugins/": {
-      "filePath": "plugins/index.tsx"
-    },
-    "/plugins/$pluginId/feed": {
-      "filePath": "plugins/$pluginId/feed.tsx"
-    },
-    "/plugins/$pluginId/options": {
-      "filePath": "plugins/$pluginId/options.tsx"
-    },
-    "/plugins/$pluginId/post/$apiId": {
-      "filePath": "plugins/$pluginId/post.$apiId.tsx"
-    },
-    "/plugins/$pluginId/trending/$topicName": {
-      "filePath": "plugins/$pluginId/trending.$topicName.tsx"
-    },
-    "/plugins/$pluginId/user/$apiId": {
-      "filePath": "plugins/$pluginId/user.$apiId.tsx"
-    },
-    "/plugins/$pluginId/instances/": {
-      "filePath": "plugins/$pluginId/instances/index.tsx"
-    },
-    "/plugins/$pluginId/trending/": {
-      "filePath": "plugins/$pluginId/trending.index.tsx"
-    },
-    "/plugins/$pluginId/instances/$instanceId/communities": {
-      "filePath": "plugins/$pluginId/instances/$instanceId/communities.tsx"
-    },
-    "/plugins/$pluginId/instances/$instanceId/feed": {
-      "filePath": "plugins/$pluginId/instances/$instanceId/feed.tsx"
-    },
-    "/plugins/$pluginId/community/$apiId/": {
-      "filePath": "plugins/$pluginId/community.$apiId.index.tsx"
-    },
-    "/plugins/$pluginId/community/$communityId/post/$apiId": {
-      "filePath": "plugins/$pluginId/community.$communityId.post.$apiId.tsx"
-    },
-    "/plugins/$pluginId/instances/$instanceId/community/$apiId/": {
-      "filePath": "plugins/$pluginId/instances/$instanceId/community.$apiId.index.tsx"
-    },
-    "/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId": {
-      "filePath": "plugins/$pluginId/instances/$instanceId/community.$communityId.post.$apiId.tsx"
-    }
-  }
-}
-ROUTE_MANIFEST_END */

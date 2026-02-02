@@ -2,7 +2,6 @@ import { GetCommentsResponse, Post } from "@/plugintypes";
 import PostComponent from "./PostComponent";
 import CommentComponent from "./CommentComponent";
 import React from "react";
-import { Helmet } from "react-helmet-async";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { usePlugins } from "@/hooks/usePlugins";
@@ -36,9 +35,7 @@ const PostWithComments: React.FC<Props> = (props) => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 p-4">
-      <Helmet>
-        <title>{data.post?.title}</title>
-      </Helmet>
+      <title>{data.post?.title}</title>
       
       {/* Community Header */}
       {data.community && (

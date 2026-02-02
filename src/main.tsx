@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
 import Router from "./router";
@@ -30,12 +29,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <FavoritesRepoProvider>
               <FavoritesProvider>
                 <ExtensionProvider>
-                  <HelmetProvider>
-                    <Helmet>
-                      <title>SocialGata</title>
-                    </Helmet>
-                    <Router />
-                  </HelmetProvider>
+                  <title>SocialGata</title>
+                  <Router />
                 </ExtensionProvider>
               </FavoritesProvider>
             </FavoritesRepoProvider>

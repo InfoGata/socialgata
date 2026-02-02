@@ -1,3 +1,4 @@
+import React from "react";
 import { LinkOptions } from "@tanstack/react-router";
 import { GetCommentRepliesRequest, GetCommentRepliesResponse, GetCommentsRequest, GetCommentsResponse, GetCommunitiesRequest, GetCommunitiesResponse, GetCommunityRequest, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetInstancesRequest, GetInstancesResponse, GetTrendingTopicFeedRequest, GetTrendingTopicFeedResponse, GetTrendingTopicsRequest, GetTrendingTopicsResponse, GetUserResponse, GetUserRequest, LoginRequest, ManifestAuthentication, SearchRequest, SearchResponse } from "./plugintypes";
 import { RouterType } from "./router";
@@ -67,7 +68,7 @@ export type LinkRouterProps = LinkOptions<RouterType>;
 export interface NavigationLinkItem {
   title: string;
   link: LinkRouterProps;
-  icon: JSX.Element;
+  icon: React.JSX.Element;
 }
 
 export interface PluginDescription {
