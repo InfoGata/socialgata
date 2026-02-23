@@ -84,6 +84,7 @@ export class PluginFrameContainer extends PluginFrame<PluginMethodInterface> {
   name?: string;
   id?: string;
   hasOptions?: boolean;
+  hasFeed?: boolean;
   fileList?: FileList;
   optionsSameOrigin?: boolean;
   version?: string;
@@ -246,6 +247,8 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
         await host.executeCode(plugin.script);
 
         // Try to get platform type from plugin
+        host.hasFeed = await host.hasDefined.onGetFeed();
+
         if (await host.hasDefined.onGetPlatformType()) {
           host.platformType = await host.remote.onGetPlatformType();
         }

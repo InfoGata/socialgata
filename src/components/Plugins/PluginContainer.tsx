@@ -39,13 +39,15 @@ const PluginContainer: React.FC<PluginContainerProps> = (props) => {
           {plugin.name} {plugin.version}
         </h3>
         <div className="flex gap-2 items-center">
-          <Link
-            className={cn(buttonVariants({ variant: "outline" }))}
-            to="/plugins/$pluginId/feed"
-            params={{ pluginId: plugin.id || "" }}
-          >
-            {t("viewFeed")}
-          </Link>
+          {plugin.hasFeed && (
+            <Link
+              className={cn(buttonVariants({ variant: "outline" }))}
+              to="/plugins/$pluginId/feed"
+              params={{ pluginId: plugin.id || "" }}
+            >
+              {t("viewFeed")}
+            </Link>
+          )}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button

@@ -12,7 +12,7 @@ export const Index: React.FC = () => {
     <>
       <ExtensionBanner />
       <div className="flex flex-col gap-2">
-        {pluginsLoaded && plugins.map((plugin) => (
+        {pluginsLoaded && plugins.filter((plugin) => plugin.hasFeed).map((plugin) => (
           <PluginFeedButtons key={plugin.id} pluginId={plugin.id!} />
         ))}
       </div>
