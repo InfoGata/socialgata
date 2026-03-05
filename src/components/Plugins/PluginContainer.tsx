@@ -38,7 +38,13 @@ const PluginContainer: React.FC<PluginContainerProps> = (props) => {
     <div>
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">
-          {plugin.name} {plugin.version}
+          <Link
+            to="/plugins/$pluginId"
+            params={{ pluginId: plugin.id || "" }}
+            className="hover:underline"
+          >
+            {plugin.name} {plugin.version}
+          </Link>
         </h3>
         <div className="flex gap-2 items-center">
           {plugin.hasFeed && (

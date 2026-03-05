@@ -41,6 +41,18 @@
     "updatePluginTitle": "Update Plugin",
     "confirmUpdatePlugin": "This plugin is already installed. Would you like to update it?",
     "updatePlugin": "Update",
-    "confirmInstallPlugin": "Review and confirm the plugin installation below."
+    "confirmInstallPlugin": "Review and confirm the plugin installation below.",
+    "pluginDetails": "Plugin Details",
+    "pluginDescription": "Description",
+    "homepage": "Homepage",
+    "version": "Version",
+    "updateUrl": "Update URL",
+    "checkForUpdates": "Check for Updates",
+    "updateFromFile": "Update from File",
+    "reloadPlugin": "Reload Plugin",
+    "updateFound": "Update available",
+    "noUpdateFound": "No update found",
+    "scriptSize": "Script Size",
+    "optionsPageSize": "Options Page Size"
   }
 }
