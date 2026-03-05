@@ -2,6 +2,7 @@ import React from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { usePlugins } from "@/hooks/usePlugins";
+import { usePluginLogin } from "@/hooks/usePluginLogin";
 
 interface PluginLoginProps {
   pluginId: string;
@@ -24,12 +25,18 @@ function usePersistedState(
 }
 
 const PluginLogin = (props: PluginLoginProps) => {
-  const { pluginId, isLoggedIn, setIsLoggedIn } = props;
+  const { pluginId, setIsLoggedIn } = props;
   const { plugins } = usePlugins();
   const plugin = plugins.find(p => p.id === pluginId);
+  const { isLoggedIn, login, logout } = usePluginLogin(plugin);
 
   const [apiKey, setApiKey] = usePersistedState(`${pluginId}key`, "");
   const [apiSecret, setApiSecret] = usePersistedState(`${pluginId}secret`, "");
+
+  // Sync login state back to parent
+  React.useEffect(() => {
+    setIsLoggedIn(isLoggedIn);
+  }, [isLoggedIn, setIsLoggedIn]);
 
   const onChangeApiKey = (event: React.ChangeEvent<HTMLInputElement>) => {
     setApiKey(event.currentTarget.value);
@@ -37,22 +44,6 @@ const PluginLogin = (props: PluginLoginProps) => {
 
   const onChangeApiSecret = (event: React.ChangeEvent<HTMLInputElement>) => {
     setApiSecret(event.currentTarget.value);
-  };
-
-  const login = async () => {
-    if (plugin && await plugin.hasDefined.onLogin()) {
-      await plugin.remote.onLogin({ apiKey: apiKey, apiSecret: apiSecret });
-      if (await plugin.hasDefined.onIsLoggedIn()) {
-        setIsLoggedIn(await plugin.remote.onIsLoggedIn());
-      }
-    }
-  };
-
-  const logout = async () => {
-    if (plugin && await plugin.hasDefined.onLogout() && await plugin.hasDefined.onIsLoggedIn()) {
-      await plugin.remote.onLogout();
-      setIsLoggedIn(await plugin.remote.onIsLoggedIn());
-    }
   };
 
   return (
@@ -72,7 +63,7 @@ const PluginLogin = (props: PluginLoginProps) => {
       {isLoggedIn ? (
         <Button onClick={logout}>Logout</Button>
       ) : (
-        <Button onClick={login}>Login to {plugin?.name}</Button>
+        <Button onClick={() => login(apiKey, apiSecret)}>Login to {plugin?.name}</Button>
       )}
     </div>
   );

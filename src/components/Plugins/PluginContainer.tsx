@@ -1,7 +1,8 @@
 import Alert from "@/components/Alert";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { MoreHorizontalIcon, Settings } from "lucide-react";
+import { usePluginLogin } from "@/hooks/usePluginLogin";
+import { LogIn, LogOut, MoreHorizontalIcon, Settings } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { FaTrash } from "react-icons/fa6";
@@ -23,6 +24,7 @@ const PluginContainer: React.FC<PluginContainerProps> = (props) => {
   const { plugin, deletePlugin } = props;
   const [alertOpen, setAlertOpen] = React.useState(false);
   const { t } = useTranslation("plugins");
+  const { hasLogin, isLoggedIn, login, logout } = usePluginLogin(plugin);
 
   const onDelete = async () => {
     setAlertOpen(true);
@@ -70,6 +72,19 @@ const PluginContainer: React.FC<PluginContainerProps> = (props) => {
                     <span>{t("options")}</span>
                   </Link>
                 </DropdownMenuItem>
+              )}
+              {hasLogin && (
+                isLoggedIn ? (
+                  <DropdownMenuItem className="cursor-pointer" onClick={logout}>
+                    <LogOut />
+                    <span>{t("logout")}</span>
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => login()}>
+                    <LogIn />
+                    <span>{t("login")}</span>
+                  </DropdownMenuItem>
+                )
               )}
               <DropdownMenuItem className="cursor-pointer" onClick={onDelete}>
                 <FaTrash />

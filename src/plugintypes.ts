@@ -176,6 +176,15 @@ export type ListingType = "comment" | "post";
 export interface LoginRequest {
   apiKey: string;
   apiSecret: string;
+  popupName?: string;
+}
+
+export interface LoginResponse {
+  url?: string;
+}
+
+export interface LoginCallbackRequest {
+  url: string;
 }
 
 export interface GetCommentRepliesRequest {

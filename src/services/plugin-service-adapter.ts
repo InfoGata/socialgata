@@ -107,7 +107,7 @@ export class PluginServiceAdapter implements ServiceType {
 
   async login(request: LoginRequest): Promise<void> {
     if (await this.plugin.hasDefined.onLogin()) {
-      return this.plugin.remote.onLogin(request);
+      await this.plugin.remote.onLogin(request);
     }
   }
 

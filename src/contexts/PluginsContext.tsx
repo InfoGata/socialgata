@@ -2,6 +2,7 @@ import { PluginInterface, PluginFrame } from "plugin-frame";
 import React from "react";
 import { toast } from "sonner";
 import { db } from "../database";
+import ConfirmUpdatePluginDialog from "../components/Plugins/ConfirmUpdatePluginDialog";
 import {
   GetFeedRequest,
   GetFeedResponse,
@@ -24,6 +25,8 @@ import {
   GetInstancesRequest,
   GetInstancesResponse,
   LoginRequest,
+  LoginResponse,
+  LoginCallbackRequest,
   PluginInfo,
   SyncUploadRequest,
   SyncUploadResponse,
@@ -60,7 +63,8 @@ export interface PluginMethodInterface {
   onSearch(request: SearchRequest): Promise<SearchResponse>;
   onGetTrendingTopics(request?: GetTrendingTopicsRequest): Promise<GetTrendingTopicsResponse>;
   onGetTrendingTopicFeed(request: GetTrendingTopicFeedRequest): Promise<GetTrendingTopicFeedResponse>;
-  onLogin(request: LoginRequest): Promise<void>;
+  onLogin(request: LoginRequest): Promise<LoginResponse | void>;
+  onLoginCallback(request: LoginCallbackRequest): Promise<void>;
   onLogout(): Promise<void>;
   onIsLoggedIn(): Promise<boolean>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -114,6 +118,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
   const [pluginsFailed, setPluginsFailed] = React.useState(false);
   const [pluginFrames, setPluginFrames] = React.useState<PluginFrameContainer[]>([]);
   const [pluginMessage, setPluginMessage] = React.useState<PluginMessage>();
+  const [pendingUpdatePlugin, setPendingUpdatePlugin] = React.useState<PluginInfo | null>(null);
 
   const corsProxyUrl = "";  // TODO: Add CORS proxy support if needed
   const theme = useTheme();
@@ -227,7 +232,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
           },
         },
         frameSrc: srcUrl,
-        sandboxAttributes: ["allow-scripts", "allow-same-origin"],
+        sandboxAttributes: ["allow-scripts", "allow-same-origin", "allow-popups"],
       });
 
       host.name = plugin.name;
@@ -269,10 +274,11 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
         throw new Error("Plugin must have an id");
       }
 
-      // Check if plugin already exists
+      // Check if plugin already exists - prompt for update instead of throwing
       const existingPlugin = await db.plugins.get(id);
       if (existingPlugin) {
-        throw new Error(`Plugin with id ${id} already exists`);
+        setPendingUpdatePlugin(plugin);
+        return;
       }
 
       // Save to database
@@ -358,6 +364,17 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
     reloadPlugins();
   }, [reloadPlugins]);
 
+  const handleConfirmUpdate = React.useCallback(async () => {
+    if (pendingUpdatePlugin?.id) {
+      await updatePlugin(pendingUpdatePlugin, pendingUpdatePlugin.id);
+      setPendingUpdatePlugin(null);
+    }
+  }, [pendingUpdatePlugin, updatePlugin]);
+
+  const handleCloseUpdate = React.useCallback(() => {
+    setPendingUpdatePlugin(null);
+  }, []);
+
   const value: PluginContextInterface = {
     addPlugin,
     updatePlugin,
@@ -372,6 +389,12 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
   return (
     <PluginsContext.Provider value={value}>
       {props.children}
+      <ConfirmUpdatePluginDialog
+        open={!!pendingUpdatePlugin}
+        plugin={pendingUpdatePlugin}
+        onConfirm={handleConfirmUpdate}
+        onClose={handleCloseUpdate}
+      />
     </PluginsContext.Provider>
   );
 };

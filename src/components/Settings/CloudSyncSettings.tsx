@@ -4,10 +4,14 @@ import { Cloud, RefreshCw, Check, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   setCloudSyncAutoSync,
+  setCloudSyncEnabled,
+  setCloudSyncPluginProvider,
+  disconnectCloudSync,
 } from '@/store/reducers/uiSlice';
 import type { RootState } from '@/store/store';
 import { cloudSyncManager } from '@/sync/cloudSyncManager';
 import type { SyncStatus } from '@/sync/cloud/CloudSyncProvider';
+import { PluginSyncProviderAdapter } from '@/sync/cloud/PluginSyncProviderAdapter';
 import { usePlugins } from '@/hooks/usePlugins';
 import type { PluginFrameContainer } from '@/contexts/PluginsContext';
 
@@ -52,6 +56,24 @@ const CloudSyncSettings: React.FC = () => {
 
     return unsubscribe;
   }, []);
+
+  // Connect a sync-capable plugin
+  const handleConnect = (plugin: PluginFrameContainer) => {
+    const adapter = new PluginSyncProviderAdapter(plugin);
+    cloudSyncManager.setProvider(adapter);
+    dispatch(setCloudSyncPluginProvider({ pluginId: plugin.id! }));
+    dispatch(setCloudSyncEnabled(true));
+    if (cloudSync.autoSync) {
+      cloudSyncManager.startPeriodicSync(cloudSync.syncIntervalSeconds * 1000);
+    }
+  };
+
+  // Disconnect the current provider
+  const handleDisconnect = () => {
+    cloudSyncManager.stopPeriodicSync();
+    cloudSyncManager.setProvider(null);
+    dispatch(disconnectCloudSync());
+  };
 
   // Handle manual sync
   const handleManualSync = async () => {
@@ -109,10 +131,15 @@ const CloudSyncSettings: React.FC = () => {
           {syncCapablePlugins.length > 0 ? (
             <div className="grid gap-3">
               {syncCapablePlugins.map(plugin => (
-                <>
-                  <Cloud className="mr-2 h-5 w-5" />
-                  {plugin.name}
-                </>
+                <div key={plugin.id} className="flex items-center justify-between rounded-lg border p-4">
+                  <div className="flex items-center gap-3">
+                    <Cloud className="h-5 w-5" />
+                    <span className="font-medium">{plugin.name}</span>
+                  </div>
+                  <Button size="sm" onClick={() => handleConnect(plugin)}>
+                    Connect
+                  </Button>
+                </div>
               ))}
             </div>
           ) : (
@@ -134,6 +161,9 @@ const CloudSyncSettings: React.FC = () => {
                 <p className="text-sm text-muted-foreground">Connected</p>
               </div>
             </div>
+            <Button variant="outline" size="sm" onClick={handleDisconnect}>
+              Disconnect
+            </Button>
           </div>
 
           <div className="space-y-4">

@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -71,6 +72,7 @@ const ConfirmPluginDialog: React.FC<ConfirmPluginDialogProps> = (props) => {
           <DialogTitle>
             {t("addPluginCount", { count: plugins.length })}
           </DialogTitle>
+          <DialogDescription>{t("confirmInstallPlugin")}</DialogDescription>
         </DialogHeader>
         <div>
           <div className="flex flex-col gap-2">{info}</div>
