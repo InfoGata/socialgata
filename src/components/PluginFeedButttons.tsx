@@ -2,7 +2,6 @@ import { usePlugins } from "@/hooks/usePlugins";
 import { Link } from "@tanstack/react-router";
 import React from "react";
 import { useState } from "react";
-import PluginLogin from "./PluginLogin";
 import { buttonVariants } from "./ui/button";
 
 interface PluginFeedButtonsProps {
@@ -12,22 +11,8 @@ interface PluginFeedButtonsProps {
 const PluginFeedButtons = ({ pluginId }: PluginFeedButtonsProps) => {
   const [hasInstances, setHasInstances] = useState(false);
   const [hasTrending, setHasTrending] = useState(false);
-  const [hasLogin, setHasLogin] = React.useState(false);
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const { plugins } = usePlugins();
   const plugin = plugins.find(p => p.id === pluginId);
-
-  React.useEffect(() => {
-    const getLoginStatus = async () => {
-      if (plugin) {
-        setHasLogin(await plugin.hasDefined.onLogin());
-        if (await plugin.hasDefined.onIsLoggedIn()) {
-          setIsLoggedIn(await plugin.remote.onIsLoggedIn());
-        }
-      }
-    };
-    getLoginStatus();
-  }, [plugin]);
 
   React.useEffect(() => {
     const getInstances = async () => {
@@ -84,13 +69,6 @@ const PluginFeedButtons = ({ pluginId }: PluginFeedButtonsProps) => {
           )}
         </div>
       </div>
-      {hasLogin && (
-        <PluginLogin
-          pluginId={pluginId}
-          isLoggedIn={isLoggedIn}
-          setIsLoggedIn={setIsLoggedIn}
-        />
-      )}
     </div>
   );
 };
