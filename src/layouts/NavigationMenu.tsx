@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setIsNavigationMenuOpen } from "@/store/reducers/uiSlice";
 import { NavigationLinkItem } from "@/types";
-import { FaGear, FaHouse, FaPuzzlePiece } from "react-icons/fa6";
+import { FaCircleInfo, FaGear, FaHouse, FaPuzzlePiece } from "react-icons/fa6";
 import { Star } from "lucide-react";
 
 const NavigationMenu: React.FC = () => {
@@ -35,6 +35,11 @@ const NavigationMenu: React.FC = () => {
       title: "Settings",
       link: { to: "/settings" },
       icon: <FaGear />
+    },
+    {
+      title: "About",
+      link: { to: "/about" },
+      icon: <FaCircleInfo />
     }
   ]
 
