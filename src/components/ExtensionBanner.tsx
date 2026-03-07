@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 import { useExtension } from "@/hooks/useExtension";
+import { isCorsDisabled } from "@/utils";
 
 export const ExtensionBanner: React.FC = () => {
   const { t } = useTranslation();
@@ -10,13 +11,13 @@ export const ExtensionBanner: React.FC = () => {
   const [bannerDismissed, setBannerDismissed] = useState(() => {
     return localStorage.getItem("extensionBannerDismissed") === "true";
   });
-  
+
   const handleDismiss = () => {
     setBannerDismissed(true);
     localStorage.setItem("extensionBannerDismissed", "true");
   };
-  
-  if (extensionDetected !== false || bannerDismissed) {
+
+  if (isCorsDisabled() || extensionDetected !== false || bannerDismissed) {
     return null;
   }
   

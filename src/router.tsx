@@ -1,4 +1,9 @@
-import { RouterProvider, createRouter } from "@tanstack/react-router";
+import {
+  RouterProvider,
+  createRouter,
+  createHashHistory,
+} from "@tanstack/react-router";
+import isElectron from "is-electron";
 import { routeTree } from "./routeTree.gen";
 import Spinner from "./components/Spinner";
 import { usePlugins } from "./hooks/usePlugins";
@@ -13,7 +18,8 @@ const router = createRouter({
   scrollRestoration: true,
   context: {
     plugins: undefined!
-  }
+  },
+  ...(isElectron() ? { history: createHashHistory() } : {}),
 });
 export type RouterType = typeof router;
 

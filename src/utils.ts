@@ -1,4 +1,5 @@
 import semverGte from "semver/functions/gte";
+import isElectron from "is-electron";
 
 export const hasExtension = () => {
   return typeof window.InfoGata !== "undefined";
@@ -14,5 +15,5 @@ export const hasAuthentication = async () => {
 };
 
 export const isCorsDisabled = () => {
-  return hasExtension();
+  return hasExtension() || isElectron();
 }
