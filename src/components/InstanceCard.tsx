@@ -4,7 +4,7 @@ import { Link } from "@tanstack/react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { MessageSquareTextIcon, UsersIcon, MessagesSquareIcon, ExternalLink, Layers } from "lucide-react";
 import { usePlugins } from "@/hooks/usePlugins";
-import { Button, buttonVariants } from "./ui/button";
+import { buttonVariants } from "./ui/button";
 import { cn } from "@/lib/utils";
 import DOMPurify from "dompurify";
 import { FavoriteButton } from "./FavoriteButton";
