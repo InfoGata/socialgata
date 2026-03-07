@@ -1,8 +1,7 @@
 import { Post } from "@/plugintypes";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Link } from "@tanstack/react-router";
-import { Button, buttonVariants } from "./ui/button";
-import { ArrowDownIcon, ArrowUpIcon, MessageCircleIcon } from "lucide-react";
+import { ArrowUpIcon, ArrowDownIcon, MessageCircleIcon, ExternalLinkIcon } from "lucide-react";
 import ReactTimeago from "react-timeago";
 import PostLink from "./PostLink";
 import React from "react";
@@ -18,91 +17,96 @@ type Props = {
   showFullPost?: boolean;
 };
 
+const imageRegex = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|webp|svg|ico|tiff|tif|raw|heic|heif|avif))/i;
+
 const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) => {
   const [expand, setExpand] = React.useState(false);
-  const toggleExpand = () => {
-    setExpand(!expand);
-  };
+  const toggleExpand = () => setExpand(!expand);
   const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
   const sanitizer = DOMPurify.sanitize;
+  const hasThumbnail = !!post.thumbnailUrl || (post.url && imageRegex.test(post.url));
+  const isExternal = post.url && !post.url.startsWith('/');
 
   return (
-    <div className="group relative bg-card rounded-xl border border-border/60 hover:border-primary/40 hover:shadow-lg shadow-sm transition-all duration-300 overflow-hidden">
-      <div className="flex gap-4 p-4">
-        {/* Post Number & Thumbnail */}
-        <div className="flex gap-3 items-start">
-          {post.number && (
-            <span className="text-xl font-bold text-muted-foreground/40 min-w-[2rem] text-right pt-1">
-              {post.number}
+    <div className="group relative bg-card hover:bg-accent/30 rounded-lg border border-border/50 hover:border-border transition-colors duration-150">
+      <div className="flex">
+        {/* Vote Column */}
+        {post.score !== undefined && (
+          <div className="flex flex-col items-center justify-start gap-0.5 px-2.5 py-3 bg-muted/30 rounded-l-lg border-r border-border/30 min-w-[52px]">
+            <ArrowUpIcon className="h-4 w-4 text-muted-foreground/50" />
+            <span className="text-xs font-bold text-foreground/80">
+              {numberFormatter.format(post.score)}
             </span>
-          )}
-          <div className="rounded-lg size-20 bg-muted/50 overflow-hidden flex-shrink-0 ring-1 ring-border/40 hover:ring-primary/30 transition-all">
-            <ImageThumbnail
-              url={post.url}
-              thumbnailUrl={post.thumbnailUrl}
-              toggleExpand={toggleExpand}
-            />
+            <ArrowDownIcon className="h-4 w-4 text-muted-foreground/50" />
           </div>
-        </div>
+        )}
 
-        {/* Main Content */}
-        <div className="flex-1 min-w-0">
-          {/* Author & Community Info */}
-          <div className="flex items-center gap-2 mb-2 text-xs">
+        {/* Content */}
+        <div className="flex-1 min-w-0 px-3 py-2.5">
+          {/* Meta line */}
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+            {post.number && (
+              <span className="font-bold text-muted-foreground/50 mr-1">
+                #{post.number}
+              </span>
+            )}
             {post.authorAvatar && (
-              <Avatar className="size-6 ring-2 ring-border/40">
+              <Avatar className="size-4">
                 <AvatarImage src={post.authorAvatar} />
-                <AvatarFallback className="text-[10px] bg-primary/10 text-primary font-medium">
+                <AvatarFallback className="text-[8px] bg-primary/10 text-primary">
                   {post.authorName?.slice(0, 2)}
                 </AvatarFallback>
               </Avatar>
             )}
-            <div className="flex flex-wrap items-center gap-x-1.5 text-muted-foreground">
-              <Link
-                to="/plugins/$pluginId/user/$apiId"
-                className="font-semibold hover:text-primary transition-colors"
-                params={{
-                  pluginId: post.pluginId || "",
-                  apiId: post.authorApiId || "",
-                }}
-              >
-                {post.authorName}
-              </Link>
-              {post.communityName && (
-                <>
-                  <span className="text-muted-foreground/60">•</span>
-                  <Link
-                    to="/plugins/$pluginId/community/$apiId"
-                    className="font-medium hover:text-primary transition-colors"
-                    params={{
-                      pluginId: post.pluginId || "",
-                      apiId: post.communityApiId || "",
-                    }}
-                  >
-                    {post.communityName}
-                  </Link>
-                </>
-              )}
-              <span className="text-muted-foreground/60">•</span>
-              <span className="text-muted-foreground/80">
-                {post.publishedDate && <ReactTimeago date={post.publishedDate} />}
-              </span>
-            </div>
+            <Link
+              to="/plugins/$pluginId/user/$apiId"
+              className="font-medium hover:text-primary transition-colors"
+              params={{
+                pluginId: post.pluginId || "",
+                apiId: post.authorApiId || "",
+              }}
+            >
+              {post.authorName}
+            </Link>
+            {post.communityName && (
+              <>
+                <span className="text-muted-foreground/40">in</span>
+                <Link
+                  to="/plugins/$pluginId/community/$apiId"
+                  className="font-semibold text-primary/80 hover:text-primary transition-colors"
+                  params={{
+                    pluginId: post.pluginId || "",
+                    apiId: post.communityApiId || "",
+                  }}
+                >
+                  {post.communityName}
+                </Link>
+              </>
+            )}
+            <span className="text-muted-foreground/40">·</span>
+            <span className="text-muted-foreground/60">
+              {post.publishedDate && <ReactTimeago date={post.publishedDate} />}
+            </span>
           </div>
 
           {/* Title */}
-          <PostLink
-            post={post}
-            isTitleLink
-            className="text-lg font-bold text-foreground hover:text-primary transition-colors line-clamp-2 mb-2 leading-tight"
-            instanceId={instanceId}
-          >
-            {post.title}
-          </PostLink>
+          <div className="flex items-start gap-1.5 mb-1">
+            <PostLink
+              post={post}
+              isTitleLink
+              className="text-[15px] font-semibold text-foreground hover:text-primary transition-colors leading-snug line-clamp-2"
+              instanceId={instanceId}
+            >
+              {post.title}
+            </PostLink>
+            {isExternal && (
+              <ExternalLinkIcon className="h-3.5 w-3.5 text-muted-foreground/40 flex-shrink-0 mt-0.5" />
+            )}
+          </div>
 
-          {/* Body */}
+          {/* Body preview */}
           {post.body && (
-            <div className="text-sm text-muted-foreground/90 mb-3 line-clamp-3 leading-relaxed">
+            <div className="text-xs text-muted-foreground/70 line-clamp-2 leading-relaxed mb-1.5">
               {parse(sanitizer(post.body))}
             </div>
           )}
@@ -114,49 +118,21 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
               isVideo={post.isVideo}
               thumbnailUrl={post.thumbnailUrl}
               alt={post.title || "Post media"}
-              className="rounded-lg mb-3 max-w-full shadow-md"
+              className="rounded-lg mb-2 max-w-full"
+              toggleExpand={toggleExpand}
             />
           )}
 
-          {/* Actions Bar */}
-          <div className="flex items-center gap-2">
-            {post.score !== undefined && (
-              <div className="flex items-center rounded-lg bg-muted/60 border border-border/40 px-2 py-1 hover:bg-muted/80 transition-colors">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 hover:text-orange-500 hover:bg-orange-500/10"
-                  disabled={true}
-                >
-                  <ArrowUpIcon className="h-4 w-4" />
-                </Button>
-                <span className="px-2 font-bold text-sm min-w-[3ch] text-center">
-                  {numberFormatter.format(post.score)}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 hover:text-blue-500 hover:bg-blue-500/10"
-                  disabled={true}
-                >
-                  <ArrowDownIcon className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
-
+          {/* Actions */}
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
             {post.numOfComments !== undefined && (
               <PostLink
                 post={post}
-                className={buttonVariants({
-                  variant: "ghost",
-                  size: "sm"
-                }) + " h-8 px-3 py-2 rounded-lg border border-border/40 hover:bg-muted/60 hover:border-primary/30"}
+                className="flex items-center gap-1 hover:text-primary transition-colors font-medium"
                 instanceId={instanceId}
               >
-                <MessageCircleIcon className="h-4 w-4" />
-                <span className="ml-1.5 text-sm font-semibold">
-                  {numberFormatter.format(post.numOfComments)}
-                </span>
+                <MessageCircleIcon className="h-3.5 w-3.5" />
+                <span>{numberFormatter.format(post.numOfComments)} comments</span>
               </PostLink>
             )}
 
@@ -166,11 +142,24 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
                 item={post}
                 pluginId={post.pluginId}
                 size="sm"
-                className="h-8 w-8 border border-border/40 hover:border-primary/30"
+                className="h-6 w-6 text-muted-foreground hover:text-primary"
               />
             )}
           </div>
         </div>
+
+        {/* Thumbnail */}
+        {hasThumbnail && (
+          <div className="flex-shrink-0 p-2.5 pl-0">
+            <div className="rounded-md size-16 sm:size-[72px] bg-muted/40 overflow-hidden ring-1 ring-border/30">
+              <ImageThumbnail
+                url={post.url}
+                thumbnailUrl={post.thumbnailUrl}
+                toggleExpand={toggleExpand}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
