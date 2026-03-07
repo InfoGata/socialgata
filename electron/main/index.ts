@@ -40,6 +40,10 @@ function createWindow(): void {
   });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
+    // Allow about:blank popups (used for OAuth login flow)
+    if (details.url === "about:blank") {
+      return { action: "allow" };
+    }
     shell.openExternal(details.url);
     return { action: "deny" };
   });
