@@ -41,17 +41,11 @@ npm install
 ### Development
 
 ```bash
-# Start development server with CORS proxy (recommended)
+# Start development server
 npm run dev
-
-# Or start Vite dev server only
-npm start
-
-# Run CORS proxy server separately
-npm run cors-server
 ```
 
-The app will be available at `http://localhost:3000` with the CORS proxy running on port 8085.
+The app will be available at `http://localhost:3000`.
 
 ### Building for Production
 
@@ -84,13 +78,11 @@ src/
 
 ## Available Scripts
 
-- `npm run dev` - Start development server with CORS proxy (Vite on port 3000, CORS proxy on port 8085)
-- `npm start` - Start Vite dev server only (port 3000)
+- `npm run dev` - Start Vite development server (port 3000)
 - `npm run build` - Build for production
 - `npm run lint` - Run ESLint
 - `npm test` - Run test suite
 - `npm run preview` - Preview production build
-- `npm run cors-server` - Run CORS proxy server
 
 ## Contributing
 
