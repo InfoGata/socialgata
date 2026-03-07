@@ -1,5 +1,4 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
 import { defaultPlugins } from "../../default-plugins";
 import { PluginDescription } from "../../types";
 import { usePlugins } from "../../hooks/usePlugins";
@@ -14,7 +13,6 @@ import PluginCard from "./PluginCard";
 import { useNavigate } from "@tanstack/react-router";
 
 const PluginCards: React.FC = () => {
-  const { t } = useTranslation("plugins");
   const { plugins, addPlugin, pluginsLoaded } = usePlugins();
   const [backdropOpen, setBackdropOpen] = React.useState(false);
   const navigate = useNavigate();
@@ -46,17 +44,14 @@ const PluginCards: React.FC = () => {
       <PluginCard addPlugin={onAddPlugin} plugin={dp} key={dp.id} />
     ));
 
+  if (pluginCards.length === 0) return null;
+
   return (
     <>
-      {pluginCards.length > 0 && (
-        <div className="space-y-2">
-          <Spinner open={backdropOpen} />
-          <h2 className="text-2xl font-bold">{t("availablePlugins")}</h2>
-          {pluginsLoaded && (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 animate-in fade-in">
-              {pluginCards}
-            </div>
-          )}
+      <Spinner open={backdropOpen} />
+      {pluginsLoaded && (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 animate-in fade-in">
+          {pluginCards}
         </div>
       )}
     </>

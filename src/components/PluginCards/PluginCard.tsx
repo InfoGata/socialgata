@@ -2,12 +2,12 @@ import { PluginDescription } from "@/types";
 import {
   Card,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "../ui/card";
 import { Button } from "../ui/button";
 import { useTranslation } from "react-i18next";
+import { Plus } from "lucide-react";
 
 type Props = {
   plugin: PluginDescription;
@@ -22,14 +22,21 @@ const PluginCard = (props: Props) => {
   const { t } = useTranslation("plugins");
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl">{plugin.name}</CardTitle>
-        <CardDescription>{plugin.description}</CardDescription>
+    <Card className="flex flex-col justify-between transition-colors hover:border-primary/30">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-base">{plugin.name}</CardTitle>
+        {plugin.description && (
+          <CardDescription className="text-sm mt-1">
+            {plugin.description}
+          </CardDescription>
+        )}
       </CardHeader>
-      <CardFooter>
-        <Button onClick={onClickAdd}>{t("addPlugin")}</Button>
-      </CardFooter>
+      <div className="px-6 pb-4">
+        <Button size="sm" onClick={onClickAdd} className="w-full">
+          <Plus className="h-4 w-4 mr-1.5" />
+          {t("addPlugin")}
+        </Button>
+      </div>
     </Card>
   );
 };
