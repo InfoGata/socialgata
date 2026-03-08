@@ -42,13 +42,13 @@ export const Index: React.FC = () => {
           <p className="text-sm text-muted-foreground max-w-md mb-6">
             Aggregate your social media feeds in one place. Install plugins below to get started, or visit the plugins page.
           </p>
-          <Link
+          <button
             className={cn(buttonVariants({ variant: "default" }))}
-            to="/plugins"
+            onClick={() => document.getElementById("discover-plugins")?.scrollIntoView({ behavior: "smooth" })}
           >
             <Puzzle className="h-4 w-4 mr-1.5" />
             Browse Plugins
-          </Link>
+          </button>
         </section>
       )}
 
@@ -67,7 +67,7 @@ const DiscoverSection: React.FC = () => {
   if (hasAllPlugins) return null;
 
   return (
-    <section className="space-y-4">
+    <section id="discover-plugins" className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Puzzle className="h-5 w-5 text-muted-foreground" />
