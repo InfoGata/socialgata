@@ -55,8 +55,20 @@ const platformConfig = {
 const PluginContainer: React.FC<PluginContainerProps> = (props) => {
   const { plugin, deletePlugin } = props;
   const [alertOpen, setAlertOpen] = React.useState(false);
+  const [hasInstances, setHasInstances] = React.useState(false);
   const { t } = useTranslation("plugins");
   const { hasLogin, isLoggedIn, login, logout } = usePluginLogin(plugin);
+
+  React.useEffect(() => {
+    const getInstances = async () => {
+      if (plugin && await plugin.hasDefined.onGetInstances()) {
+        setHasInstances(true);
+      } else {
+        setHasInstances(false);
+      }
+    };
+    getInstances();
+  }, [plugin]);
 
   const onDelete = async () => {
     setAlertOpen(true);
@@ -167,7 +179,7 @@ const PluginContainer: React.FC<PluginContainerProps> = (props) => {
           </DropdownMenu>
         </div>
       </CardHeader>
-      {plugin.hasFeed && (
+      {plugin.hasFeed && !hasInstances && (
         <CardContent className="pt-0 pb-4">
           <Link
             className={cn(buttonVariants({ variant: "default", size: "sm" }))}
