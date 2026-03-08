@@ -1,5 +1,4 @@
 import Feed from '@/components/Feed';
-import { PageInfo } from '@/plugintypes';
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
 const InstanceFeed: React.FC = () => {
@@ -20,19 +19,23 @@ const InstanceFeed: React.FC = () => {
 
 export const Route = createFileRoute('/plugins/$pluginId/instances/$instanceId/feed')({
   component: InstanceFeed,
-  loaderDeps: ({search}) => ({pageInfo: search.pageInfo, feedTypeId: search.feedTypeId}),
-  loader: async ({ params, context }) => {
+  loaderDeps: ({search}) => ({page: search.page, feedTypeId: search.feedTypeId}),
+  loader: async ({ params, deps: { page, feedTypeId }, context }) => {
     const plugin = context.plugins.find(p => p.id === params.pluginId);
     if (plugin && await plugin.hasDefined.onGetFeed()) {
-      const response = await plugin.remote.onGetFeed({instanceId: params.instanceId});
+      const response = await plugin.remote.onGetFeed({
+        instanceId: params.instanceId,
+        pageInfo: { page },
+        feedTypeId,
+      });
       return response;
     } else {
       throw notFound();
     }
   },
-  validateSearch: (search: Record<string, unknown>): {pageInfo?: PageInfo, feedTypeId?: string} => {
-    const pageInfo = search as PageInfo | undefined;
+  validateSearch: (search: Record<string, unknown>): {page?: string | number, feedTypeId?: string} => {
+    const page = search.page as string | number | undefined;
     const feedTypeId = search.feedTypeId as string | undefined;
-    return {pageInfo, feedTypeId};
+    return { page, feedTypeId };
   }
 })
