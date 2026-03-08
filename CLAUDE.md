@@ -40,6 +40,11 @@ The app aggregates social media content through a dynamic plugin system.
 3. PluginServiceAdapter wraps plugin to match ServiceType interface
 4. Components use `usePlugins()` hook to access loaded plugins
 
+**Dev Plugin Auto-Reload**:
+- Plugins installed from `localhost` URLs are auto-polled every 3 seconds for changes
+- To develop a plugin locally: serve its folder (`npx serve . -p 8080 --cors`), install via URL (`http://localhost:8080/manifest.json`), then run the plugin build in watch mode
+- Changes are detected by comparing script content and auto-applied (logged to console as `[dev] Auto-updating plugin: ...`)
+
 **Routes** support plugin-based URLs: `/plugins/$pluginId/feed`
 - Platform-specific instances: `/plugins/$pluginId/instances/$instanceId/feed`
 
