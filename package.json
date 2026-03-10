@@ -13,7 +13,8 @@
     "build": "tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "android": "npm run build && cap run android"
   },
   "dependencies": {
     "@automerge/automerge": "^3.2.0",
@@ -21,6 +22,11 @@
     "@automerge/automerge-repo-network-broadcastchannel": "^2.5.0",
     "@automerge/automerge-repo-react-hooks": "^2.5.0",
     "@automerge/automerge-repo-storage-indexeddb": "^2.5.0",
+    "@capacitor/android": "^8.2.0",
+    "@capacitor/app": "^8.0.1",
+    "@capacitor/core": "^8.2.0",
+    "@capacitor/keyboard": "^8.0.1",
+    "@capacitor/status-bar": "^8.0.1",
     "@infogata/extension-components": "^0.1.0",
     "@infogata/shadcn-vite-theme-provider": "^0.1.0",
     "@radix-ui/react-accordion": "^1.2.12",
@@ -62,6 +68,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.2.0",
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@eslint/js": "^9.39.3",

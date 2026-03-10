@@ -4,6 +4,7 @@ import {
   createHashHistory,
 } from "@tanstack/react-router";
 import isElectron from "is-electron";
+import { Capacitor } from "@capacitor/core";
 import { routeTree } from "./routeTree.gen";
 import Spinner from "./components/Spinner";
 import { usePlugins } from "./hooks/usePlugins";
@@ -19,7 +20,9 @@ const router = createRouter({
   context: {
     plugins: undefined!
   },
-  ...(isElectron() ? { history: createHashHistory() } : {}),
+  ...(isElectron() || Capacitor.isNativePlatform()
+    ? { history: createHashHistory() }
+    : {}),
 });
 export type RouterType = typeof router;
 
