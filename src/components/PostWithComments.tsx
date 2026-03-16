@@ -6,6 +6,7 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { usePlugins } from "@/hooks/usePlugins";
 import { MessageCircleIcon, Users2Icon } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { ImageboardPostsProvider } from "@/contexts/ImageboardPostsContext";
 
 interface Props {
@@ -52,7 +53,17 @@ const PostWithComments: React.FC<Props> = (props) => {
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Users2Icon className="h-4 w-4" />
-              <span>Community: <span className="font-medium text-foreground">{data.community.name}</span></span>
+              <span>Community: <Link
+                to={data.community.instanceId
+                  ? "/plugins/$pluginId/instances/$instanceId/community/$apiId"
+                  : "/plugins/$pluginId/community/$apiId"}
+                className="font-medium text-foreground hover:text-primary transition-colors"
+                params={{
+                  pluginId: pluginId || "",
+                  instanceId: data.community.instanceId || "",
+                  apiId: data.community.apiId,
+                }}
+              >{data.community.name}</Link></span>
             </div>
           </CardHeader>
         </Card>
