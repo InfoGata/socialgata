@@ -10,6 +10,7 @@ import DOMPurify from "dompurify";
 import ImageThumbnail from "./ImageThumbnail";
 import ExpandedMedia from "./ExpandedMedia";
 import { FavoriteButton } from "./FavoriteButton";
+import { createImageboardParseOptions } from "./ImageboardQuoteLink";
 
 type Props = {
   post: Post;
@@ -18,6 +19,10 @@ type Props = {
 
 const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
   const [expand, setExpand] = React.useState(false);
+  const parseOptions = React.useMemo(
+    () => createImageboardParseOptions(post.pluginId || "", post.communityApiId, instanceId),
+    [post.pluginId, post.communityApiId, instanceId],
+  );
   const toggleExpand = () => {
     setExpand(!expand);
   };
@@ -25,7 +30,7 @@ const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
   const sanitizer = DOMPurify.sanitize;
 
   return (
-    <div className="group relative bg-card rounded-lg border hover:border-primary/50 transition-all duration-200">
+    <div className="group relative bg-card rounded-lg border hover:border-primary/50 transition-all duration-200" data-post-number={post.number}>
       <div className="p-3">
         {/* Expanded Media - Full Width Above Content */}
         {expand && post.url && post.thumbnailUrl && (
@@ -111,7 +116,7 @@ const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
             {post.body && (
               <div className="text-sm text-foreground mb-2 line-clamp-4">
                 <div className="whitespace-pre-wrap break-words">
-                  {parse(sanitizer(post.body))}
+                  {parse(sanitizer(post.body), parseOptions)}
                 </div>
               </div>
             )}

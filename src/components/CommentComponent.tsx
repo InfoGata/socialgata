@@ -9,6 +9,7 @@ import ImageThumbnail from "./ImageThumbnail";
 import ExpandedMedia from "./ExpandedMedia";
 import ReactTimeago from "react-timeago";
 import { FavoriteButton } from "./FavoriteButton";
+import { createImageboardParseOptions } from "./ImageboardQuoteLink";
 
 type Props = {
   comment: Post;
@@ -24,11 +25,15 @@ const CommentComponent: React.FC<Props> = (props) => {
   const sanitizer = DOMPurify.sanitize;
 
   const clean = sanitizer(comment.body || "");
+  const imageboardParseOptions = React.useMemo(
+    () => createImageboardParseOptions(comment.pluginId || "", comment.communityApiId, comment.instanceId),
+    [comment.pluginId, comment.communityApiId, comment.instanceId],
+  );
 
   // Imageboard-style rendering
   if (platformType === "imageboard") {
     return (
-      <div className="border-l-2 border-muted pl-4 my-4">
+      <div className="border-l-2 border-muted pl-4 my-4" data-post-number={comment.number}>
         {/* Expanded Media - Full Width Above Content */}
         {expand && comment.url && comment.thumbnailUrl && (
           <div className="mb-3">
@@ -92,7 +97,7 @@ const CommentComponent: React.FC<Props> = (props) => {
             {comment.body && (
               <div className="text-sm text-foreground">
                 <div className="whitespace-pre-wrap break-words">
-                  {parse(clean)}
+                  {parse(clean, imageboardParseOptions)}
                 </div>
               </div>
             )}

@@ -6,6 +6,7 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { usePlugins } from "@/hooks/usePlugins";
 import { MessageCircleIcon, Users2Icon } from "lucide-react";
+import { ImageboardPostsProvider } from "@/contexts/ImageboardPostsContext";
 
 interface Props {
   data: GetCommentsResponse;
@@ -33,10 +34,18 @@ const PostWithComments: React.FC<Props> = (props) => {
   }
 
 
-  return (
+  const allPosts = React.useMemo(() => {
+    const posts: Post[] = [];
+    if (data.post) posts.push(data.post);
+    posts.push(...data.items);
+    if (replies) posts.push(...replies);
+    return posts;
+  }, [data.post, data.items, replies]);
+
+  const content = (
     <div className="max-w-4xl mx-auto space-y-6 p-4">
       <title>{data.post?.title}</title>
-      
+
       {/* Community Header */}
       {data.community && (
         <Card className="bg-muted/30">
@@ -80,7 +89,7 @@ const PostWithComments: React.FC<Props> = (props) => {
       {/* Load More Replies */}
       {data.post?.moreRepliesId && !replies && (
         <div className="flex justify-center pt-4">
-          <Button 
+          <Button
             onClick={getReplies}
             variant="outline"
             className="min-w-[200px]"
@@ -107,6 +116,16 @@ const PostWithComments: React.FC<Props> = (props) => {
       )}
     </div>
   );
+
+  if (platformType === "imageboard") {
+    return (
+      <ImageboardPostsProvider posts={allPosts}>
+        {content}
+      </ImageboardPostsProvider>
+    );
+  }
+
+  return content;
 };
 
 export default PostWithComments;
