@@ -5,7 +5,7 @@ import React from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { usePlugins } from "@/hooks/usePlugins";
-import { MessageCircleIcon, Users2Icon } from "lucide-react";
+import { ExternalLinkIcon, MessageCircleIcon, Users2Icon } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { ImageboardPostsProvider } from "@/contexts/ImageboardPostsContext";
 
@@ -75,6 +75,19 @@ const PostWithComments: React.FC<Props> = (props) => {
           <CardContent className="p-0">
             <PostComponent post={data.post} platformType={platformType} showFullPost={true} />
           </CardContent>
+          {data.post.originalUrl && (
+            <CardContent className="pt-0 pb-3 px-4">
+              <a
+                href={data.post.originalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                <ExternalLinkIcon className="h-4 w-4" />
+                <span>View original</span>
+              </a>
+            </CardContent>
+          )}
         </Card>
       )}
 

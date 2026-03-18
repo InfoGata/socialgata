@@ -1,7 +1,7 @@
 import { Post } from "@/plugintypes";
 import { Link } from "@tanstack/react-router";
 import { buttonVariants } from "./ui/button";
-import { MessageCircleIcon } from "lucide-react";
+import { MessageCircleIcon, ExternalLinkIcon } from "lucide-react";
 import ReactTimeago from "react-timeago";
 import PostLink from "./PostLink";
 import React from "react";
@@ -139,6 +139,23 @@ const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
                     {numberFormatter.format(post.numOfComments)} replies
                   </span>
                 </PostLink>
+              )}
+
+              {post.originalUrl && (
+                <a
+                  href={post.originalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={
+                    buttonVariants({
+                      variant: "ghost",
+                      size: "sm",
+                    }) + " h-7 px-2 py-1"
+                  }
+                >
+                  <ExternalLinkIcon className="h-3.5 w-3.5" />
+                  <span className="ml-1 text-xs font-medium">original</span>
+                </a>
               )}
 
               {post.pluginId && post.apiId && (

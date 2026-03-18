@@ -2,7 +2,7 @@ import { Post } from "@/plugintypes";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Link } from "@tanstack/react-router";
 import { Button } from "./ui/button";
-import { MessageCircleIcon, Heart } from "lucide-react";
+import { MessageCircleIcon, Heart, ExternalLinkIcon } from "lucide-react";
 import ReactTimeago from "react-timeago";
 import PostLink from "./PostLink";
 import React from "react";
@@ -123,6 +123,18 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
                     {numberFormatter.format(post.score)}
                   </span>
                 </div>
+              )}
+
+              {post.originalUrl && (
+                <a
+                  href={post.originalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 hover:text-primary transition-colors group/action"
+                >
+                  <ExternalLinkIcon className="h-4 w-4" />
+                  <span className="text-xs font-medium">original</span>
+                </a>
               )}
 
               {post.pluginId && post.apiId && (

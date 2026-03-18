@@ -136,6 +136,18 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
               </PostLink>
             )}
 
+            {post.originalUrl && (
+              <a
+                href={post.originalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 hover:text-primary transition-colors font-medium"
+              >
+                <ExternalLinkIcon className="h-3.5 w-3.5" />
+                <span>original</span>
+              </a>
+            )}
+
             {post.pluginId && post.apiId && (
               <FavoriteButton
                 type="post"
