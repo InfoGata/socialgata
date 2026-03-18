@@ -46,7 +46,7 @@ import { hasExtension } from "@/utils";
 
 interface ApplicationPluginInterface extends PluginInterface {
   networkRequest(input: string, init?: RequestInit): Promise<NetworkRequest>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   postUiMessage(message: any): Promise<void>;
   getCorsProxy(): Promise<string | undefined>;
   isLoggedIn(): Promise<boolean>;
@@ -69,7 +69,7 @@ export interface PluginMethodInterface {
   onLoginCallback(request: LoginCallbackRequest): Promise<void>;
   onLogout(): Promise<void>;
   onIsLoggedIn(): Promise<boolean>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   onUiMessage(message: any): Promise<void>;
   onPostLogin(): Promise<void>;
   onPostLogout(): Promise<void>;
@@ -82,7 +82,7 @@ export interface PluginMethodInterface {
 
 export interface PluginMessage {
   pluginId?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   message: any;
 }
 
@@ -184,7 +184,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
           };
           return result;
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         postUiMessage: async (message: any) => {
           setPluginMessage({ pluginId: plugin.id, message });
         },

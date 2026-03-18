@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { ExtensionProvider } from "@/contexts/ExtensionContext";
 import { PluginsProvider } from "@/contexts/PluginsContext";
 import { ThemeProvider } from "@infogata/shadcn-vite-theme-provider";

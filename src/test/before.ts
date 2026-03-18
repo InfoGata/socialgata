@@ -1,6 +1,6 @@
 Object.defineProperty(window, "matchMedia", {
   writable: true,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   value: (query: any) => ({
     matches: false,
     media: query,
