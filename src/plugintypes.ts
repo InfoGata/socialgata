@@ -73,6 +73,7 @@ export interface Community {
   name: string;
   instanceId?: string;
   description?: string;
+  originalUrl?: string;
 }
 
 export interface Instance {

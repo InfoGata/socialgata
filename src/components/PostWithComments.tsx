@@ -64,6 +64,16 @@ const PostWithComments: React.FC<Props> = (props) => {
                   apiId: data.community.apiId,
                 }}
               >{data.community.name}</Link></span>
+              {data.community.originalUrl && (
+                <a
+                  href={data.community.originalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <ExternalLinkIcon className="h-3.5 w-3.5" />
+                </a>
+              )}
             </div>
           </CardHeader>
         </Card>

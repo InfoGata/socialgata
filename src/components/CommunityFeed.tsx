@@ -12,6 +12,7 @@ import { PageInfo, Post, Community } from "@/plugintypes";
 import React from "react";
 import { FavoriteButton } from "./FavoriteButton";
 import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { ExternalLinkIcon } from "lucide-react";
 import BrowseCommunitiesButton from "./BrowseCommunitiesButton";
 
 type CommunityFeedProps = {
@@ -44,6 +45,17 @@ const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
                   <CardTitle className="text-2xl">{community.name}</CardTitle>
                   {community.description && (
                     <CardDescription className="mt-2">{community.description}</CardDescription>
+                  )}
+                  {community.originalUrl && (
+                    <a
+                      href={community.originalUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mt-2"
+                    >
+                      <ExternalLinkIcon className="h-4 w-4" />
+                      <span>View original</span>
+                    </a>
                   )}
                 </div>
                 <FavoriteButton
