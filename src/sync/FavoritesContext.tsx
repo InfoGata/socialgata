@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '@/store/store';
 import { usePlugins } from '@/hooks/usePlugins';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const FavoritesContext = createContext<FavoritesContextValue | null>(null);
 
 /**

@@ -20,7 +20,11 @@ export default tseslint.config(
     rules: {
       "react-refresh/only-export-components": [
         "warn",
-        { allowConstantExport: true },
+        {
+          allowConstantExport: true,
+          extraHOCs: ["createFileRoute", "createRootRoute", "createLazyFileRoute", "createRootRouteWithContext"],
+
+        },
       ],
     },
   }

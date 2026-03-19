@@ -86,6 +86,7 @@ export interface PluginMessage {
   message: any;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export class PluginFrameContainer extends PluginFrame<PluginMethodInterface> {
   name?: string;
   id?: string;
@@ -113,6 +114,7 @@ export interface PluginContextInterface {
   reloadPlugins: () => Promise<void>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const PluginsContext = React.createContext<PluginContextInterface | undefined>(undefined);
 
 export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {

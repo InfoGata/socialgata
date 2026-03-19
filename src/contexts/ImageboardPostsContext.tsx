@@ -51,6 +51,7 @@ export const ImageboardPostsProvider: React.FC<{
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useImageboardPosts() {
   return React.useContext(ImageboardPostsContext);
 }
