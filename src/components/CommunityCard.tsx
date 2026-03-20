@@ -1,6 +1,7 @@
 import { Community } from "@/plugintypes";
 import { Card, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import { Link } from "@tanstack/react-router";
+import { ExternalLinkIcon } from "lucide-react";
 import { FavoriteButton } from "./FavoriteButton";
 
 interface CommunityCardProps {
@@ -30,6 +31,17 @@ const CommunityCard: React.FC<CommunityCardProps> = (props) => {
             </CardTitle>
             {community.description && (
               <CardDescription className="mt-2">{community.description}</CardDescription>
+            )}
+            {community.originalUrl && (
+              <a
+                href={community.originalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mt-2"
+              >
+                <ExternalLinkIcon className="h-4 w-4" />
+                <span>View original</span>
+              </a>
             )}
           </div>
           <FavoriteButton
