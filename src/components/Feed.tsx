@@ -26,6 +26,7 @@ const Feed: React.FC<FeedProps> = (props) => {
 
   return (
     <div className="min-h-screen bg-background">
+      {plugin?.name && <title>{`${plugin.name} - SocialGata`}</title>}
       <div className="max-w-3xl mx-auto px-3 sm:px-4 py-4">
         {/* Header */}
         <div className="mb-4">
