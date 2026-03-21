@@ -130,7 +130,7 @@ const CommentComponent: React.FC<Props> = (props) => {
   // Forum/default style rendering
   return (
     <div className="border-l-2 border-muted pl-4 my-4">
-      <div className="text-sm text-muted-foreground mb-2">
+      <div className="text-sm text-muted-foreground mb-2 flex items-center gap-1.5">
         <Link
           to="/plugins/$pluginId/user/$apiId"
           params={{
@@ -140,6 +140,12 @@ const CommentComponent: React.FC<Props> = (props) => {
         >
           {comment.authorName}
         </Link>
+        {comment.publishedDate && (
+          <>
+            <span>•</span>
+            <ReactTimeago date={comment.publishedDate} />
+          </>
+        )}
       </div>
       <div>
         {parse(clean)}
