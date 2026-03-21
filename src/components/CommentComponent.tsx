@@ -1,7 +1,7 @@
 import { Post } from "@/plugintypes";
 import { Link } from "@tanstack/react-router";
 import { Button } from "./ui/button";
-import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
+import { ArrowDownIcon, ArrowUpIcon, ExternalLinkIcon } from "lucide-react";
 import parse from 'html-react-parser';
 import DOMPurify from "dompurify";
 import React from "react";
@@ -102,16 +102,28 @@ const CommentComponent: React.FC<Props> = (props) => {
               </div>
             )}
 
-            {/* Favorite Button */}
-            {comment.pluginId && comment.apiId && (
-              <div className="mt-2">
-                <FavoriteButton
-                  type="comment"
-                  item={comment}
-                  pluginId={comment.pluginId}
-                  size="sm"
-                  className="h-7 w-7"
-                />
+            {/* Favorite Button & Original Link */}
+            {(comment.pluginId && comment.apiId || comment.originalUrl) && (
+              <div className="mt-2 flex items-center gap-2">
+                {comment.pluginId && comment.apiId && (
+                  <FavoriteButton
+                    type="comment"
+                    item={comment}
+                    pluginId={comment.pluginId}
+                    size="sm"
+                    className="h-7 w-7"
+                  />
+                )}
+                {comment.originalUrl && (
+                  <a
+                    href={comment.originalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <ExternalLinkIcon className="h-3.5 w-3.5" />
+                  </a>
+                )}
               </div>
             )}
           </div>
@@ -171,6 +183,17 @@ const CommentComponent: React.FC<Props> = (props) => {
             size="sm"
             className="h-7 w-7"
           />
+        )}
+
+        {comment.originalUrl && (
+          <a
+            href={comment.originalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+          >
+            <ExternalLinkIcon className="h-3.5 w-3.5" />
+          </a>
         )}
       </div>
       <div className="ml-2">
