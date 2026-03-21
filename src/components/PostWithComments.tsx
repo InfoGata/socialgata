@@ -127,7 +127,7 @@ const PostWithComments: React.FC<Props> = (props) => {
             <div className="flex items-center gap-2">
               <MessageCircleIcon className="h-5 w-5 text-muted-foreground" />
               <h3 className="text-lg font-semibold">
-                Comments ({data.items.length})
+                Comments
               </h3>
             </div>
           </CardHeader>
