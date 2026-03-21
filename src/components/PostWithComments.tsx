@@ -133,7 +133,7 @@ const PostWithComments: React.FC<Props> = (props) => {
           </CardHeader>
           <CardContent className="space-y-4 pt-0">
             {data.items.map((d) => (
-              <CommentComponent key={d.apiId} comment={d} platformType={platformType} />
+              <CommentComponent key={d.apiId} comment={d} platformType={platformType} routePluginId={pluginId} />
             ))}
           </CardContent>
         </Card>
@@ -162,7 +162,7 @@ const PostWithComments: React.FC<Props> = (props) => {
           </CardHeader>
           <CardContent className="space-y-4 pt-0">
             {replies.map((r) => (
-              <CommentComponent key={r.apiId} comment={r} platformType={platformType} />
+              <CommentComponent key={r.apiId} comment={r} platformType={platformType} routePluginId={pluginId} />
             ))}
           </CardContent>
         </Card>
