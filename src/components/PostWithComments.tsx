@@ -5,7 +5,7 @@ import React from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { usePlugins } from "@/hooks/usePlugins";
-import { ExternalLinkIcon, MessageCircleIcon, Users2Icon } from "lucide-react";
+import { ArrowLeftIcon, ExternalLinkIcon, MessageCircleIcon, Users2Icon } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { ImageboardPostsProvider } from "@/contexts/ImageboardPostsContext";
 
@@ -17,9 +17,16 @@ interface Props {
 const PostWithComments: React.FC<Props> = (props) => {
   const { data, pluginId } = props;
   const [replies, setReplies] = React.useState<Post[] | null>(null);
+  const [hasFeed, setHasFeed] = React.useState(false);
   const { plugins } = usePlugins();
   const plugin = pluginId ? plugins.find(p => p.id === pluginId) : null;
   const platformType = plugin?.platformType || "forum";
+
+  React.useEffect(() => {
+    if (plugin) {
+      plugin.hasDefined.onGetFeed().then(setHasFeed);
+    }
+  }, [plugin]);
 
   const getReplies = async () => {
     if (!pluginId || !data.post?.moreRepliesId || !plugin) return;
@@ -46,6 +53,18 @@ const PostWithComments: React.FC<Props> = (props) => {
   const content = (
     <div className="max-w-4xl mx-auto space-y-6 p-4">
       <title>{data.post?.title}</title>
+
+      {/* Feed Link */}
+      {pluginId && hasFeed && (
+        <Link
+          to="/plugins/$pluginId/feed"
+          params={{ pluginId }}
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+        >
+          <ArrowLeftIcon className="h-4 w-4" />
+          <span>{plugin?.name || "Feed"}</span>
+        </Link>
+      )}
 
       {/* Community Header */}
       {data.community && (
