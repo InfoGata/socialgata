@@ -19,7 +19,7 @@ const CommunityCard: React.FC<CommunityCardProps> = (props) => {
             <CardTitle>
               {community.instanceId ? (
                 <Link
-                  to="/plugins/$pluginId/instances/$instanceId/community/$apiId/"
+                  to="/plugins/$pluginId/instances/$instanceId/community/$apiId"
                   params={{
                     pluginId,
                     instanceId: community.instanceId,
@@ -31,7 +31,7 @@ const CommunityCard: React.FC<CommunityCardProps> = (props) => {
                 </Link>
               ) : (
                 <Link
-                  to="/plugins/$pluginId/community/$apiId/"
+                  to="/plugins/$pluginId/community/$apiId"
                   params={{
                     pluginId,
                     apiId: community.apiId,
