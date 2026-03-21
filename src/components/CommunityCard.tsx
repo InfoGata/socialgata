@@ -17,17 +17,30 @@ const CommunityCard: React.FC<CommunityCardProps> = (props) => {
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             <CardTitle>
-              <Link
-                to={`/plugins/$pluginId/instances/$instanceId/community/$apiId`}
-                params={{
-                  pluginId,
-                  instanceId: community.instanceId || "",
-                  apiId: community.apiId
-                }}
-                className="hover:underline"
-              >
-                {community.name}
-              </Link>
+              {community.instanceId ? (
+                <Link
+                  to="/plugins/$pluginId/instances/$instanceId/community/$apiId/"
+                  params={{
+                    pluginId,
+                    instanceId: community.instanceId,
+                    apiId: community.apiId,
+                  }}
+                  className="hover:underline"
+                >
+                  {community.name}
+                </Link>
+              ) : (
+                <Link
+                  to="/plugins/$pluginId/community/$apiId/"
+                  params={{
+                    pluginId,
+                    apiId: community.apiId,
+                  }}
+                  className="hover:underline"
+                >
+                  {community.name}
+                </Link>
+              )}
             </CardTitle>
             {community.description && (
               <CardDescription className="mt-2">{community.description}</CardDescription>

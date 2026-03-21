@@ -25,21 +25,32 @@ const BrowseCommunitiesButton: React.FC<BrowseCommunitiesButtonProps> = ({ plugi
     checkCommunities();
   }, [plugin]);
 
-  if (!instanceId || !hasCommunities) {
+  if (!hasCommunities) {
     return null;
   }
 
   return (
     <div className="mb-3">
       <Button variant="outline" size="sm" asChild>
-        <Link
-          to="/plugins/$pluginId/instances/$instanceId/communities"
-          params={{ pluginId, instanceId }}
-          className="flex items-center gap-2"
-        >
-          <LayoutGrid className="w-4 h-4" />
-          <span>Browse Communities</span>
-        </Link>
+        {instanceId ? (
+          <Link
+            to="/plugins/$pluginId/instances/$instanceId/communities"
+            params={{ pluginId, instanceId }}
+            className="flex items-center gap-2"
+          >
+            <LayoutGrid className="w-4 h-4" />
+            <span>Browse Communities</span>
+          </Link>
+        ) : (
+          <Link
+            to="/plugins/$pluginId/communities"
+            params={{ pluginId }}
+            className="flex items-center gap-2"
+          >
+            <LayoutGrid className="w-4 h-4" />
+            <span>Browse Communities</span>
+          </Link>
+        )}
       </Button>
     </div>
   );

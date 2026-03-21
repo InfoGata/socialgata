@@ -16,7 +16,7 @@ const Communities: React.FC = () => {
 
   if (!data.items || data.items.length === 0) {
     return <div className="text-center text-muted-foreground p-8">
-      No communities found for this instance.
+      No communities found.
     </div>
   }
 
@@ -63,14 +63,13 @@ type CommunitiesSearch = {
   page?: string | number;
 }
 
-export const Route = createFileRoute('/plugins/$pluginId/instances/$instanceId/communities')({
+export const Route = createFileRoute('/plugins/$pluginId/communities')({
   component: Communities,
   loaderDeps: ({ search }) => ({ page: search.page }),
   loader: async ({ params, deps: { page }, context }) => {
     const plugin = context.plugins.find(p => p.id === params.pluginId);
     if (plugin && await plugin.hasDefined.onGetCommunities()) {
       const response = await plugin.remote.onGetCommunities({
-        instanceId: params.instanceId,
         pageInfo: { page },
       });
       return response;
