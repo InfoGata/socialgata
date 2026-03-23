@@ -30,7 +30,7 @@ const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
   const sanitizer = DOMPurify.sanitize;
 
   return (
-    <div className="group relative bg-card rounded-lg border hover:border-primary/50 transition-all duration-200" data-post-number={post.number}>
+    <div className="group relative bg-card rounded-lg border hover:border-primary/50 transition-all duration-200 overflow-hidden" data-post-number={post.number}>
       <div className="p-3">
         {/* Expanded Media - Full Width Above Content */}
         {expand && post.url && post.thumbnailUrl && (
@@ -114,8 +114,8 @@ const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
 
             {/* Body */}
             {post.body && (
-              <div className="text-sm text-foreground mb-2 line-clamp-4">
-                <div className="whitespace-pre-wrap break-words">
+              <div className="text-sm text-foreground mb-2 overflow-hidden">
+                <div className="whitespace-pre-wrap break-words line-clamp-4">
                   {parse(sanitizer(post.body), parseOptions)}
                 </div>
               </div>

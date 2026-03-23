@@ -73,7 +73,7 @@ const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
         {/* Posts Section */}
         <div className="space-y-2">
           {/* Posts Grid */}
-          <div className="grid gap-2">
+          <div className="space-y-2">
             {posts.map((p, index) => (
               <div
                 key={p.apiId}
