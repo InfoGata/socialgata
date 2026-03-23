@@ -10,12 +10,9 @@ import {
 import { isCorsDisabled } from "../../utils";
 import Spinner from "../Spinner";
 import PluginCard from "./PluginCard";
-import { useNavigate } from "@tanstack/react-router";
-
 const PluginCards: React.FC = () => {
   const { plugins, addPlugin, pluginsLoaded } = usePlugins();
   const [backdropOpen, setBackdropOpen] = React.useState(false);
-  const navigate = useNavigate();
 
   const onAddPlugin = async (description: PluginDescription) => {
     if (!description.url) return;
@@ -29,7 +26,6 @@ const PluginCards: React.FC = () => {
         plugin.id = generatePluginId();
       }
       await addPlugin(plugin);
-      navigate({ to: "/plugins" });
     }
     setBackdropOpen(false);
   };
