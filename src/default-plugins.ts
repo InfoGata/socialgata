@@ -43,6 +43,7 @@ export const defaultPlugins: PluginDescription[] = [
     name: "Mastodon Plugin for SocialGata",
     description: "Browse Mastodon feeds, users, and trending topics",
     url: "https://cdn.jsdelivr.net/gh/InfoGata/mastodon-socialgata@latest/manifest.json",
+    requiresCorsDisabled: true
   },
   {
     id: "f7a3e9c2-4b8d-11ef-9e3a-0242ac130002",
