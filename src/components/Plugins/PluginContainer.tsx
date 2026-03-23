@@ -1,8 +1,7 @@
 import Alert from "@/components/Alert";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
   CardHeader,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -55,20 +54,8 @@ const platformConfig = {
 const PluginContainer: React.FC<PluginContainerProps> = (props) => {
   const { plugin, deletePlugin } = props;
   const [alertOpen, setAlertOpen] = React.useState(false);
-  const [hasInstances, setHasInstances] = React.useState(false);
   const { t } = useTranslation("plugins");
   const { hasLogin, isLoggedIn, login, logout } = usePluginLogin(plugin);
-
-  React.useEffect(() => {
-    const getInstances = async () => {
-      if (plugin && await plugin.hasDefined.onGetInstances()) {
-        setHasInstances(true);
-      } else {
-        setHasInstances(false);
-      }
-    };
-    getInstances();
-  }, [plugin]);
 
   const onDelete = async () => {
     setAlertOpen(true);
@@ -179,18 +166,7 @@ const PluginContainer: React.FC<PluginContainerProps> = (props) => {
           </DropdownMenu>
         </div>
       </CardHeader>
-      {plugin.hasFeed && !hasInstances && (
-        <CardContent className="pt-0 pb-4">
-          <Link
-            className={cn(buttonVariants({ variant: "default", size: "sm" }))}
-            to="/plugins/$pluginId/feed"
-            params={{ pluginId: plugin.id || "" }}
-          >
-            <Rss className="h-4 w-4 mr-1.5" />
-            {t("viewFeed")}
-          </Link>
-        </CardContent>
-      )}
+
       <Alert
         title={t("deletePlugin")}
         description={t("confirmDelete")}
