@@ -234,6 +234,10 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
             feed?.items.forEach((i) => (i.pluginId = plugin.id));
             return feed;
           },
+          onGetCommunity: (response: GetCommunityResponse) => {
+            response?.items.forEach((i) => (i.pluginId = plugin.id));
+            return response;
+          },
         },
         frameSrc: srcUrl,
         sandboxAttributes: ["allow-scripts", "allow-same-origin", "allow-popups"],

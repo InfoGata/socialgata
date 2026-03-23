@@ -64,11 +64,15 @@ const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
               {post.communityName && (
                 <>
                   <Link
-                    to="/plugins/$pluginId/community/$apiId"
+                    to={instanceId
+                      ? "/plugins/$pluginId/instances/$instanceId/community/$apiId"
+                      : "/plugins/$pluginId/community/$apiId"
+                    }
                     className="font-bold text-primary hover:underline"
                     params={{
                       pluginId: post.pluginId || "",
                       apiId: post.communityApiId || "",
+                      ...(instanceId ? { instanceId } : {}),
                     }}
                   >
                     {post.communityName}
