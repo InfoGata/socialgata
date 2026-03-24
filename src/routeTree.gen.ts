@@ -16,6 +16,7 @@ import { Route as DonateRouteImport } from './routes/donate'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PluginsIndexRouteImport } from './routes/plugins/index'
+import { Route as PSplatRouteImport } from './routes/p/$'
 import { Route as PluginsPluginIdIndexRouteImport } from './routes/plugins/$pluginId/index'
 import { Route as PluginsPluginIdOptionsRouteImport } from './routes/plugins/$pluginId/options'
 import { Route as PluginsPluginIdFeedRouteImport } from './routes/plugins/$pluginId/feed'
@@ -65,6 +66,11 @@ const IndexRoute = IndexRouteImport.update({
 const PluginsIndexRoute = PluginsIndexRouteImport.update({
   id: '/plugins/',
   path: '/plugins/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PSplatRoute = PSplatRouteImport.update({
+  id: '/p/$',
+  path: '/p/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PluginsPluginIdIndexRoute = PluginsPluginIdIndexRouteImport.update({
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/favorites': typeof FavoritesRoute
   '/privacy': typeof PrivacyRoute
   '/settings': typeof SettingsRoute
+  '/p/$': typeof PSplatRoute
   '/plugins/': typeof PluginsIndexRoute
   '/plugins/$pluginId/communities': typeof PluginsPluginIdCommunitiesRoute
   '/plugins/$pluginId/feed': typeof PluginsPluginIdFeedRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/favorites': typeof FavoritesRoute
   '/privacy': typeof PrivacyRoute
   '/settings': typeof SettingsRoute
+  '/p/$': typeof PSplatRoute
   '/plugins': typeof PluginsIndexRoute
   '/plugins/$pluginId/communities': typeof PluginsPluginIdCommunitiesRoute
   '/plugins/$pluginId/feed': typeof PluginsPluginIdFeedRoute
@@ -213,6 +221,7 @@ export interface FileRoutesById {
   '/favorites': typeof FavoritesRoute
   '/privacy': typeof PrivacyRoute
   '/settings': typeof SettingsRoute
+  '/p/$': typeof PSplatRoute
   '/plugins/': typeof PluginsIndexRoute
   '/plugins/$pluginId/communities': typeof PluginsPluginIdCommunitiesRoute
   '/plugins/$pluginId/feed': typeof PluginsPluginIdFeedRoute
@@ -239,6 +248,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/privacy'
     | '/settings'
+    | '/p/$'
     | '/plugins/'
     | '/plugins/$pluginId/communities'
     | '/plugins/$pluginId/feed'
@@ -263,6 +273,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/privacy'
     | '/settings'
+    | '/p/$'
     | '/plugins'
     | '/plugins/$pluginId/communities'
     | '/plugins/$pluginId/feed'
@@ -287,6 +298,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/privacy'
     | '/settings'
+    | '/p/$'
     | '/plugins/'
     | '/plugins/$pluginId/communities'
     | '/plugins/$pluginId/feed'
@@ -312,6 +324,7 @@ export interface RootRouteChildren {
   FavoritesRoute: typeof FavoritesRoute
   PrivacyRoute: typeof PrivacyRoute
   SettingsRoute: typeof SettingsRoute
+  PSplatRoute: typeof PSplatRoute
   PluginsIndexRoute: typeof PluginsIndexRoute
   PluginsPluginIdCommunitiesRoute: typeof PluginsPluginIdCommunitiesRoute
   PluginsPluginIdFeedRoute: typeof PluginsPluginIdFeedRoute
@@ -379,6 +392,13 @@ declare module '@tanstack/react-router' {
       path: '/plugins'
       fullPath: '/plugins/'
       preLoaderRoute: typeof PluginsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/p/$': {
+      id: '/p/$'
+      path: '/p/$'
+      fullPath: '/p/$'
+      preLoaderRoute: typeof PSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/plugins/$pluginId/': {
@@ -496,6 +516,7 @@ const rootRouteChildren: RootRouteChildren = {
   FavoritesRoute: FavoritesRoute,
   PrivacyRoute: PrivacyRoute,
   SettingsRoute: SettingsRoute,
+  PSplatRoute: PSplatRoute,
   PluginsIndexRoute: PluginsIndexRoute,
   PluginsPluginIdCommunitiesRoute: PluginsPluginIdCommunitiesRoute,
   PluginsPluginIdFeedRoute: PluginsPluginIdFeedRoute,
