@@ -36,12 +36,17 @@ import {
 } from "../plugintypes";
 import { Theme, useTheme } from "@infogata/shadcn-vite-theme-provider";
 import { NetworkRequest } from "../types";
+import semverGt from "semver/functions/gt";
+import semverValid from "semver/functions/parse";
 import {
+  getFileText,
   getFileTypeFromPluginUrl,
   getPlugin,
   getPluginUrl,
   isAuthorizedDomain,
 } from "../plugin-utils";
+import { Manifest } from "../plugintypes";
+import { useAppSelector } from "../store/hooks";
 import { hasExtension } from "@/utils";
 
 interface ApplicationPluginInterface extends PluginInterface {
@@ -120,6 +125,10 @@ export const PluginsContext = React.createContext<PluginContextInterface | undef
 export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
   const [pluginsLoaded, setPluginsLoaded] = React.useState(false);
   const [pluginsFailed, setPluginsFailed] = React.useState(false);
+  const hasUpdated = React.useRef(false);
+  const disableAutoUpdatePlugins = useAppSelector(
+    (state) => state.ui.disableAutoUpdatePlugins
+  );
   const [pluginFrames, setPluginFrames] = React.useState<PluginFrameContainer[]>([]);
   const [pluginMessage, setPluginMessage] = React.useState<PluginMessage>();
   const [pendingUpdatePlugin, setPendingUpdatePlugin] = React.useState<PluginInfo | null>(null);
@@ -419,6 +428,53 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
 
     return () => clearInterval(interval);
   }, [pluginsLoaded]);
+
+  // Auto-update plugins when newer versions are available
+  React.useEffect(() => {
+    const checkUpdate = async () => {
+      if (pluginsLoaded && !disableAutoUpdatePlugins && !hasUpdated.current) {
+        hasUpdated.current = true;
+        for (const p of pluginFrames) {
+          if (p.manifestUrl) {
+            try {
+              const fileType = getFileTypeFromPluginUrl(p.manifestUrl);
+              const manifestText = await getFileText(
+                fileType,
+                "manifest.json",
+                true
+              );
+              if (manifestText) {
+                const manifest = JSON.parse(manifestText) as Manifest;
+                if (
+                  manifest.version &&
+                  p.version &&
+                  semverValid(manifest.version) &&
+                  semverValid(p.version) &&
+                  semverGt(manifest.version, p.version)
+                ) {
+                  const newPlugin = await getPlugin(fileType);
+
+                  if (newPlugin && p.id) {
+                    newPlugin.id = p.id;
+                    newPlugin.manifestUrl = p.manifestUrl;
+                    await updatePlugin(newPlugin, p.id);
+                  }
+                }
+              }
+            } catch {
+              // Ignore update errors for individual plugins
+            }
+          }
+        }
+      }
+    };
+    checkUpdate();
+  }, [
+    pluginsLoaded,
+    pluginFrames,
+    disableAutoUpdatePlugins,
+    updatePlugin,
+  ]);
 
   const handleConfirmUpdate = React.useCallback(async () => {
     if (pendingUpdatePlugin?.id) {

@@ -12,6 +12,7 @@ interface CloudSyncSettings {
 interface UiState {
   isNavigationMenuOpen: boolean;
   cloudSync: CloudSyncSettings;
+  disableAutoUpdatePlugins: boolean;
 }
 
 const initialState: UiState = {
@@ -20,7 +21,8 @@ const initialState: UiState = {
     enabled: false,
     autoSync: true,
     syncIntervalSeconds: 30,
-  }
+  },
+  disableAutoUpdatePlugins: false,
 }
 
 export const uiSlice = createSlice({
@@ -45,6 +47,9 @@ export const uiSlice = createSlice({
     disconnectCloudSync: (state) => {
       state.cloudSync.enabled = false;
       state.cloudSync.pluginId = undefined;
+    },
+    setDisableAutoUpdatePlugins: (state, action: PayloadAction<boolean>) => {
+      state.disableAutoUpdatePlugins = action.payload;
     }
   }
 })
@@ -55,6 +60,7 @@ export const {
   setCloudSyncAutoSync,
   setCloudSyncInterval,
   setCloudSyncPluginProvider,
-  disconnectCloudSync
+  disconnectCloudSync,
+  setDisableAutoUpdatePlugins
 } = uiSlice.actions;
 export default uiSlice.reducer;
