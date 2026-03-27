@@ -20,7 +20,7 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const repo = useRepo();
   const [handle, setHandle] = useState<DocHandle<FavoritesDoc> | null>(null);
   const [doc] = useDocument<FavoritesDoc>(handle?.url);
-  const [isReady, setIsReady] = useState(false);
+  const isReady = !!(doc && handle);
   const cloudSync = useSelector((state: RootState) => state.ui.cloudSync);
   const { plugins, pluginsLoaded } = usePlugins();
 
@@ -93,12 +93,6 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     plugins,
     pluginsLoaded,
   ]);
-
-  useEffect(() => {
-    if (doc && handle) {
-      setIsReady(true);
-    }
-  }, [doc, handle]);
 
   // Don't provide context until handle is ready
   if (!handle) {

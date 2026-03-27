@@ -136,7 +136,9 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
   const corsProxyUrl = "";  // TODO: Add CORS proxy support if needed
   const theme = useTheme();
   const themeRef = React.useRef(theme.theme);
-  themeRef.current = theme.theme;
+  React.useEffect(() => {
+    themeRef.current = theme.theme;
+  }, [theme.theme]);
 
   const loadPlugin = React.useCallback(
     async (plugin: PluginInfo, pluginFiles?: FileList) => {
@@ -378,12 +380,15 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
 
   // Load plugins on mount
   React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- async data loading on mount
     reloadPlugins();
   }, [reloadPlugins]);
 
   // Auto-poll localhost plugins for changes during development
   const updatePluginRef = React.useRef(updatePlugin);
-  updatePluginRef.current = updatePlugin;
+  React.useEffect(() => {
+    updatePluginRef.current = updatePlugin;
+  }, [updatePlugin]);
   React.useEffect(() => {
     if (!pluginsLoaded) return;
 

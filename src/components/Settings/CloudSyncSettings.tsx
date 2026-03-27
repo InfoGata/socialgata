@@ -22,8 +22,8 @@ import type { PluginFrameContainer } from '@/contexts/PluginsContext';
 const CloudSyncSettings: React.FC = () => {
   const dispatch = useDispatch();
   const cloudSync = useSelector((state: RootState) => state.ui.cloudSync);
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
-  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>(() => cloudSyncManager.getStatus());
+  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(() => cloudSyncManager.getLastSyncTime());
   const { plugins } = usePlugins();
   const [syncCapablePlugins, setSyncCapablePlugins] = useState<PluginFrameContainer[]>([]);
 
@@ -49,10 +49,6 @@ const CloudSyncSettings: React.FC = () => {
       setSyncStatus(status);
       setLastSyncTime(cloudSyncManager.getLastSyncTime());
     });
-
-    // Initial status
-    setSyncStatus(cloudSyncManager.getStatus());
-    setLastSyncTime(cloudSyncManager.getLastSyncTime());
 
     return unsubscribe;
   }, []);

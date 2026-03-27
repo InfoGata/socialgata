@@ -14,7 +14,7 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": "off",
     },
   },
-  reactHooks.configs["recommended-latest"],
+  reactHooks.configs.flat["recommended-latest"],
   {
     ...reactRefresh.configs.vite,
     rules: {

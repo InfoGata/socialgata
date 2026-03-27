@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { usePlugins } from "@/hooks/usePlugins";
 
 export const TopBar: React.FC = () => {
@@ -59,39 +59,26 @@ export const TopBar: React.FC = () => {
 
   const pluginId = (params as Record<string, string | undefined>)?.pluginId;
 
-  // Set default search source when sources change
-  useEffect(() => {
-    if (searchSources.length > 0 && !selectedSearchSource) {
-      // If on a plugin page, default to that plugin if it supports search
-      if (pluginId) {
-        const source = searchSources.find(s => s.pluginId === pluginId);
-        if (source) {
-          setSelectedSearchSource(source.id);
-          return;
-        }
-      }
-      // Otherwise default to first source
-      setSelectedSearchSource(searchSources[0].id);
+  // Compute effective search source: prefer pluginId match, then user selection, then first source
+  const effectiveSearchSource = React.useMemo(() => {
+    if (searchSources.length === 0) return "";
+    if (pluginId) {
+      const source = searchSources.find(s => s.pluginId === pluginId);
+      if (source) return source.id;
     }
+    if (selectedSearchSource && searchSources.find(s => s.id === selectedSearchSource)) {
+      return selectedSearchSource;
+    }
+    return searchSources[0].id;
   }, [searchSources, selectedSearchSource, pluginId]);
 
-  // Update search source when navigating to a plugin page
-  useEffect(() => {
-    if (pluginId && searchSources.length > 0) {
-      const source = searchSources.find(s => s.pluginId === pluginId);
-      if (source) {
-        setSelectedSearchSource(source.id);
-      }
-    }
-  }, [pluginId, searchSources]);
-
   const handleSearch = (query: string) => {
-    const selectedSource = searchSources.find(source => source.id === selectedSearchSource);
+    const selectedSource = searchSources.find(source => source.id === effectiveSearchSource);
     if (selectedSource) {
-      navigate({ 
-        to: '/plugins/$pluginId/feed', 
+      navigate({
+        to: '/plugins/$pluginId/feed',
         params: { pluginId: selectedSource.pluginId },
-        search: { q: query } 
+        search: { q: query }
       });
     }
   };
@@ -108,7 +95,7 @@ export const TopBar: React.FC = () => {
         {searchSources.length > 0 && (
           <div className="flex items-center gap-2 max-w-md ml-auto">
             <Select
-              value={selectedSearchSource}
+              value={effectiveSearchSource}
               onValueChange={(value) => setSelectedSearchSource(value)}
             >
               <SelectTrigger className="w-32">
@@ -124,7 +111,7 @@ export const TopBar: React.FC = () => {
             </Select>
             <SearchBar
               onSearch={handleSearch}
-              placeholder={`Search ${searchSources.find(source => source.id === selectedSearchSource)?.name ?? ""}...`}
+              placeholder={`Search ${searchSources.find(source => source.id === effectiveSearchSource)?.name ?? ""}...`}
               className="flex-1"
             />
           </div>
