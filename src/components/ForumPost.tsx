@@ -140,7 +140,7 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
               </PostLink>
             )}
 
-            {post.originalUrl && (
+            {!showFullPost && post.originalUrl && (
               <a
                 href={post.originalUrl}
                 target="_blank"
