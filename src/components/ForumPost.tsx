@@ -116,7 +116,7 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
           )}
 
           {/* Expanded Media */}
-          {(expand || showFullPost) && post.url && (
+          {(expand || showFullPost) && post.url && (post.isVideo || imageRegex.test(post.url)) && (
             <ExpandedMedia
               url={post.url}
               isVideo={post.isVideo}
