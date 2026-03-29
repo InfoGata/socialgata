@@ -31,7 +31,7 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
     <div className="group relative bg-card hover:bg-accent/30 rounded-lg border border-border/50 hover:border-border transition-colors duration-150">
       <div className="flex">
         {/* Vote Column */}
-        {post.score !== undefined && (
+        {post.score != null && (
           <div className="flex flex-col items-center justify-start gap-0.5 px-2.5 py-3 bg-muted/30 rounded-l-lg border-r border-border/30 min-w-[52px]">
             <ArrowUpIcon className="h-4 w-4 text-muted-foreground/50" />
             <span className="text-xs font-bold text-foreground/80">
