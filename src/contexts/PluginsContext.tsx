@@ -311,7 +311,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
   );
 
   const updatePlugin = React.useCallback(
-    async (plugin: PluginInfo, id: string) => {
+    async (plugin: PluginInfo, _id: string) => {
       await db.plugins.put(plugin);
 
       // Reload all plugins - note: reloadPlugins is defined below
