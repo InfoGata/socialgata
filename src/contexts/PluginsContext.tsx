@@ -108,7 +108,6 @@ export interface PluginContextInterface {
   addPlugin: (plugin: PluginInfo, pluginFiles?: FileList) => Promise<void>;
   updatePlugin: (
     plugin: PluginInfo,
-    id: string,
     pluginFiles?: FileList
   ) => Promise<void>;
   deletePlugin: (plugin: PluginFrameContainer) => Promise<void>;
@@ -311,7 +310,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
   );
 
   const updatePlugin = React.useCallback(
-    async (plugin: PluginInfo, _id: string) => {
+    async (plugin: PluginInfo) => {
       await db.plugins.put(plugin);
 
       // Reload all plugins - note: reloadPlugins is defined below
@@ -419,7 +418,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
             newPlugin.id = dbPlugin.id;
             newPlugin.manifestUrl = dbPlugin.manifestUrl;
             console.log(`[dev] Auto-updating plugin: ${newPlugin.name}`);
-            await updatePluginRef.current(newPlugin, dbPlugin.id);
+            await updatePluginRef.current(newPlugin);
           }
         } catch {
           // Server might be down, ignore
@@ -462,7 +461,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
                   if (newPlugin && p.id) {
                     newPlugin.id = p.id;
                     newPlugin.manifestUrl = p.manifestUrl;
-                    await updatePlugin(newPlugin, p.id);
+                    await updatePlugin(newPlugin);
                   }
                 }
               }
@@ -514,7 +513,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
 
   const handleConfirmUpdate = React.useCallback(async () => {
     if (pendingUpdatePlugin?.id) {
-      await updatePlugin(pendingUpdatePlugin, pendingUpdatePlugin.id);
+      await updatePlugin(pendingUpdatePlugin);
       setPendingUpdatePlugin(null);
     }
   }, [pendingUpdatePlugin, updatePlugin]);

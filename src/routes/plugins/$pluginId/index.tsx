@@ -58,7 +58,7 @@ const PluginDetails: React.FC = () => {
 
     if (newPlugin && pluginInfo && pluginInfo.id) {
       newPlugin.id = pluginInfo.id;
-      await updatePlugin(newPlugin, pluginInfo.id);
+      await updatePlugin(newPlugin);
     }
   };
 
@@ -86,7 +86,7 @@ const PluginDetails: React.FC = () => {
       if (newPlugin && pluginInfo.id) {
         newPlugin.id = pluginInfo.id;
         newPlugin.manifestUrl = pluginInfo.manifestUrl;
-        await updatePlugin(newPlugin, pluginInfo.id);
+        await updatePlugin(newPlugin);
       }
     }
   };
