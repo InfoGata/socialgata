@@ -56,6 +56,10 @@
     "updateFound": "Update available",
     "noUpdateFound": "No update found",
     "scriptSize": "Script Size",
-    "optionsPageSize": "Options Page Size"
+    "optionsPageSize": "Options Page Size",
+    "manifestUrlRequired": "The filename 'manifest.json' must be in the url",
+    "fileNotFound": "File not found: {{name}}",
+    "couldNotFetchFile": "Could not fetch file: {{name}}",
+    "manifestNoScript": "Manifest does not contain a script property"
   }
 }

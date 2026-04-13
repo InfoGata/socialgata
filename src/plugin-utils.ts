@@ -1,4 +1,6 @@
 import { customAlphabet } from "nanoid";
+import { toast } from "sonner";
+import i18next from "i18next";
 import { Manifest, PluginInfo } from "./plugintypes";
 import { DirectoryFile } from "./types";
 
@@ -53,7 +55,7 @@ export async function getFileText(
     const file = getFileByDirectoryAndName(fileType.filelist, name);
     if (!file) {
       if (!suppressErrors) {
-        alert(`File not found: ${name}`);
+        toast.error(i18next.t("fileNotFound", { ns: "plugins", name }));
       }
       return null;
     }
@@ -67,7 +69,7 @@ export async function getFileText(
       return await result.text();
     } catch {
       if (!suppressErrors) {
-        alert(`Could not fetch file: ${name}`);
+        toast.error(i18next.t("couldNotFetchFile", { ns: "plugins", name }));
       }
       return null;
     }
@@ -86,7 +88,7 @@ export async function getPlugin(
   const manifest = JSON.parse(manifestText) as Manifest;
   if (!manifest.script) {
     if (!suppressErrors) {
-      alert("Manifest does not contain a script property");
+      toast.error(i18next.t("manifestNoScript", { ns: "plugins" }));
     }
     return null;
   }

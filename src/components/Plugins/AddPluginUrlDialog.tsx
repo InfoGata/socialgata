@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { PluginInfo } from "../../plugintypes";
 import { FileType, generatePluginId, getPlugin } from "../../plugin-utils";
 import {
@@ -45,7 +46,7 @@ const AddPluginUrlDialog: React.FC<AddPluginUrlDialogProps> = (props) => {
 
   const onConfirm = async () => {
     if (!pluginUrl.includes("manifest.json")) {
-      alert("The filename 'manifest.json' must be in the url");
+      toast.error(t("manifestUrlRequired"));
       return;
     }
     const headers: Record<string, string> = {};
