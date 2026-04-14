@@ -3,6 +3,8 @@ import { load, save } from '@automerge/automerge';
 import type { CloudSyncProvider, SyncStatus, CloudSyncError } from './CloudSyncProvider';
 import type { FavoritesDoc } from '../favorites-repo';
 
+const FAVORITES_SYNC_FILE_ID = 'socialgata-favorites';
+
 /**
  * Cloud Sync Manager
  *
@@ -140,7 +142,7 @@ export class CloudSyncManager {
   private async performSync() {
     if (!this.provider || !this.handle) return;
 
-    const docUrl = this.handle.url;
+    const docUrl = FAVORITES_SYNC_FILE_ID;
 
     // Step 1: Download remote document if it exists
     const remoteData = await this.provider.download(docUrl);
