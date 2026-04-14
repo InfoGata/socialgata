@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Cloud, RefreshCw, Check, AlertCircle } from 'lucide-react';
+import { Cloud, RefreshCw, Check, AlertCircle, LogIn, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   setCloudSyncAutoSync,
@@ -13,6 +13,7 @@ import { cloudSyncManager } from '@/sync/cloudSyncManager';
 import type { SyncStatus } from '@/sync/cloud/CloudSyncProvider';
 import { PluginSyncProviderAdapter } from '@/sync/cloud/PluginSyncProviderAdapter';
 import { usePlugins } from '@/hooks/usePlugins';
+import { usePluginLogin } from '@/hooks/usePluginLogin';
 import type { PluginFrameContainer } from '@/contexts/PluginsContext';
 
 /**
@@ -26,6 +27,8 @@ const CloudSyncSettings: React.FC = () => {
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(() => cloudSyncManager.getLastSyncTime());
   const { plugins } = usePlugins();
   const [syncCapablePlugins, setSyncCapablePlugins] = useState<PluginFrameContainer[]>([]);
+  const connectedPlugin = plugins.find(p => p.id === cloudSync.pluginId);
+  const { hasLogin, isLoggedIn, login, logout } = usePluginLogin(connectedPlugin);
 
   // Check which plugins have sync capabilities (onSyncUpload and onSyncDownload defined)
   useEffect(() => {
@@ -152,15 +155,43 @@ const CloudSyncSettings: React.FC = () => {
               <Cloud className="h-8 w-8 text-primary" />
               <div>
                 <p className="font-medium">
-                  {plugins.find(p => p.id === cloudSync.pluginId)?.name || 'Sync Provider'}
+                  {connectedPlugin?.name || 'Sync Provider'}
                 </p>
-                <p className="text-sm text-muted-foreground">Connected</p>
+                <p className="text-sm text-muted-foreground">
+                  {hasLogin ? (isLoggedIn ? 'Signed in' : 'Not signed in') : 'Connected'}
+                </p>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={handleDisconnect}>
-              Disconnect
-            </Button>
+            <div className="flex gap-2">
+              {hasLogin && (
+                isLoggedIn ? (
+                  <Button variant="outline" size="sm" onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log Out
+                  </Button>
+                ) : (
+                  <Button variant="outline" size="sm" onClick={() => login()}>
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Log In
+                  </Button>
+                )
+              )}
+              <Button variant="outline" size="sm" onClick={handleDisconnect}>
+                Disconnect
+              </Button>
+            </div>
           </div>
+
+          {hasLogin && syncStatus === 'error' && isLoggedIn && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-100">
+              <p className="font-medium">Authentication may have expired</p>
+              <p className="mt-1">If sync keeps failing, try logging in again to refresh credentials.</p>
+              <Button variant="outline" size="sm" className="mt-2" onClick={() => login()}>
+                <LogIn className="mr-2 h-4 w-4" />
+                Re-authenticate
+              </Button>
+            </div>
+          )}
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
