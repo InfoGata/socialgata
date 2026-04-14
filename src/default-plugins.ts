@@ -20,6 +20,12 @@ export const defaultPlugins: PluginDescription[] = [
     url: "https://cdn.jsdelivr.net/gh/InfoGata/hackernews-socialgata@latest/manifest.json",
   },
   {
+    id: "LB7q3v9rZkMn",
+    name: "Lobsters Plugin for SocialGata",
+    description: "Browse Lobsters stories and comments",
+    url: "https://cdn.jsdelivr.net/gh/InfoGata/lobsters-socialgata@latest/manifest.json",
+  },
+  {
     id: "3YKmz8pL4Rwd",
     name: "Lemmy Plugin for SocialGata",
     description: "Browse Lemmy feeds, communities, and comments across multiple instances",
