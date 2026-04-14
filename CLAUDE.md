@@ -78,19 +78,17 @@ Redux store with slices:
 - Supported items: instances, communities, posts, comments
 - Storage: IndexedDB via `@automerge/automerge-repo-storage-indexeddb`
 - Local sync: Cross-tab via BroadcastChannel
-- Cloud sync: Dropbox (with Google Drive, OneDrive planned)
+- Cloud sync: Provided by plugins implementing `onSyncUpload`/`onSyncDownload`
 
 **Cloud Sync Architecture** (Hybrid Approach):
 - **Primary storage**: IndexedDB (fast, offline-first)
-- **Cloud backup**: Periodic uploads to cloud storage providers
+- **Cloud backup**: Periodic uploads via sync-capable plugins
 - **Conflict resolution**: Automerge CRDT automatically merges changes
 - `src/sync/cloud/CloudSyncProvider.ts` - Interface for all cloud providers
-- `src/sync/cloud/CloudSyncManager.ts` - Orchestrates sync operations (periodic uploads, downloads, CRDT merging)
-- `src/sync/cloud/DropboxSyncProvider.ts` - Dropbox OAuth + file upload/download implementation
-- `src/routes/auth/dropbox/callback.tsx` - OAuth callback handler
+- `src/sync/cloud/CloudSyncManager.ts` - Orchestrates sync operations (periodic uploads, downloads, CRDT merging). Uses a stable file ID (`socialgata-favorites`) so all devices share the same cloud file.
+- `src/sync/cloud/PluginSyncProviderAdapter.ts` - Wraps a sync-capable plugin to implement `CloudSyncProvider`
 - `src/components/Settings/CloudSyncSettings.tsx` - Settings UI for connecting providers
-- Settings stored in Redux `uiSlice.cloudSync`: provider, enabled, autoSync, syncIntervalSeconds
-- Environment variables: `VITE_DROPBOX_CLIENT_ID`, `VITE_DROPBOX_REDIRECT_URI`
+- Settings stored in Redux `uiSlice.cloudSync`: pluginId, enabled, autoSync, syncIntervalSeconds
 - Setup docs: `docs/CLOUD_SYNC_SETUP.md`
 
 ### Testing
