@@ -9,7 +9,7 @@ interface CloudSyncSettings {
   pluginId?: string;
 }
 
-interface UiState {
+export interface UiState {
   isNavigationMenuOpen: boolean;
   cloudSync: CloudSyncSettings;
   disableAutoUpdatePlugins: boolean;
