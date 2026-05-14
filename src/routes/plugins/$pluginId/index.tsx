@@ -248,6 +248,24 @@ const PluginDetails: React.FC = () => {
                   </dd>
                 </div>
               )}
+              {pluginInfo.manifest?.siteMatch &&
+                pluginInfo.manifest.siteMatch.length > 0 && (
+                  <div>
+                    <dt className="text-muted-foreground">
+                      {t("plugins:siteMatchPatterns")}
+                    </dt>
+                    <dd className="mt-1 flex flex-wrap gap-1">
+                      {pluginInfo.manifest.siteMatch.map((pattern) => (
+                        <code
+                          key={pattern}
+                          className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono break-all"
+                        >
+                          {pattern}
+                        </code>
+                      ))}
+                    </dd>
+                  </div>
+                )}
             </dl>
           </CardContent>
         </Card>
