@@ -34,6 +34,9 @@ export default defineConfig({
   renderer: {
     root: ".",
     build: {
+      // top-level-await + wasm require a modern target; es2022 also avoids
+      // esbuild's destructuring-downlevel failure on Rolldown output under Vite 8.
+      target: "es2022",
       rollupOptions: {
         input: {
           index: resolve(__dirname, "index.html"),

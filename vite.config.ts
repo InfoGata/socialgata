@@ -10,6 +10,11 @@ import topLevelAwait from "vite-plugin-top-level-await";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [wasm(), topLevelAwait(), react(), TanStackRouterVite({ target: "react" }), tailwindcss()],
+  // top-level-await + wasm (automerge) require a modern target; es2022 also avoids
+  // esbuild's destructuring-downlevel failure on Rolldown output under Vite 8.
+  build: {
+    target: "es2022",
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
