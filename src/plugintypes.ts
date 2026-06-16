@@ -22,6 +22,12 @@ export interface Manifest {
   updateUrl?: string;
   authentication?: ManifestAuthentication;
   siteMatch?: string[];
+  redirects?: ManifestRedirect[];
+}
+
+export interface ManifestRedirect {
+  pattern: string;
+  path: string;
 }
 
 export interface ManifestAuthentication {

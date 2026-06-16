@@ -15,6 +15,11 @@ export interface NetworkRequestOptions {
   auth?: ManifestAuthentication;
 }
 
+export interface RedirectPatternRule {
+  pattern: string;
+  redirectPath: string;
+}
+
 export interface SiteRedirectRule {
   pluginId: string;
   pluginName: string;
@@ -22,6 +27,7 @@ export interface SiteRedirectRule {
   appOrigin: string;
   siteMatchPatterns: string[];
   redirectPath: string;
+  patternRedirects?: RedirectPatternRule[];
 }
 
 export interface InfoGataExtension {

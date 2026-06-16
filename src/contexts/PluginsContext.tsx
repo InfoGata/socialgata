@@ -492,6 +492,11 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
       for (const plugin of dbPlugins) {
         const siteMatch = plugin.manifest?.siteMatch;
         if (siteMatch && siteMatch.length > 0 && plugin.id) {
+          const manifestRedirects = plugin.manifest?.redirects ?? [];
+          const patternRedirects = manifestRedirects.map((r) => ({
+            pattern: r.pattern,
+            redirectPath: `/plugins/${plugin.id}${r.path}`,
+          }));
           rules.push({
             pluginId: plugin.id,
             pluginName: plugin.name,
@@ -499,6 +504,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
             appOrigin: window.location.origin,
             siteMatchPatterns: siteMatch,
             redirectPath: `/plugins/${plugin.id}/feed`,
+            patternRedirects,
           });
         }
       }
