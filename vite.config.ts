@@ -10,6 +10,13 @@ import topLevelAwait from "vite-plugin-top-level-await";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [wasm(), topLevelAwait(), react(), TanStackRouterVite({ target: "react" }), tailwindcss()],
+  // Vite 8 switched to Rolldown and made CJS default-import interop "consistent"
+  // (default = full module.exports), which breaks CJS deps that use the
+  // `exports.default` + `__esModule` pattern without an ESM build (e.g.
+  // redux-persist). Restore the pre-Vite-8 behavior.
+  legacy: {
+    inconsistentCjsInterop: true,
+  },
   // top-level-await + wasm (automerge) require a modern target; es2022 also avoids
   // esbuild's destructuring-downlevel failure on Rolldown output under Vite 8.
   build: {

@@ -32,6 +32,10 @@ export default defineConfig({
     },
   },
   renderer: {
+    // Restore pre-Vite-8 CJS default-import interop (see vite.config.ts).
+    legacy: {
+      inconsistentCjsInterop: true,
+    },
     root: ".",
     build: {
       // top-level-await + wasm require a modern target; es2022 also avoids
