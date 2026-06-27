@@ -1,10 +1,9 @@
 import { resolve } from "path";
 import { defineConfig, externalizeDepsPlugin } from "electron-vite";
 import react from "@vitejs/plugin-react";
-import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
 import wasm from "vite-plugin-wasm";
-import topLevelAwait from "vite-plugin-top-level-await";
 
 export default defineConfig({
   main: {
@@ -38,8 +37,10 @@ export default defineConfig({
     },
     root: ".",
     build: {
-      // top-level-await + wasm require a modern target; es2022 also avoids
+      // wasm + native top-level await require a modern target; es2022 also avoids
       // esbuild's destructuring-downlevel failure on Rolldown output under Vite 8.
+      // With es2022, Vite 8 handles top-level await natively, so
+      // vite-plugin-top-level-await is no longer needed here.
       target: "es2022",
       rollupOptions: {
         input: {
@@ -54,9 +55,8 @@ export default defineConfig({
     },
     plugins: [
       wasm(),
-      topLevelAwait(),
       react(),
-      TanStackRouterVite({ target: "react" }),
+      tanstackRouter({ target: "react" }),
       tailwindcss(),
     ],
   },

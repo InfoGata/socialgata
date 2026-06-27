@@ -1,15 +1,13 @@
-/// <reference types="vitest" />
 import path from "path";
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
-import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
 import wasm from "vite-plugin-wasm";
-import topLevelAwait from "vite-plugin-top-level-await";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [wasm(), topLevelAwait(), react(), TanStackRouterVite({ target: "react" }), tailwindcss()],
+  plugins: [wasm(), react(), tanstackRouter({ target: "react" }), tailwindcss()],
   // Vite 8 switched to Rolldown and made CJS default-import interop "consistent"
   // (default = full module.exports), which breaks CJS deps that use the
   // `exports.default` + `__esModule` pattern without an ESM build (e.g.
@@ -17,8 +15,10 @@ export default defineConfig({
   legacy: {
     inconsistentCjsInterop: true,
   },
-  // top-level-await + wasm (automerge) require a modern target; es2022 also avoids
-  // esbuild's destructuring-downlevel failure on Rolldown output under Vite 8.
+  // wasm (automerge) + native top-level await require a modern target; es2022 also
+  // avoids esbuild's destructuring-downlevel failure on Rolldown output under Vite 8.
+  // With the es2022 target, Vite 8 handles top-level await natively, so
+  // vite-plugin-top-level-await is no longer needed here.
   build: {
     target: "es2022",
   },
