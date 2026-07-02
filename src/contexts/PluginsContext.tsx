@@ -47,13 +47,14 @@ import {
 } from "../plugin-utils";
 import { Manifest } from "../plugintypes";
 import { useAppSelector } from "../store/hooks";
-import { hasExtension } from "@/utils";
+import { hasExtension, isCorsDisabled } from "@/utils";
 
 interface ApplicationPluginInterface extends PluginInterface {
   networkRequest(input: string, init?: RequestInit): Promise<NetworkRequest>;
    
   postUiMessage(message: any): Promise<void>;
   getCorsProxy(): Promise<string | undefined>;
+  isNetworkRequestCorsDisabled(): Promise<boolean>;
   isLoggedIn(): Promise<boolean>;
   getTheme(): Promise<Theme>;
   createNotification(notification: NotificationMessage): Promise<void>;
@@ -201,6 +202,9 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
           setPluginMessage({ pluginId: plugin.id, message });
         },
         getCorsProxy: async () => corsProxyUrl || undefined,
+        isNetworkRequestCorsDisabled: async () => {
+          return isCorsDisabled();
+        },
         isLoggedIn: async () => {
           if (plugin?.id) {
             const auth = await db.pluginAuths.get(plugin.id);
