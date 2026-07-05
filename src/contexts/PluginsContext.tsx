@@ -145,7 +145,13 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
       const api: ApplicationPluginInterface = {
         networkRequest: async (input: string, init?: RequestInit) => {
           if (hasExtension() && window.InfoGata?.networkRequest) {
-            return await window.InfoGata.networkRequest(input, init);
+            // Provide the installed manifest's siteMatch authoritatively so the
+            // extension can scope credentialed requests to the plugin's own
+            // domains (the plugin itself can't spoof these).
+            const options = plugin?.manifest?.siteMatch
+              ? { siteMatchPatterns: plugin.manifest.siteMatch }
+              : undefined;
+            return await window.InfoGata.networkRequest(input, init, options);
           }
           const pluginAuth = plugin?.id
             ? await db.pluginAuths.get(plugin.id)

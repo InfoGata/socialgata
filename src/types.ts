@@ -13,6 +13,13 @@ export interface NetworkRequest {
 
 export interface NetworkRequestOptions {
   auth?: ManifestAuthentication;
+  /**
+   * The plugin's declared siteMatch patterns. The extension sends credentials
+   * (cookies) for requests whose URL matches one of these patterns, so they
+   * behave like the site would in a normal browser tab (scoped credential
+   * access).
+   */
+  siteMatchPatterns?: string[];
 }
 
 export interface RedirectPatternRule {
