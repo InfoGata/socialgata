@@ -133,6 +133,13 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
   const [pluginMessage, setPluginMessage] = React.useState<PluginMessage>();
   const [pendingUpdatePlugin, setPendingUpdatePlugin] = React.useState<PluginInfo | null>(null);
 
+  // Mirrors of state that background tasks (dev poll, auto-update) read without
+  // re-subscribing, so they don't have to re-run every time a load flips state.
+  const pluginFramesRef = React.useRef<PluginFrameContainer[]>([]);
+  const pluginsLoadedRef = React.useRef(false);
+  // Only the newest load may publish its frames; older overlapping loads discard theirs.
+  const loadIdRef = React.useRef(0);
+
   const corsProxyUrl = "";  // TODO: Add CORS proxy support if needed
   const theme = useTheme();
   const themeRef = React.useRef(theme.theme);
@@ -287,12 +294,68 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
         }
       } catch (error) {
         console.error(`Failed to load plugin ${plugin.name}:`, error);
+        // Otherwise a plugin that times out leaves its iframe in the document.
+        host.destroy();
         throw error;
       }
 
       return host;
     },
     []
+  );
+
+  const publishFrames = React.useCallback((frames: PluginFrameContainer[]) => {
+    pluginFramesRef.current = frames;
+    setPluginFrames(frames);
+  }, []);
+
+  // Rebuilds every frame from what's currently in the database. `silent` keeps
+  // pluginsLoaded true so background updates don't drop the app back to the
+  // full-page spinner. Concurrent calls are safe: only the newest one publishes.
+  const loadAllPlugins = React.useCallback(
+    async (options?: { silent?: boolean }) => {
+      const loadId = ++loadIdRef.current;
+      const silent = options?.silent && pluginsLoadedRef.current;
+
+      if (!silent) {
+        pluginsLoadedRef.current = false;
+        setPluginsLoaded(false);
+      }
+      setPluginsFailed(false);
+
+      try {
+        const dbPlugins = await db.plugins.toArray();
+        const loadedPlugins: PluginFrameContainer[] = [];
+
+        for (const dbPlugin of dbPlugins) {
+          try {
+            loadedPlugins.push(await loadPlugin(dbPlugin));
+          } catch (error) {
+            console.error(`Failed to load plugin ${dbPlugin.name}:`, error);
+          }
+        }
+
+        // A newer load already superseded this one (e.g. StrictMode's double
+        // mount, or an update that landed mid-load). These frames were never
+        // published, so nothing can be holding them — drop them.
+        if (loadId !== loadIdRef.current) {
+          loadedPlugins.forEach((p) => p.destroy());
+          return;
+        }
+
+        publishFrames(loadedPlugins);
+      } catch (error) {
+        if (loadId !== loadIdRef.current) return;
+        console.error("Failed to reload plugins:", error);
+        setPluginsFailed(true);
+      } finally {
+        if (loadId === loadIdRef.current) {
+          pluginsLoadedRef.current = true;
+          setPluginsLoaded(true);
+        }
+      }
+    },
+    [loadPlugin, publishFrames]
   );
 
   const addPlugin = React.useCallback(
@@ -314,40 +377,17 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
 
       // Load the plugin
       const pluginFrame = await loadPlugin(plugin, pluginFiles);
-      setPluginFrames((prev) => [...prev, pluginFrame]);
+      publishFrames([...pluginFramesRef.current, pluginFrame]);
     },
-    [loadPlugin]
+    [loadPlugin, publishFrames]
   );
 
   const updatePlugin = React.useCallback(
     async (plugin: PluginInfo) => {
       await db.plugins.put(plugin);
-
-      // Reload all plugins - note: reloadPlugins is defined below
-      setPluginsLoaded(false);
-      setPluginsFailed(false);
-
-      try {
-        const dbPlugins = await db.plugins.toArray();
-        const loadedPlugins: PluginFrameContainer[] = [];
-
-        for (const dbPlugin of dbPlugins) {
-          try {
-            const pluginFrame = await loadPlugin(dbPlugin);
-            loadedPlugins.push(pluginFrame);
-          } catch (error) {
-            console.error(`Failed to load plugin ${dbPlugin.name}:`, error);
-          }
-        }
-
-        setPluginFrames(loadedPlugins);
-        setPluginsLoaded(true);
-      } catch (error) {
-        console.error("Failed to reload plugins:", error);
-        setPluginsFailed(true);
-      }
+      await loadAllPlugins({ silent: true });
     },
-    [loadPlugin]
+    [loadAllPlugins]
   );
 
   const deletePlugin = React.useCallback(
@@ -357,138 +397,117 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
       await db.plugins.delete(plugin.id);
       await db.pluginAuths.delete(plugin.id);
 
-      setPluginFrames((prev) => prev.filter((p) => p.id !== plugin.id));
+      publishFrames(
+        pluginFramesRef.current.filter((p) => p.id !== plugin.id)
+      );
+      plugin.destroy();
     },
-    []
+    [publishFrames]
   );
 
   const reloadPlugins = React.useCallback(async () => {
-    setPluginsLoaded(false);
-    setPluginsFailed(false);
-
-    try {
-      const dbPlugins = await db.plugins.toArray();
-      const loadedPlugins: PluginFrameContainer[] = [];
-
-      for (const plugin of dbPlugins) {
-        try {
-          const pluginFrame = await loadPlugin(plugin);
-          loadedPlugins.push(pluginFrame);
-        } catch (error) {
-          console.error(`Failed to load plugin ${plugin.name}:`, error);
-        }
-      }
-
-      setPluginFrames(loadedPlugins);
-      setPluginsLoaded(true);
-    } catch (error) {
-      console.error("Failed to reload plugins:", error);
-      setPluginsFailed(true);
-    }
-  }, [loadPlugin]);
+    await loadAllPlugins();
+  }, [loadAllPlugins]);
 
   // Load plugins on mount
   React.useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- async data loading on mount
-    reloadPlugins();
-  }, [reloadPlugins]);
+    loadAllPlugins();
+  }, [loadAllPlugins]);
 
-  // Auto-poll localhost plugins for changes during development
-  const updatePluginRef = React.useRef(updatePlugin);
+  // Auto-poll localhost plugins for changes during development. The interval is
+  // created once; it reads pluginsLoaded through a ref so that reloads it
+  // triggers itself don't tear it down and wipe the script cache.
+  const devScriptCache = React.useRef(new Map<string, string>());
   React.useEffect(() => {
-    updatePluginRef.current = updatePlugin;
-  }, [updatePlugin]);
-  React.useEffect(() => {
-    if (!pluginsLoaded) return;
-
     const DEV_POLL_INTERVAL = 3000;
-    const scriptCache = new Map<string, string>();
+    let checking = false;
 
     const checkForUpdates = async () => {
-      const dbPlugins = await db.plugins.toArray();
-      const localhostPlugins = dbPlugins.filter(
-        (p) => p.manifestUrl && new URL(p.manifestUrl).hostname === "localhost"
-      );
+      if (checking || !pluginsLoadedRef.current) return;
+      checking = true;
 
-      for (const dbPlugin of localhostPlugins) {
-        try {
-          const fileType = getFileTypeFromPluginUrl(dbPlugin.manifestUrl!);
-          const newPlugin = await getPlugin(fileType, true);
-          if (!newPlugin || !dbPlugin.id) continue;
+      try {
+        const dbPlugins = await db.plugins.toArray();
+        const localhostPlugins = dbPlugins.filter(
+          (p) => p.manifestUrl && new URL(p.manifestUrl).hostname === "localhost"
+        );
 
-          const cached = scriptCache.get(dbPlugin.id);
-          if (cached === undefined) {
-            // First check — seed cache, don't update
-            scriptCache.set(dbPlugin.id, newPlugin.script);
-            continue;
-          }
+        let changed = false;
+        for (const dbPlugin of localhostPlugins) {
+          try {
+            const fileType = getFileTypeFromPluginUrl(dbPlugin.manifestUrl!);
+            const newPlugin = await getPlugin(fileType, true);
+            if (!newPlugin || !dbPlugin.id) continue;
 
-          if (newPlugin.script !== cached) {
-            scriptCache.set(dbPlugin.id, newPlugin.script);
+            const cached = devScriptCache.current.get(dbPlugin.id);
+            devScriptCache.current.set(dbPlugin.id, newPlugin.script);
+            // First check seeds the cache without triggering an update.
+            if (cached === undefined || cached === newPlugin.script) continue;
+
             newPlugin.id = dbPlugin.id;
             newPlugin.manifestUrl = dbPlugin.manifestUrl;
             console.log(`[dev] Auto-updating plugin: ${newPlugin.name}`);
-            await updatePluginRef.current(newPlugin);
+            await db.plugins.put(newPlugin);
+            changed = true;
+          } catch {
+            // Server might be down, ignore
           }
-        } catch {
-          // Server might be down, ignore
         }
+
+        if (changed) await loadAllPlugins({ silent: true });
+      } finally {
+        checking = false;
       }
     };
 
     const interval = setInterval(checkForUpdates, DEV_POLL_INTERVAL);
-    // Run immediately to seed cache
-    checkForUpdates();
-
     return () => clearInterval(interval);
-  }, [pluginsLoaded]);
+  }, [loadAllPlugins]);
 
-  // Auto-update plugins when newer versions are available
+  // Auto-update plugins when newer versions are available. Every plugin is
+  // written to the database first, then everything reloads once, so N available
+  // updates cost one reload rather than N.
   React.useEffect(() => {
-    const checkUpdate = async () => {
-      if (pluginsLoaded && !disableAutoUpdatePlugins && !hasUpdated.current) {
-        hasUpdated.current = true;
-        for (const p of pluginFrames) {
-          if (p.manifestUrl) {
-            try {
-              const fileType = getFileTypeFromPluginUrl(p.manifestUrl);
-              const manifestText = await getFileText(
-                fileType,
-                "manifest.json",
-                true
-              );
-              if (manifestText) {
-                const manifest = JSON.parse(manifestText) as Manifest;
-                if (
-                  manifest.version &&
-                  p.version &&
-                  semverValid(manifest.version) &&
-                  semverValid(p.version) &&
-                  semverGt(manifest.version, p.version)
-                ) {
-                  const newPlugin = await getPlugin(fileType);
+    if (!pluginsLoaded || disableAutoUpdatePlugins || hasUpdated.current) return;
+    hasUpdated.current = true;
 
-                  if (newPlugin && p.id) {
-                    newPlugin.id = p.id;
-                    newPlugin.manifestUrl = p.manifestUrl;
-                    await updatePlugin(newPlugin);
-                  }
-                }
-              }
-            } catch {
-              // Ignore update errors for individual plugins
+    const checkUpdate = async () => {
+      let changed = false;
+
+      for (const p of pluginFramesRef.current) {
+        if (!p.manifestUrl) continue;
+        try {
+          const fileType = getFileTypeFromPluginUrl(p.manifestUrl);
+          const manifestText = await getFileText(fileType, "manifest.json", true);
+          if (!manifestText) continue;
+
+          const manifest = JSON.parse(manifestText) as Manifest;
+          if (
+            manifest.version &&
+            p.version &&
+            semverValid(manifest.version) &&
+            semverValid(p.version) &&
+            semverGt(manifest.version, p.version)
+          ) {
+            const newPlugin = await getPlugin(fileType);
+
+            if (newPlugin && p.id) {
+              newPlugin.id = p.id;
+              newPlugin.manifestUrl = p.manifestUrl;
+              await db.plugins.put(newPlugin);
+              changed = true;
             }
           }
+        } catch {
+          // Ignore update errors for individual plugins
         }
       }
+
+      if (changed) await loadAllPlugins({ silent: true });
     };
     checkUpdate();
-  }, [
-    pluginsLoaded,
-    pluginFrames,
-    disableAutoUpdatePlugins,
-    updatePlugin,
-  ]);
+  }, [pluginsLoaded, disableAutoUpdatePlugins, loadAllPlugins]);
 
   // Register site redirect rules with the extension
   React.useEffect(() => {
