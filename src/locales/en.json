@@ -58,6 +58,7 @@
     "scriptSize": "Script Size",
     "optionsPageSize": "Options Page Size",
     "siteMatchPatterns": "Site Match Patterns",
+    "redirects": "Redirects",
     "manifestUrlRequired": "The filename 'manifest.json' must be in the url",
     "fileNotFound": "File not found: {{name}}",
     "couldNotFetchFile": "Could not fetch file: {{name}}",

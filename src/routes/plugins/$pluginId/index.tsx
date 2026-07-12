@@ -24,6 +24,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import {
+  ArrowRightIcon,
   ExternalLinkIcon,
   FileCodeIcon,
   FolderUpIcon,
@@ -262,6 +263,30 @@ const PluginDetails: React.FC = () => {
                         >
                           {pattern}
                         </code>
+                      ))}
+                    </dd>
+                  </div>
+                )}
+              {pluginInfo.manifest?.redirects &&
+                pluginInfo.manifest.redirects.length > 0 && (
+                  <div>
+                    <dt className="text-muted-foreground">
+                      {t("plugins:redirects")}
+                    </dt>
+                    <dd className="mt-1 space-y-2">
+                      {pluginInfo.manifest.redirects.map((redirect) => (
+                        <div key={redirect.pattern} className="space-y-1">
+                          <code className="block rounded bg-muted px-1.5 py-0.5 text-xs font-mono break-all">
+                            {redirect.pattern}
+                          </code>
+                          <div className="flex items-start gap-1 pl-2">
+                            <ArrowRightIcon className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground" />
+                            <code className="text-xs font-mono break-all">
+                              /plugins/{pluginInfo.id}
+                              {redirect.path}
+                            </code>
+                          </div>
+                        </div>
                       ))}
                     </dd>
                   </div>
