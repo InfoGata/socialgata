@@ -34,7 +34,9 @@ import {
   RefreshCwIcon,
   RssIcon,
   SettingsIcon,
+  TriangleAlertIcon,
 } from "lucide-react";
+import { isValidRedirectPattern } from "@/redirect-validation";
 
 const PluginDetails: React.FC = () => {
   const { pluginId } = Route.useParams();
@@ -274,20 +276,41 @@ const PluginDetails: React.FC = () => {
                       {t("plugins:redirects")}
                     </dt>
                     <dd className="mt-1 space-y-2">
-                      {pluginInfo.manifest.redirects.map((redirect) => (
-                        <div key={redirect.pattern} className="space-y-1">
-                          <code className="block rounded bg-muted px-1.5 py-0.5 text-xs font-mono break-all">
-                            {redirect.pattern}
-                          </code>
-                          <div className="flex items-start gap-1 pl-2">
-                            <ArrowRightIcon className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground" />
-                            <code className="text-xs font-mono break-all">
-                              /plugins/{pluginInfo.id}
-                              {redirect.path}
+                      {pluginInfo.manifest.redirects.map((redirect) => {
+                        const isValid = isValidRedirectPattern(
+                          redirect.pattern
+                        );
+                        return (
+                          <div key={redirect.pattern} className="space-y-1">
+                            <code
+                              className={cn(
+                                "block rounded px-1.5 py-0.5 text-xs font-mono break-all",
+                                isValid
+                                  ? "bg-muted"
+                                  : "bg-destructive/10 text-destructive"
+                              )}
+                            >
+                              {redirect.pattern}
                             </code>
+                            {isValid ? (
+                              <div className="flex items-start gap-1 pl-2">
+                                <ArrowRightIcon className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground" />
+                                <code className="text-xs font-mono break-all">
+                                  /plugins/{pluginInfo.id}
+                                  {redirect.path}
+                                </code>
+                              </div>
+                            ) : (
+                              <div className="flex items-start gap-1 pl-2 text-destructive">
+                                <TriangleAlertIcon className="mt-0.5 h-3 w-3 shrink-0" />
+                                <span className="text-xs">
+                                  {t("plugins:invalidRedirectPattern")}
+                                </span>
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </dd>
                   </div>
                 )}

@@ -59,6 +59,7 @@
     "optionsPageSize": "Options Page Size",
     "siteMatchPatterns": "Site Match Patterns",
     "redirects": "Redirects",
+    "invalidRedirectPattern": "Invalid pattern — ignored by the browser extension",
     "manifestUrlRequired": "The filename 'manifest.json' must be in the url",
     "fileNotFound": "File not found: {{name}}",
     "couldNotFetchFile": "Could not fetch file: {{name}}",

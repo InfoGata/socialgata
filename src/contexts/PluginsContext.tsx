@@ -36,6 +36,7 @@ import {
 } from "../plugintypes";
 import { Theme, useTheme } from "@infogata/shadcn-vite-theme-provider";
 import { NetworkRequest, SiteRedirectRule } from "../types";
+import { filterValidRedirects } from "../redirect-validation";
 import semverGt from "semver/functions/gt";
 import semverValid from "semver/functions/parse";
 import {
@@ -521,7 +522,10 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
       for (const plugin of dbPlugins) {
         const siteMatch = plugin.manifest?.siteMatch;
         if (siteMatch && siteMatch.length > 0 && plugin.id) {
-          const manifestRedirects = plugin.manifest?.redirects ?? [];
+          const manifestRedirects = filterValidRedirects(
+            plugin.manifest?.redirects ?? [],
+            plugin
+          );
           const patternRedirects = manifestRedirects.map((r) => ({
             pattern: r.pattern,
             redirectPath: `/plugins/${plugin.id}${r.path}`,
