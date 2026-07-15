@@ -229,7 +229,7 @@ const PluginDetails: React.FC = () => {
               )}
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Id</span>
-                <span className="font-mono text-xs truncate max-w-[200px]">
+                <span className="font-mono text-xs truncate max-w-50">
                   {pluginInfo.id}
                 </span>
               </div>
