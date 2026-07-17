@@ -73,6 +73,25 @@ export interface User {
   name: string;
   avatar?: string;
   instanceId?: string;
+  /** Handle/username without the leading @ (e.g. "damn_jehu") */
+  handle?: string;
+  /** Profile description/bio */
+  bio?: string;
+  /** Banner/header image URL */
+  banner?: string;
+  /** Location text from the profile */
+  location?: string;
+  /** Website URL from the profile */
+  website?: string;
+  /** When the user joined (e.g. "May 2023") */
+  joinedDate?: string;
+  /** Whether the account is verified */
+  verified?: boolean;
+  followerCount?: number;
+  followingCount?: number;
+  /** Number of posts/tweets */
+  tweetCount?: number;
+  likeCount?: number;
 }
 
 export interface Community {
