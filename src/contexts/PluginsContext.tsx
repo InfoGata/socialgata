@@ -421,9 +421,8 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
   }, [loadAllPlugins]);
 
   // Auto-poll localhost plugins for changes during development. The interval is
-  // created once; it reads pluginsLoaded through a ref so that reloads it
-  // triggers itself don't tear it down and wipe the script cache.
-  const devScriptCache = React.useRef(new Map<string, string>());
+  // created once; it reads pluginsLoaded through a ref so that the reloads it
+  // triggers itself don't tear it down.
   React.useEffect(() => {
     const DEV_POLL_INTERVAL = 3000;
     let checking = false;
@@ -445,10 +444,10 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
             const newPlugin = await getPlugin(fileType, true);
             if (!newPlugin || !dbPlugin.id) continue;
 
-            const cached = devScriptCache.current.get(dbPlugin.id);
-            devScriptCache.current.set(dbPlugin.id, newPlugin.script);
-            // First check seeds the cache without triggering an update.
-            if (cached === undefined || cached === newPlugin.script) continue;
+            // Compare against the stored script rather than an in-memory cache,
+            // so a change made while the app was closed is still picked up on
+            // the first poll after load.
+            if (dbPlugin.script === newPlugin.script) continue;
 
             newPlugin.id = dbPlugin.id;
             newPlugin.manifestUrl = dbPlugin.manifestUrl;
