@@ -7,9 +7,9 @@ import ReactTimeago from "react-timeago";
 import PostLink from "./PostLink";
 import React from "react";
 import ImageThumbnail from "./ImageThumbnail";
-import parse from 'html-react-parser';
-import DOMPurify from "dompurify";
 import ExpandedMedia from "./ExpandedMedia";
+import PostBody from "./PostBody";
+import { htmlToText } from "@/lib/post-body-links";
 import { FavoriteButton } from "./FavoriteButton";
 
 type Props = {
@@ -24,7 +24,6 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
     setExpand(!expand);
   };
   const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
-  const sanitizer = DOMPurify.sanitize;
 
   return (
     <div className="group relative bg-card rounded-lg border hover:border-primary/50 transition-all duration-200">
@@ -67,9 +66,11 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
             {/* Post Body */}
             <div className="text-sm mb-2">
               {post.body && (
-                <div className="whitespace-pre-wrap break-words">
-                  {parse(sanitizer(post.body))}
-                </div>
+                <PostBody
+                  body={post.body}
+                  pluginId={post.pluginId || ""}
+                  className="whitespace-pre-wrap break-words"
+                />
               )}
             </div>
 
@@ -89,7 +90,7 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
               <ExpandedMedia
                 url={post.url}
                 thumbnailUrl={post.thumbnailUrl}
-                alt={post.body || "Post media"}
+                alt={post.body ? htmlToText(post.body) : "Post media"}
                 className="rounded-xl mb-2 max-w-full border"
               />
             )}
