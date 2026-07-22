@@ -53,9 +53,12 @@ const QuotedPost: React.FC<{ post: Post; pluginId: string }> = ({
           {post.publishedDate && (
             <>
               <span className="text-muted-foreground text-xs">•</span>
-              <span className="text-muted-foreground text-xs">
+              <PostLink
+                post={{ ...post, pluginId: post.pluginId || pluginId }}
+                className="text-muted-foreground text-xs hover:underline"
+              >
                 <ReactTimeago date={post.publishedDate} />
-              </span>
+              </PostLink>
             </>
           )}
         </div>
@@ -125,10 +128,18 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
               >
                 {post.authorName}
               </Link>
-              <span className="text-muted-foreground text-sm">•</span>
-              <span className="text-muted-foreground text-sm">
-                {post.publishedDate && <ReactTimeago date={post.publishedDate} />}
-              </span>
+              {post.publishedDate && (
+                <>
+                  <span className="text-muted-foreground text-sm">•</span>
+                  <PostLink
+                    post={post}
+                    instanceId={instanceId}
+                    className="text-muted-foreground text-sm hover:underline"
+                  >
+                    <ReactTimeago date={post.publishedDate} />
+                  </PostLink>
+                </>
+              )}
             </div>
 
             {/* Post Body */}
