@@ -18,6 +18,74 @@ type Props = {
   showFullPost?: boolean;
 };
 
+// A tweet that this post quotes, rendered inline as a nested card rather than
+// as a separate standalone post.
+const QuotedPost: React.FC<{ post: Post; pluginId: string }> = ({
+  post,
+  pluginId,
+}) => {
+  return (
+    <div className="mt-2 mb-2 rounded-xl border bg-muted/30 hover:bg-muted/50 transition-colors overflow-hidden">
+      <div className="p-3">
+        {/* Header: Author & Time */}
+        <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+          <Avatar className="size-5">
+            <AvatarImage src={post.authorAvatar} />
+            <AvatarFallback className="text-[10px]">
+              {post.authorName?.slice(0, 2)}
+            </AvatarFallback>
+          </Avatar>
+          <Link
+            to="/plugins/$pluginId/user/$apiId"
+            className="font-semibold text-xs hover:underline"
+            params={{
+              pluginId: post.pluginId || pluginId,
+              apiId: post.authorApiId || "",
+            }}
+          >
+            {post.authorName}
+          </Link>
+          {post.authorApiId && (
+            <span className="text-muted-foreground text-xs">
+              @{post.authorApiId}
+            </span>
+          )}
+          {post.publishedDate && (
+            <>
+              <span className="text-muted-foreground text-xs">•</span>
+              <span className="text-muted-foreground text-xs">
+                <ReactTimeago date={post.publishedDate} />
+              </span>
+            </>
+          )}
+        </div>
+
+        {/* Body */}
+        {post.body && (
+          <div className="text-sm">
+            <PostBody
+              body={post.body}
+              pluginId={post.pluginId || pluginId}
+              className="whitespace-pre-wrap break-words"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Media */}
+      {post.thumbnailUrl && (
+        <div className="border-t">
+          <ImageThumbnail
+            url={post.url}
+            thumbnailUrl={post.thumbnailUrl}
+            toggleExpand={() => {}}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
 const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) => {
   const [expand, setExpand] = React.useState(false);
   const toggleExpand = () => {
@@ -73,6 +141,14 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
                 />
               )}
             </div>
+
+            {/* Quoted Tweet */}
+            {post.quotedPost && (
+              <QuotedPost
+                post={post.quotedPost}
+                pluginId={post.pluginId || ""}
+              />
+            )}
 
             {/* Image/Media */}
             {(post.thumbnailUrl || post.url) && (

@@ -66,6 +66,7 @@ export interface Post {
   moreRepliesId?: string;
   moreRepliesCount?: number;
   isVideo?: boolean;
+  quotedPost?: Post;
 }
 
 export interface User {
