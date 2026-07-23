@@ -33,6 +33,7 @@ import {
   SyncDownloadRequest,
   SyncDownloadResponse,
   NotificationMessage,
+  Post,
 } from "../plugintypes";
 import { Theme, useTheme } from "@infogata/shadcn-vite-theme-provider";
 import { NetworkRequest, SiteRedirectRule } from "../types";
@@ -248,26 +249,39 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
       };
 
       const srcUrl = getPluginUrl(plugin.id!, "/pluginframe.html");
+      // Stamp the owning plugin id onto a post and any post it quotes so links
+      // (author, thread) resolve. Nested quoted posts aren't in the top-level
+      // `items` array, so they need stamping explicitly.
+      const stampPost = (post?: Post) => {
+        if (!post) return;
+        post.pluginId = plugin.id;
+        stampPost(post.quotedPost);
+      };
       const host = new PluginFrameContainer(api, {
         completeMethods: {
           onGetFeed: (feed: GetFeedResponse) => {
-            feed?.items.forEach((i) => (i.pluginId = plugin.id));
+            feed?.items.forEach(stampPost);
             return feed;
           },
           onSearch: (feed: SearchResponse) => {
-            feed?.items.forEach((i) => (i.pluginId = plugin.id));
+            feed?.items.forEach(stampPost);
             return feed;
           },
           onGetTrendingTopicFeed: (feed: GetTrendingTopicFeedResponse) => {
-            feed?.items.forEach((i) => (i.pluginId = plugin.id));
+            feed?.items.forEach(stampPost);
             return feed;
           },
           onGetCommunity: (response: GetCommunityResponse) => {
-            response?.items.forEach((i) => (i.pluginId = plugin.id));
+            response?.items.forEach(stampPost);
             return response;
           },
           onGetUser: (response: GetUserResponse) => {
-            response?.items.forEach((i) => (i.pluginId = plugin.id));
+            response?.items.forEach(stampPost);
+            return response;
+          },
+          onGetComments: (response: GetCommentsResponse) => {
+            stampPost(response?.post);
+            response?.items.forEach(stampPost);
             return response;
           },
         },
