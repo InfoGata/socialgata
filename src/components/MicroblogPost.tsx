@@ -36,7 +36,7 @@ const QuotedPost: React.FC<{ post: Post; pluginId: string }> = ({
             </AvatarFallback>
           </Avatar>
           <Link
-            to="/plugins/$pluginId/user/$apiId"
+            to="/s/$pluginId/user/$apiId"
             className="font-semibold text-xs hover:underline"
             params={{
               pluginId: post.pluginId || pluginId,
@@ -102,7 +102,7 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
         <div className="flex gap-3">
           {/* Avatar */}
           <Link
-            to="/plugins/$pluginId/user/$apiId"
+            to="/s/$pluginId/user/$apiId"
             params={{
               pluginId: post.pluginId || "",
               apiId: post.authorApiId || "",
@@ -119,7 +119,7 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
             {/* Header: Author & Time */}
             <div className="flex items-center gap-1 mb-1 flex-wrap">
               <Link
-                to="/plugins/$pluginId/user/$apiId"
+                to="/s/$pluginId/user/$apiId"
                 className="font-semibold text-sm hover:underline"
                 params={{
                   pluginId: post.pluginId || "",

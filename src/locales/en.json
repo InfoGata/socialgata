@@ -9,6 +9,7 @@
     "close": "Close",
     "cancel": "Cancel",
     "confirm": "Confirm",
+    "save": "Save",
     "notFound": "Not found"
   },
   "settings": {
@@ -63,6 +64,16 @@
     "manifestUrlRequired": "The filename 'manifest.json' must be in the url",
     "fileNotFound": "File not found: {{name}}",
     "couldNotFetchFile": "Could not fetch file: {{name}}",
-    "manifestNoScript": "Manifest does not contain a script property"
+    "manifestNoScript": "Manifest does not contain a script property",
+    "urlAlias": "URL Alias",
+    "urlAliasDescription": "Used in this plugin's urls, e.g. /s/{{alias}}/feed",
+    "renameAlias": "Rename",
+    "aliasErrorInvalid": "Use lowercase letters, numbers and dashes only",
+    "aliasErrorTooShort": "Must be at least 2 characters",
+    "aliasErrorIsPluginId": "Already used as a plugin id",
+    "aliasErrorTaken": "Already used by another plugin",
+    "pluginNotInstalledTitle": "Plugin not installed",
+    "pluginNotInstalledDescription": "No installed plugin answers to \"{{alias}}\".",
+    "browsePlugins": "Browse plugins"
   }
 }

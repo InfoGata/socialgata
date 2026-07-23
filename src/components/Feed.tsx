@@ -43,8 +43,8 @@ const Feed: React.FC<FeedProps> = (props) => {
                   <Link
                     key={feedType.id}
                     to={instanceId
-                      ? "/plugins/$pluginId/instances/$instanceId/feed"
-                      : "/plugins/$pluginId/feed"
+                      ? "/s/$pluginId/i/$instanceId/feed"
+                      : "/s/$pluginId/feed"
                     }
                     params={instanceId
                       ? { pluginId, instanceId }

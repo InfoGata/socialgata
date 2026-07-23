@@ -1,6 +1,11 @@
 import { TrendingTopic } from '@/plugintypes';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  canonicalizePluginUrl,
+  pluginIdParams,
+  pluginNotFoundComponent,
+} from "@/lib/plugin-route";
 
 const TrendingTopics: React.FC = () => {
   const data = Route.useLoaderData();
@@ -15,7 +20,7 @@ const TrendingTopics: React.FC = () => {
             <CardHeader>
               <CardTitle>
                 <Link
-                  to="/plugins/$pluginId/trending/$topicName"
+                  to="/s/$pluginId/trending/$topicName"
                   params={{
                     pluginId: params.pluginId,
                     topicName: encodeURIComponent(topic.name)
@@ -41,7 +46,10 @@ const TrendingTopics: React.FC = () => {
   );
 };
 
-export const Route = createFileRoute('/plugins/$pluginId/trending/')({
+export const Route = createFileRoute('/s/$pluginId/trending/')({
+  params: pluginIdParams(),
+  beforeLoad: canonicalizePluginUrl,
+  notFoundComponent: pluginNotFoundComponent,
   component: TrendingTopics,
   loader: async ({ params, context }) => {
     const plugin = context.plugins.find(p => p.id === params.pluginId);

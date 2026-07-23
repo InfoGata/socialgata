@@ -11,6 +11,11 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import React from "react";
+import {
+  canonicalizePluginUrl,
+  pluginIdParams,
+  pluginNotFoundComponent,
+} from "@/lib/plugin-route";
 
 const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
 
@@ -161,7 +166,10 @@ const UserOverview: React.FC = () => {
   );
 };
 
-export const Route = createFileRoute("/plugins/$pluginId/user/$apiId")({
+export const Route = createFileRoute("/s/$pluginId/user/$apiId")({
+  params: pluginIdParams<{ apiId: string }>(),
+  beforeLoad: canonicalizePluginUrl,
+  notFoundComponent: pluginNotFoundComponent,
   component: UserOverview,
   loader: async ({ params, context }) => {
     const plugin = context.plugins.find((p) => p.id === params.pluginId);

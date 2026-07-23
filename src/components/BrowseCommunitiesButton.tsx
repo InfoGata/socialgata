@@ -34,7 +34,7 @@ const BrowseCommunitiesButton: React.FC<BrowseCommunitiesButtonProps> = ({ plugi
       <Button variant="outline" size="sm" asChild>
         {instanceId ? (
           <Link
-            to="/plugins/$pluginId/instances/$instanceId/communities"
+            to="/s/$pluginId/i/$instanceId/communities"
             params={{ pluginId, instanceId }}
             className="flex items-center gap-2"
           >
@@ -43,7 +43,7 @@ const BrowseCommunitiesButton: React.FC<BrowseCommunitiesButtonProps> = ({ plugi
           </Link>
         ) : (
           <Link
-            to="/plugins/$pluginId/communities"
+            to="/s/$pluginId/communities"
             params={{ pluginId }}
             className="flex items-center gap-2"
           >

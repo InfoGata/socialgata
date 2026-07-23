@@ -117,7 +117,7 @@ const CommentComponent: React.FC<Props> = (props) => {
                 )}
                 {routePluginId && comment.apiId && (
                   <Link
-                    to="/plugins/$pluginId/post/$apiId"
+                    to="/s/$pluginId/post/$apiId"
                     params={{
                       pluginId: routePluginId,
                       apiId: comment.apiId,
@@ -157,7 +157,7 @@ const CommentComponent: React.FC<Props> = (props) => {
     <div className="border-l-2 border-muted pl-4 my-4">
       <div className="text-sm text-muted-foreground mb-2 flex items-center gap-1.5">
         <Link
-          to="/plugins/$pluginId/user/$apiId"
+          to="/s/$pluginId/user/$apiId"
           params={{
             pluginId: comment.pluginId || "",
             apiId: comment.authorApiId || "",
@@ -200,7 +200,7 @@ const CommentComponent: React.FC<Props> = (props) => {
 
         {routePluginId && comment.apiId && (
           <Link
-            to="/plugins/$pluginId/post/$apiId"
+            to="/s/$pluginId/post/$apiId"
             params={{
               pluginId: routePluginId,
               apiId: comment.apiId,

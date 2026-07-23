@@ -57,7 +57,7 @@ const PostWithComments: React.FC<Props> = (props) => {
       {/* Feed Link */}
       {pluginId && hasFeed && (
         <Link
-          to="/plugins/$pluginId/feed"
+          to="/s/$pluginId/feed"
           params={{ pluginId }}
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
         >
@@ -74,8 +74,8 @@ const PostWithComments: React.FC<Props> = (props) => {
               <Users2Icon className="h-4 w-4" />
               <span>Community: <Link
                 to={data.community.instanceId
-                  ? "/plugins/$pluginId/instances/$instanceId/community/$apiId"
-                  : "/plugins/$pluginId/community/$apiId"}
+                  ? "/s/$pluginId/i/$instanceId/c/$apiId"
+                  : "/s/$pluginId/c/$apiId"}
                 className="font-medium text-foreground hover:text-primary transition-colors"
                 params={{
                   pluginId: pluginId || "",

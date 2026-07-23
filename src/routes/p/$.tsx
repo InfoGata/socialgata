@@ -1,20 +1,21 @@
+import { toContentPath } from "@/lib/plugin-route";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/**
+ * The old short url form, from before `/s` existed. Its `i`/`c` segments are
+ * now the canonical ones, so this only has to swap the prefix and resolve the
+ * plugin segment to the current alias.
+ */
 export const Route = createFileRoute("/p/$")({
   beforeLoad: ({ params, location }) => {
-    const splatPath = params._splat ?? "";
+    const [pluginSegment = "", ...rest] = (params._splat ?? "")
+      .split("/")
+      .filter(Boolean);
 
-    const segments = splatPath.split("/");
-    const expanded = segments.map((seg, i) => {
-      if (seg === "i" && i === 1) return "instances";
-      if (seg === "c") return "community";
-      return seg;
-    });
-
-    const fullPath = "/plugins/" + expanded.join("/");
     throw redirect({
-      to: fullPath,
+      to: toContentPath(pluginSegment, rest),
       search: location.search,
+      replace: true,
     });
   },
 });

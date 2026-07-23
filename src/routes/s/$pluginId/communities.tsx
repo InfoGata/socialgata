@@ -8,6 +8,11 @@ import {
   PaginationNext,
 } from '@/components/ui/pagination';
 import { createFileRoute, notFound } from '@tanstack/react-router'
+import {
+  canonicalizePluginUrl,
+  pluginIdParams,
+  pluginNotFoundComponent,
+} from "@/lib/plugin-route";
 
 const Communities: React.FC = () => {
   const data = Route.useLoaderData();
@@ -63,7 +68,10 @@ type CommunitiesSearch = {
   page?: string | number;
 }
 
-export const Route = createFileRoute('/plugins/$pluginId/communities')({
+export const Route = createFileRoute('/s/$pluginId/communities')({
+  params: pluginIdParams(),
+  beforeLoad: canonicalizePluginUrl,
+  notFoundComponent: pluginNotFoundComponent,
   component: Communities,
   loaderDeps: ({ search }) => ({ page: search.page }),
   loader: async ({ params, deps: { page }, context }) => {

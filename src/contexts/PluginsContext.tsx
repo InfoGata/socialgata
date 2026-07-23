@@ -50,6 +50,14 @@ import {
 import { Manifest } from "../plugintypes";
 import { useAppSelector } from "../store/hooks";
 import { hasExtension, isCorsDisabled } from "@/utils";
+import {
+  aliasForId,
+  aliasFromName,
+  assignAlias,
+  setPluginAliases,
+  validateAlias,
+  AliasError,
+} from "@/lib/plugin-alias";
 
 interface ApplicationPluginInterface extends PluginInterface {
   networkRequest(input: string, init?: RequestInit): Promise<NetworkRequest>;
@@ -98,6 +106,7 @@ export interface PluginMessage {
 export class PluginFrameContainer extends PluginFrame<PluginMethodInterface> {
   name?: string;
   id?: string;
+  alias?: string;
   hasOptions?: boolean;
   hasFeed?: boolean;
   fileList?: FileList;
@@ -114,6 +123,10 @@ export interface PluginContextInterface {
     pluginFiles?: FileList
   ) => Promise<void>;
   deletePlugin: (plugin: PluginFrameContainer) => Promise<void>;
+  setPluginAlias: (
+    pluginId: string,
+    alias: string
+  ) => Promise<AliasError | null>;
   plugins: PluginFrameContainer[];
   pluginMessage?: PluginMessage;
   pluginsLoaded: boolean;
@@ -291,6 +304,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
 
       host.name = plugin.name;
       host.id = plugin.id;
+      host.alias = plugin.alias;
       host.version = plugin.version;
       host.hasOptions = !!plugin.optionsHtml;
       host.fileList = pluginFiles;
@@ -325,6 +339,10 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
 
   const publishFrames = React.useCallback((frames: PluginFrameContainer[]) => {
     pluginFramesRef.current = frames;
+    // Router params.parse/stringify read the alias registry outside of React,
+    // so refresh it here: this runs before pluginsLoaded flips true, which is
+    // what gates the router from rendering at all (see router.tsx).
+    setPluginAliases(frames);
     setPluginFrames(frames);
   }, []);
 
@@ -391,6 +409,14 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
         return;
       }
 
+      // The manifest's alias is a request: fall back to the name, and take a
+      // `-N` variant when another plugin already holds it.
+      plugin.alias = assignAlias(
+        plugin.alias || aliasFromName(plugin.name),
+        await db.plugins.toArray(),
+        id
+      );
+
       // Save to database
       await db.plugins.add(plugin);
 
@@ -403,8 +429,37 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
 
   const updatePlugin = React.useCallback(
     async (plugin: PluginInfo) => {
+      // Urls have to survive plugin updates, so keep whatever alias the plugin
+      // already has here — including one the user picked — rather than letting
+      // a changed manifest alias move them. Every update path (dev auto-reload,
+      // auto-update, the details page) goes through here.
+      const existing = plugin.id ? await db.plugins.get(plugin.id) : undefined;
+      plugin.alias =
+        existing?.alias ??
+        assignAlias(
+          plugin.alias || aliasFromName(plugin.name),
+          await db.plugins.toArray(),
+          plugin.id
+        );
+
       await db.plugins.put(plugin);
       await loadAllPlugins({ silent: true });
+    },
+    [loadAllPlugins]
+  );
+
+  /** Rename a plugin's url alias. Returns why it was rejected, or null. */
+  const setPluginAlias = React.useCallback(
+    async (pluginId: string, alias: string): Promise<AliasError | null> => {
+      const plugin = await db.plugins.get(pluginId);
+      if (!plugin) return "invalid";
+
+      const error = validateAlias(alias, await db.plugins.toArray(), pluginId);
+      if (error) return error;
+
+      await db.plugins.update(pluginId, { alias });
+      await loadAllPlugins({ silent: true });
+      return null;
     },
     [loadAllPlugins]
   );
@@ -543,6 +598,9 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
             plugin.manifest?.redirects ?? [],
             plugin
           );
+          // Manifest redirect paths are authored against the old
+          // `/plugins/<id>/community/...` segments, so leave them alone and let
+          // the back-compat splat route forward them to `/s/<alias>/c/...`.
           const patternRedirects = manifestRedirects.map((r) => ({
             pattern: r.pattern,
             redirectPath: `/plugins/${plugin.id}${r.path}`,
@@ -553,7 +611,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
             appName: "SocialGata",
             appOrigin: window.location.origin,
             siteMatchPatterns: siteMatch,
-            redirectPath: `/plugins/${plugin.id}/feed`,
+            redirectPath: `/s/${aliasForId(plugin.id)}/feed`,
             patternRedirects,
           });
         }
@@ -582,6 +640,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
     addPlugin,
     updatePlugin,
     deletePlugin,
+    setPluginAlias,
     plugins: pluginFrames,
     pluginMessage,
     pluginsLoaded,

@@ -1,5 +1,10 @@
 import CommunityFeed from "@/components/CommunityFeed";
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import {
+  canonicalizePluginUrl,
+  pluginIdParams,
+  pluginNotFoundComponent,
+} from "@/lib/plugin-route";
 
 const Community: React.FC = () => {
   const data = Route.useLoaderData();
@@ -12,7 +17,10 @@ type CommunitySearch = {
   page?: string | number;
 }
 
-export const Route = createFileRoute("/plugins/$pluginId/community/$apiId/")({
+export const Route = createFileRoute("/s/$pluginId/c/$apiId/")({
+  params: pluginIdParams<{ apiId: string }>(),
+  beforeLoad: canonicalizePluginUrl,
+  notFoundComponent: pluginNotFoundComponent,
   component: Community,
   loaderDeps: ({search}) => ({page: search.page}),
   loader: async ({ params, deps: { page }, context }) => {

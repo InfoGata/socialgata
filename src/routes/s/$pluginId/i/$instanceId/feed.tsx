@@ -1,5 +1,10 @@
 import Feed from '@/components/Feed';
 import { createFileRoute, notFound } from '@tanstack/react-router'
+import {
+  canonicalizePluginUrl,
+  pluginIdParams,
+  pluginNotFoundComponent,
+} from "@/lib/plugin-route";
 
 const InstanceFeed: React.FC = () => {
   const data = Route.useLoaderData();
@@ -17,7 +22,10 @@ const InstanceFeed: React.FC = () => {
   );
 }
 
-export const Route = createFileRoute('/plugins/$pluginId/instances/$instanceId/feed')({
+export const Route = createFileRoute('/s/$pluginId/i/$instanceId/feed')({
+  params: pluginIdParams<{ instanceId: string }>(),
+  beforeLoad: canonicalizePluginUrl,
+  notFoundComponent: pluginNotFoundComponent,
   component: InstanceFeed,
   loaderDeps: ({search}) => ({page: search.page, feedTypeId: search.feedTypeId}),
   loader: async ({ params, deps: { page, feedTypeId }, context }) => {

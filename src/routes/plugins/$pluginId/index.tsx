@@ -37,6 +37,12 @@ import {
   TriangleAlertIcon,
 } from "lucide-react";
 import { isValidRedirectPattern } from "@/redirect-validation";
+import PluginAliasField from "@/components/Plugins/PluginAliasField";
+import {
+  canonicalizePluginUrl,
+  pluginIdParams,
+  pluginNotFoundComponent,
+} from "@/lib/plugin-route";
 
 const PluginDetails: React.FC = () => {
   const { pluginId } = Route.useParams();
@@ -46,8 +52,10 @@ const PluginDetails: React.FC = () => {
   const [pluginInfo, setPluginInfo] = React.useState<PluginInfo | undefined>();
 
   React.useEffect(() => {
+    // Refetch whenever plugins reload too, so an update or an alias rename is
+    // reflected here rather than leaving stale details on screen.
     db.plugins.get(pluginId || "").then(setPluginInfo);
-  }, [pluginId]);
+  }, [pluginId, plugins]);
   const { hasLogin, isLoggedIn, login, logout } = usePluginLogin(plugin);
   const [hasUpdate, setHasUpdate] = React.useState(false);
   const [isCheckingUpdate, setIsCheckingUpdate] = React.useState(false);
@@ -165,7 +173,7 @@ const PluginDetails: React.FC = () => {
         {plugin?.hasFeed && (
           <Link
             className={cn(buttonVariants({ variant: "default", size: "sm" }))}
-            to="/plugins/$pluginId/feed"
+            to="/s/$pluginId/feed"
             params={{ pluginId: pluginInfo.id || "" }}
           >
             <RssIcon className="mr-2 h-4 w-4" />
@@ -233,6 +241,12 @@ const PluginDetails: React.FC = () => {
                   {pluginInfo.id}
                 </span>
               </div>
+              {pluginInfo.id && (
+                <PluginAliasField
+                  pluginId={pluginInfo.id}
+                  alias={pluginInfo.alias}
+                />
+              )}
               {pluginInfo.manifestUrl && (
                 <div>
                   <dt className="text-muted-foreground">
@@ -387,5 +401,8 @@ const PluginDetails: React.FC = () => {
 };
 
 export const Route = createFileRoute("/plugins/$pluginId/")({
+  params: pluginIdParams(),
+  beforeLoad: canonicalizePluginUrl,
+  notFoundComponent: pluginNotFoundComponent,
   component: PluginDetails,
 });

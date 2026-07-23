@@ -1,5 +1,10 @@
 import Feed from '@/components/Feed';
 import { createFileRoute, notFound } from '@tanstack/react-router';
+import {
+  canonicalizePluginUrl,
+  pluginIdParams,
+  pluginNotFoundComponent,
+} from "@/lib/plugin-route";
 
 const TrendingTopicFeed: React.FC = () => {
   const data = Route.useLoaderData();
@@ -25,7 +30,10 @@ type FeedSearch = {
   page?: string | number;
 }
 
-export const Route = createFileRoute('/plugins/$pluginId/trending/$topicName')({
+export const Route = createFileRoute('/s/$pluginId/trending/$topicName')({
+  params: pluginIdParams<{ topicName: string }>(),
+  beforeLoad: canonicalizePluginUrl,
+  notFoundComponent: pluginNotFoundComponent,
   component: TrendingTopicFeed,
   loaderDeps: ({ search }) => ({ page: search.page }),
   loader: async ({ params, deps: { page }, context }) => {

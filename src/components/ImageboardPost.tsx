@@ -65,8 +65,8 @@ const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
                 <>
                   <Link
                     to={instanceId
-                      ? "/plugins/$pluginId/instances/$instanceId/community/$apiId"
-                      : "/plugins/$pluginId/community/$apiId"
+                      ? "/s/$pluginId/i/$instanceId/c/$apiId"
+                      : "/s/$pluginId/c/$apiId"
                     }
                     className="font-bold text-primary hover:underline"
                     params={{

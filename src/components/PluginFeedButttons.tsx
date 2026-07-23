@@ -106,7 +106,7 @@ const PluginFeedButtons = ({ pluginId }: PluginFeedButtonsProps) => {
           {!hasInstances && (
             <Link
               className={cn(buttonVariants({ variant: "default", size: "sm" }))}
-              to={`/plugins/$pluginId/feed`}
+              to={`/s/$pluginId/feed`}
               params={{ pluginId }}
             >
               <Rss className="h-3.5 w-3.5 mr-1.5" />
@@ -116,7 +116,7 @@ const PluginFeedButtons = ({ pluginId }: PluginFeedButtonsProps) => {
           {hasInstances && (
             <Link
               className={cn(buttonVariants({ variant: "default", size: "sm" }))}
-              to={`/plugins/$pluginId/instances`}
+              to={`/s/$pluginId/i`}
               params={{ pluginId }}
             >
               <Server className="h-3.5 w-3.5 mr-1.5" />
@@ -126,7 +126,7 @@ const PluginFeedButtons = ({ pluginId }: PluginFeedButtonsProps) => {
           {hasTrending && (
             <Link
               className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-              to={`/plugins/$pluginId/trending`}
+              to={`/s/$pluginId/trending`}
               params={{ pluginId }}
             >
               <TrendingUp className="h-3.5 w-3.5 mr-1.5" />

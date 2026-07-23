@@ -92,6 +92,11 @@ const PluginContainer: React.FC<PluginContainerProps> = (props) => {
                     v{plugin.version}
                   </span>
                 )}
+                {plugin.alias && (
+                  <span className="font-mono text-xs text-muted-foreground truncate">
+                    /s/{plugin.alias}
+                  </span>
+                )}
                 {platform && (
                   <span
                     className={cn(

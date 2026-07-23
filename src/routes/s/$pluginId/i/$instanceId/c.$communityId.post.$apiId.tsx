@@ -1,6 +1,11 @@
 import PostWithComments from "@/components/PostWithComments";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import React from "react";
+import {
+  canonicalizePluginUrl,
+  pluginIdParams,
+  pluginNotFoundComponent,
+} from "@/lib/plugin-route";
 
 const CommunityPostComments: React.FC = () => {
   const data = Route.useLoaderData();
@@ -9,8 +14,11 @@ const CommunityPostComments: React.FC = () => {
 };
 
 export const Route = createFileRoute(
-  "/plugins/$pluginId/community/$communityId/post/$apiId"
+  "/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId"
 )({
+  params: pluginIdParams<{ instanceId: string; communityId: string; apiId: string }>(),
+  beforeLoad: canonicalizePluginUrl,
+  notFoundComponent: pluginNotFoundComponent,
   component: CommunityPostComments,
   loader: async ({ params, context }) => {
     const plugin = context.plugins.find(p => p.id === params.pluginId);
@@ -18,6 +26,7 @@ export const Route = createFileRoute(
       const response = await plugin.remote.onGetComments({
         apiId: params.apiId,
         communityId: params.communityId,
+        instanceId: params.instanceId,
       });
       return response;
     } else {

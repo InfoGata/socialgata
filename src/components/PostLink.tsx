@@ -24,7 +24,7 @@ const PostLink: React.FC<PropsWithChildren<Props>> = (props) => {
     return (
       <Link
         className={className}
-      to="/plugins/$pluginId/community/$communityId/post/$apiId"
+      to="/s/$pluginId/c/$communityId/post/$apiId"
       params={{
         pluginId: post.pluginId || "",
         communityId: post.communityApiId,
@@ -40,7 +40,7 @@ const PostLink: React.FC<PropsWithChildren<Props>> = (props) => {
     return (
       <Link
         className={className}
-        to="/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId"
+        to="/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId"
         params={{
           pluginId: post.pluginId || "",
           instanceId: instanceId,
@@ -56,7 +56,7 @@ const PostLink: React.FC<PropsWithChildren<Props>> = (props) => {
   return (
     <Link
       className={className}
-      to="/plugins/$pluginId/post/$apiId"
+      to="/s/$pluginId/post/$apiId"
       params={{ pluginId: post.pluginId || "", apiId: post.apiId || "" }}
     >
       {children}

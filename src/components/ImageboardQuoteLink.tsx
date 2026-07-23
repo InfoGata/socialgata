@@ -44,17 +44,17 @@ const ImageboardQuoteLink: React.FC<Props> = ({
     // Navigate to the post's page
     if (communityApiId && instanceId) {
       navigate({
-        to: "/plugins/$pluginId/instances/$instanceId/community/$communityId/post/$apiId",
+        to: "/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId",
         params: { pluginId, instanceId, communityId: communityApiId, apiId: postNumber },
       });
     } else if (communityApiId) {
       navigate({
-        to: "/plugins/$pluginId/community/$communityId/post/$apiId",
+        to: "/s/$pluginId/c/$communityId/post/$apiId",
         params: { pluginId, communityId: communityApiId, apiId: postNumber },
       });
     } else {
       navigate({
-        to: "/plugins/$pluginId/post/$apiId",
+        to: "/s/$pluginId/post/$apiId",
         params: { pluginId, apiId: postNumber },
       });
     }

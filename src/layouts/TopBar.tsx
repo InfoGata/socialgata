@@ -76,7 +76,7 @@ export const TopBar: React.FC = () => {
     const selectedSource = searchSources.find(source => source.id === effectiveSearchSource);
     if (selectedSource) {
       navigate({
-        to: '/plugins/$pluginId/feed',
+        to: '/s/$pluginId/feed',
         params: { pluginId: selectedSource.pluginId },
         search: { q: query }
       });

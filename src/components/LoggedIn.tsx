@@ -27,7 +27,7 @@ const LogginedIn: React.FC<Props> = (props) => {
     <div className="flex gap-2">
       <Link
         className={buttonVariants({ variant: "default" })}
-        to="/plugins/$pluginId/feed"
+        to="/s/$pluginId/feed"
         params={{ pluginId: pluginId }}
       >
         Feed
@@ -35,7 +35,7 @@ const LogginedIn: React.FC<Props> = (props) => {
       {hasInstances && (
         <Link
           className={buttonVariants({ variant: "default" })}
-          to="/plugins/$pluginId/instances"
+          to="/s/$pluginId/i"
           params={{ pluginId: pluginId }}
         >
           Instances

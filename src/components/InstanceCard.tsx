@@ -78,7 +78,7 @@ const InstanceCard: React.FC<InstanceCardProps> = (props) => {
           </div>
           <div className="min-w-0 flex-1">
             <Link
-              to={`/plugins/$pluginId/instances/$instanceId/feed`}
+              to={`/s/$pluginId/i/$instanceId/feed`}
               params={{ pluginId, instanceId: instance.apiId }}
               className="font-semibold text-base hover:underline truncate block"
             >
@@ -124,7 +124,7 @@ const InstanceCard: React.FC<InstanceCardProps> = (props) => {
         <div className="mt-auto flex gap-2 pt-1">
           <Link
             className={cn(buttonVariants({ variant: "default", size: "sm" }), "flex-1")}
-            to={`/plugins/$pluginId/instances/$instanceId/feed`}
+            to={`/s/$pluginId/i/$instanceId/feed`}
             params={{ pluginId, instanceId: instance.apiId }}
           >
             <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
@@ -133,7 +133,7 @@ const InstanceCard: React.FC<InstanceCardProps> = (props) => {
           {hasCommunities && (
             <Link
               className={cn(buttonVariants({ variant: "outline", size: "sm" }), "flex-1")}
-              to={`/plugins/$pluginId/instances/$instanceId/communities`}
+              to={`/s/$pluginId/i/$instanceId/communities`}
               params={{ pluginId, instanceId: instance.apiId }}
             >
               <Layers className="h-3.5 w-3.5 mr-1.5" />

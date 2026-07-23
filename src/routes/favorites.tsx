@@ -87,7 +87,7 @@ function FavoritesPage() {
                         <CardHeader>
                           <div className="flex items-start justify-between gap-2">
                             <Link
-                              to="/plugins/$pluginId/community/$apiId"
+                              to="/s/$pluginId/c/$apiId"
                               params={{ pluginId, apiId: community.apiId }}
                               className="block group flex-1 min-w-0"
                             >
@@ -122,7 +122,7 @@ function FavoritesPage() {
                         <CardHeader>
                           <div className="flex items-start justify-between gap-2">
                             <Link
-                              to="/plugins/$pluginId/user/$apiId"
+                              to="/s/$pluginId/user/$apiId"
                               params={{ pluginId, apiId: user.apiId }}
                               className="block group flex-1 min-w-0"
                             >
@@ -201,7 +201,7 @@ function FavoritesPage() {
                   <CardHeader>
                     <div className="flex items-start justify-between gap-2">
                       <Link
-                        to="/plugins/$pluginId/community/$apiId"
+                        to="/s/$pluginId/c/$apiId"
                         params={{ pluginId, apiId: community.apiId }}
                         className="block group flex-1 min-w-0"
                       >
@@ -239,7 +239,7 @@ function FavoritesPage() {
                   <CardHeader>
                     <div className="flex items-start justify-between gap-2">
                       <Link
-                        to="/plugins/$pluginId/user/$apiId"
+                        to="/s/$pluginId/user/$apiId"
                         params={{ pluginId, apiId: user.apiId }}
                         className="block group flex-1 min-w-0"
                       >

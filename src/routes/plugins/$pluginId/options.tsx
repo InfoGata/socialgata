@@ -5,6 +5,11 @@ import Spinner from "@/components/Spinner";
 import { db } from "@/database";
 import { usePlugins } from "@/hooks/usePlugins";
 import { getPluginUrl } from "@/plugin-utils";
+import {
+  canonicalizePluginUrl,
+  pluginIdParams,
+  pluginNotFoundComponent,
+} from "@/lib/plugin-route";
 
 const PluginOptions: React.FC = () => {
   const { pluginId } = Route.useParams();
@@ -94,5 +99,8 @@ const PluginOptions: React.FC = () => {
 };
 
 export const Route = createFileRoute("/plugins/$pluginId/options")({
+  params: pluginIdParams(),
+  beforeLoad: canonicalizePluginUrl,
+  notFoundComponent: pluginNotFoundComponent,
   component: PluginOptions,
 });

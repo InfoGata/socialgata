@@ -59,7 +59,7 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
               </Avatar>
             )}
             <Link
-              to="/plugins/$pluginId/user/$apiId"
+              to="/s/$pluginId/user/$apiId"
               className="font-medium hover:text-primary transition-colors"
               params={{
                 pluginId: post.pluginId || "",
@@ -73,8 +73,8 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
                 <span className="text-muted-foreground/40">in</span>
                 <Link
                   to={instanceId
-                    ? "/plugins/$pluginId/instances/$instanceId/community/$apiId"
-                    : "/plugins/$pluginId/community/$apiId"
+                    ? "/s/$pluginId/i/$instanceId/c/$apiId"
+                    : "/s/$pluginId/c/$apiId"
                   }
                   className="font-semibold text-primary/80 hover:text-primary transition-colors"
                   params={{

@@ -2,6 +2,11 @@ import InstanceCard from '@/components/InstanceCard';
 import { usePlugins } from '@/hooks/usePlugins';
 import { createFileRoute, notFound } from '@tanstack/react-router'
 import { Globe } from 'lucide-react';
+import {
+  canonicalizePluginUrl,
+  pluginIdParams,
+  pluginNotFoundComponent,
+} from "@/lib/plugin-route";
 
 const Instances: React.FC = () => {
   const data = Route.useLoaderData();
@@ -45,7 +50,10 @@ const Instances: React.FC = () => {
   );
 }
 
-export const Route = createFileRoute('/plugins/$pluginId/instances/')({
+export const Route = createFileRoute('/s/$pluginId/i/')({
+  params: pluginIdParams(),
+  beforeLoad: canonicalizePluginUrl,
+  notFoundComponent: pluginNotFoundComponent,
   component: Instances,
   loader: async ({ params, context }) => {
     const plugin = context.plugins.find(p => p.id === params.pluginId);
