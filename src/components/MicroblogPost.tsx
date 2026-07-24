@@ -167,15 +167,18 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
                 <ImageThumbnail
                   url={post.url}
                   thumbnailUrl={post.thumbnailUrl}
+                  isVideo={post.isVideo}
                   toggleExpand={toggleExpand}
                 />
               </div>
             )}
 
             {/* Expanded Media */}
-            {(expand || showFullPost) && post.url && (
+            {(expand || showFullPost) && (post.url || post.videoSources?.length) && (
               <ExpandedMedia
-                url={post.url}
+                url={post.url ?? ""}
+                isVideo={post.isVideo}
+                videoSources={post.videoSources}
                 thumbnailUrl={post.thumbnailUrl}
                 alt={post.body ? htmlToText(post.body) : "Post media"}
                 className="rounded-xl mb-2 max-w-full border"

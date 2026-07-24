@@ -26,6 +26,10 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
   const sanitizer = DOMPurify.sanitize;
   const hasThumbnail = !!post.thumbnailUrl || (post.url && imageRegex.test(post.url));
   const isExternal = post.url && !post.url.startsWith('/');
+  // Videos may carry sources without a usable `url` (it points at a player page).
+  const hasExpandableMedia =
+    !!post.videoSources?.length ||
+    (!!post.url && (post.isVideo || imageRegex.test(post.url)));
 
   return (
     <div className="group relative bg-card hover:bg-accent/30 rounded-lg border border-border/50 hover:border-border transition-colors duration-150">
@@ -116,10 +120,11 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
           )}
 
           {/* Expanded Media */}
-          {(expand || showFullPost) && post.url && (post.isVideo || imageRegex.test(post.url)) && (
+          {(expand || showFullPost) && hasExpandableMedia && (
             <ExpandedMedia
-              url={post.url}
+              url={post.url ?? ""}
               isVideo={post.isVideo}
+              videoSources={post.videoSources}
               thumbnailUrl={post.thumbnailUrl}
               alt={post.title || "Post media"}
               className="rounded-lg mb-2 max-w-full"
@@ -171,6 +176,7 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
               <ImageThumbnail
                 url={post.url}
                 thumbnailUrl={post.thumbnailUrl}
+                isVideo={post.isVideo}
                 toggleExpand={toggleExpand}
               />
             </div>

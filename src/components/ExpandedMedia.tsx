@@ -1,26 +1,32 @@
 import React from "react";
+import { VideoSource } from "@/plugintypes";
+import VideoPlayer from "./VideoPlayer";
 
 type Props = {
   url: string;
   isVideo?: boolean;
+  videoSources?: VideoSource[];
   alt: string;
   className?: string;
   thumbnailUrl?: string;
   toggleExpand?: () => void;
 };
 
-const ExpandedMedia: React.FC<Props> = ({ url, isVideo, alt, className, thumbnailUrl, toggleExpand }) => {
-  if (isVideo) {
+const ExpandedMedia: React.FC<Props> = ({ url, isVideo, videoSources, alt, className, thumbnailUrl, toggleExpand }) => {
+  // Plugins that predate `videoSources` only give us the bare url.
+  const sources = React.useMemo(
+    () =>
+      videoSources?.length
+        ? videoSources
+        : isVideo && url
+        ? [{ source: url }]
+        : undefined,
+    [videoSources, isVideo, url]
+  );
+
+  if (sources) {
     return (
-      <video
-        src={url}
-        controls
-        className={className}
-        preload="metadata"
-        poster={thumbnailUrl}
-      >
-        Your browser does not support the video tag.
-      </video>
+      <VideoPlayer sources={sources} poster={thumbnailUrl} className={className} />
     );
   }
 

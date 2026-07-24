@@ -75,7 +75,19 @@ export interface Post {
   moreRepliesId?: string;
   moreRepliesCount?: number;
   isVideo?: boolean;
+  /**
+   * Playable sources for the video, best-quality/most-complete first.
+   * Tried in order, falling back to the next one on failure.
+   */
+  videoSources?: VideoSource[];
   quotedPost?: Post;
+}
+
+export interface VideoSource {
+  /** Url of the video */
+  source: string;
+  /** Type of video. For example `video/mp4` or `application/x-mpegURL` */
+  type?: string;
 }
 
 export interface User {

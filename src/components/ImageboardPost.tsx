@@ -33,10 +33,12 @@ const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
     <div className="group relative bg-card rounded-lg border hover:border-primary/50 transition-all duration-200 overflow-hidden" data-post-number={post.number}>
       <div className="p-3">
         {/* Expanded Media - Full Width Above Content */}
-        {expand && post.url && post.thumbnailUrl && (
+        {expand && (post.url || post.videoSources?.length) && post.thumbnailUrl && (
           <div className="mb-3">
             <ExpandedMedia
-              url={post.url}
+              url={post.url ?? ""}
+              isVideo={post.isVideo}
+              videoSources={post.videoSources}
               thumbnailUrl={post.thumbnailUrl}
               alt={post.title || "Thread image"}
               className="rounded-md max-w-full border w-full"
@@ -52,6 +54,7 @@ const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
               <ImageThumbnail
                 url={post.url}
                 thumbnailUrl={post.thumbnailUrl}
+                isVideo={post.isVideo}
                 toggleExpand={toggleExpand}
               />
             </div>

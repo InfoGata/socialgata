@@ -1,8 +1,9 @@
-import { MessageSquareIcon, ExternalLinkIcon } from "lucide-react";
+import { MessageSquareIcon, ExternalLinkIcon, PlayIcon } from "lucide-react";
 
 type ImageThumbnailProps = {
   url?: string;
   thumbnailUrl?: string;
+  isVideo?: boolean;
   toggleExpand: () => void;
 }
 
@@ -15,7 +16,22 @@ function isImageUrl(url: string | undefined) {
 
 
 const ImageThumbnail: React.FC<ImageThumbnailProps> = (props) => {
-  const { url, thumbnailUrl, toggleExpand } = props;
+  const { url, thumbnailUrl, isVideo, toggleExpand } = props;
+
+  // A video's url points at a player page, not a file, so it must expand
+  // in place rather than fall through to the open-in-new-tab branch below.
+  if (isVideo && (thumbnailUrl || url)) {
+    return (
+      <button onClick={toggleExpand} className="relative cursor-pointer block w-full h-full">
+        <img alt="video thumbnail" loading="lazy" src={thumbnailUrl ?? url} className="rounded-md w-full h-full object-cover" />
+        <span className="absolute inset-0 flex items-center justify-center">
+          <span className="rounded-full bg-black/60 p-1.5">
+            <PlayIcon className="h-4 w-4 text-white fill-white" />
+          </span>
+        </span>
+      </button>
+    );
+  }
 
   if (isImageUrl(url)) {
     return (

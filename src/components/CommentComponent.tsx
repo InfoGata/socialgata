@@ -36,10 +36,12 @@ const CommentComponent: React.FC<Props> = (props) => {
     return (
       <div className="border-l-2 border-muted pl-4 my-4" data-post-number={comment.number}>
         {/* Expanded Media - Full Width Above Content */}
-        {expand && comment.url && comment.thumbnailUrl && (
+        {expand && (comment.url || comment.videoSources?.length) && comment.thumbnailUrl && (
           <div className="mb-3">
             <ExpandedMedia
-              url={comment.url}
+              url={comment.url ?? ""}
+              isVideo={comment.isVideo}
+              videoSources={comment.videoSources}
               thumbnailUrl={comment.thumbnailUrl}
               alt={comment.title || "Reply image"}
               className="rounded-md max-w-full border w-full"
@@ -55,6 +57,7 @@ const CommentComponent: React.FC<Props> = (props) => {
               <ImageThumbnail
                 url={comment.url}
                 thumbnailUrl={comment.thumbnailUrl}
+                isVideo={comment.isVideo}
                 toggleExpand={toggleExpand}
               />
             </div>
