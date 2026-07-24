@@ -81,6 +81,24 @@ export interface Post {
    */
   videoSources?: VideoSource[];
   quotedPost?: Post;
+  /** Category/flair label attached to the post (e.g. Reddit link flair) */
+  flair?: string;
+  /** Ratio of upvotes to total votes, between 0 and 1 */
+  upvoteRatio?: number;
+  /** Whether the post is marked as not-safe-for-work / adult content */
+  nsfw?: boolean;
+  /** Whether the post is marked as a spoiler */
+  spoiler?: boolean;
+  /** Whether the post is locked (no new comments allowed) */
+  locked?: boolean;
+  /** Whether the post/comment is pinned/stickied to the top */
+  stickied?: boolean;
+  /** Whether the post/comment has been edited after publishing */
+  edited?: boolean;
+  /** Distinguished status of the author (e.g. "moderator", "admin") */
+  distinguished?: string;
+  /** Whether the comment author is the original poster of the thread */
+  isSubmitter?: boolean;
 }
 
 export interface VideoSource {

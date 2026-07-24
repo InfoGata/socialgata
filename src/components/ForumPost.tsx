@@ -42,6 +42,11 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
               {numberFormatter.format(post.score)}
             </span>
             <ArrowDownIcon className="h-4 w-4 text-muted-foreground/50" />
+            {post.upvoteRatio != null && (
+              <span className="text-[10px] text-muted-foreground/60 mt-0.5">
+                {Math.round(post.upvoteRatio * 100)}%
+              </span>
+            )}
           </div>
         )}
 
@@ -91,18 +96,56 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
                 </Link>
               </>
             )}
-            <span className="text-muted-foreground/40">·</span>
-            <span className="text-muted-foreground/60">
-              {post.publishedDate && <ReactTimeago date={post.publishedDate} />}
-            </span>
+            {post.publishedDate && (
+              <>
+                <span className="text-muted-foreground/40">·</span>
+                <span className="text-muted-foreground/60">
+                  <ReactTimeago date={post.publishedDate} />
+                </span>
+              </>
+            )}
+            {post.edited && (
+              <span className="text-muted-foreground/50 italic">· edited</span>
+            )}
           </div>
+
+          {/* Flair & content badges */}
+          {(post.flair || post.nsfw || post.spoiler || post.locked || post.stickied) && (
+            <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+              {post.stickied && (
+                <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-green-500/15 text-green-600 dark:text-green-400">
+                  Pinned
+                </span>
+              )}
+              {post.flair && (
+                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-primary/10 text-primary">
+                  {post.flair}
+                </span>
+              )}
+              {post.nsfw && (
+                <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-destructive/15 text-destructive">
+                  NSFW
+                </span>
+              )}
+              {post.spoiler && (
+                <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-muted text-muted-foreground">
+                  Spoiler
+                </span>
+              )}
+              {post.locked && (
+                <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-amber-500/15 text-amber-600 dark:text-amber-400">
+                  Locked
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Title */}
           <div className="flex items-start gap-1.5 mb-1">
             <PostLink
               post={post}
               isTitleLink
-              className="text-[15px] font-semibold text-foreground hover:text-primary transition-colors leading-snug line-clamp-2"
+              className={`text-[15px] font-semibold text-foreground hover:text-primary transition-colors leading-snug ${showFullPost ? "" : "line-clamp-2"}`}
               instanceId={instanceId}
             >
               {post.title}
@@ -112,12 +155,17 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
             )}
           </div>
 
-          {/* Body preview */}
-          {post.body && (
-            <div className="text-xs text-muted-foreground/70 line-clamp-2 leading-relaxed mb-1.5">
-              {parse(sanitizer(post.body))}
-            </div>
-          )}
+          {/* Body */}
+          {post.body &&
+            (showFullPost ? (
+              <div className="md-body text-sm text-foreground/90 leading-relaxed mb-2">
+                {parse(sanitizer(post.body))}
+              </div>
+            ) : (
+              <div className="text-xs text-muted-foreground/70 line-clamp-2 leading-relaxed mb-1.5">
+                {parse(sanitizer(post.body))}
+              </div>
+            ))}
 
           {/* Expanded Media */}
           {(expand || showFullPost) && hasExpandableMedia && (
