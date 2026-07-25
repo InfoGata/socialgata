@@ -177,6 +177,10 @@ export interface GetFeedRequest {
   pageInfo?: PageInfo;
   instanceId?: string;
   feedTypeId?: string;
+  /** Selected sort order id (matches a SortOption.id from the response) */
+  sortId?: string;
+  /** Selected time range id for sorts that declare time ranges */
+  timeRangeId?: string;
 }
 
 export interface GetFeedResponse {
@@ -185,23 +189,60 @@ export interface GetFeedResponse {
   feedTypes?: FeedType[];
   feedTypeId?: string;
   instance?: Instance;
+  /** Available sort orders for this feed */
+  sortOptions?: SortOption[];
+  /** Currently applied sort order id */
+  sortId?: string;
+  /** Currently applied time range id */
+  timeRangeId?: string;
 }
 
 export interface FeedType {
   displayName: string;
   id: string;
-} 
+}
+
+/** A time range/window for a sort (e.g. Reddit's Top: hour/day/week/...) */
+export interface TimeRange {
+  displayName: string;
+  /** Id echoed back as timeRangeId (e.g. "week") */
+  id: string;
+}
+
+/**
+ * A sort order for a feed, community, or user listing. Orthogonal to FeedType:
+ * a plugin may offer both feed-type tabs and a sort selector.
+ */
+export interface SortOption {
+  displayName: string;
+  /** Id echoed back as sortId (e.g. "top") */
+  id: string;
+  /** Time ranges this sort accepts. Omit when the sort takes no time range. */
+  timeRanges?: TimeRange[];
+  /** Time range used when none is selected */
+  defaultTimeRangeId?: string;
+}
 
 export interface GetCommunityRequest {
   apiId: string;
   instanceId?: string;
   pageInfo?: PageInfo;
+  /** Selected sort order id (matches a SortOption.id from the response) */
+  sortId?: string;
+  /** Selected time range id for sorts that declare time ranges */
+  timeRangeId?: string;
 }
 
 export interface GetCommunityResponse {
   pageInfo?: PageInfo;
   community?: Community;
   items: Post[];
+  /** Available sort orders for this community */
+  sortOptions?: SortOption[];
+  /** Currently applied sort order id */
+  sortId?: string;
+  /** Currently applied time range id */
+  timeRangeId?: string;
 }
 
 export interface GetCommunitiesRequest {
@@ -218,11 +259,21 @@ export interface GetUserResponse {
   pageInfo?: PageInfo;
   user?: User;
   items: Post[]
+  /** Available sort orders for this user's listing */
+  sortOptions?: SortOption[];
+  /** Currently applied sort order id */
+  sortId?: string;
+  /** Currently applied time range id */
+  timeRangeId?: string;
 }
 
 export interface GetUserRequest {
   apiId: string;
   instanceId?: string;
+  /** Selected sort order id (matches a SortOption.id from the response) */
+  sortId?: string;
+  /** Selected time range id for sorts that declare time ranges */
+  timeRangeId?: string;
 }
 
 export interface GetCommentsRequest {

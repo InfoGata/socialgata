@@ -10,11 +10,11 @@ const PluginFeed: React.FC = () => {
   const data = Route.useLoaderData();
   const params = Route.useParams();
   const search = Route.useSearch();
-  const feedTypeId = search.feedTypeId;
 
   return (
     <Feed
-      feedTypeId={feedTypeId}
+      sortId={search.sortId}
+      timeRangeId={search.timeRangeId}
       data={data}
       pageInfo={data.pageInfo}
       pluginId={params.pluginId}
@@ -25,6 +25,8 @@ const PluginFeed: React.FC = () => {
 type FeedSearch = {
   page?: string | number;
   feedTypeId?: string;
+  sortId?: string;
+  timeRangeId?: string;
   q?: string;
 }
 
@@ -33,8 +35,8 @@ export const Route = createFileRoute('/s/$pluginId/feed')({
   beforeLoad: canonicalizePluginUrl,
   notFoundComponent: pluginNotFoundComponent,
   component: PluginFeed,
-  loaderDeps: ({search}) => ({page: search.page, feedTypeId: search.feedTypeId, q: search.q}),
-  loader: async ({ params, deps: { page, feedTypeId, q }, context }) => {
+  loaderDeps: ({search}) => ({page: search.page, feedTypeId: search.feedTypeId, sortId: search.sortId, timeRangeId: search.timeRangeId, q: search.q}),
+  loader: async ({ params, deps: { page, feedTypeId, sortId, timeRangeId, q }, context }) => {
     const plugin = context.plugins.find(p => p.id === params.pluginId);
     if (plugin) {
       // If there's a search query and the plugin supports search, use search
@@ -50,6 +52,8 @@ export const Route = createFileRoute('/s/$pluginId/feed')({
         const response = await plugin.remote.onGetFeed({
           pageInfo: { page },
           feedTypeId: feedTypeId,
+          sortId,
+          timeRangeId,
         });
         return response;
       }
@@ -59,7 +63,9 @@ export const Route = createFileRoute('/s/$pluginId/feed')({
   validateSearch: (search: Record<string, unknown>): FeedSearch => {
     const page = search.page as string | number | undefined;
     const feedTypeId = search.feedTypeId as string | undefined;
+    const sortId = search.sortId as string | undefined;
+    const timeRangeId = search.timeRangeId as string | undefined;
     const q = search.q as string | undefined;
-    return { page, feedTypeId, q };
+    return { page, feedTypeId, sortId, timeRangeId, q };
   }
 });

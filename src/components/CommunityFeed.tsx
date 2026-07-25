@@ -8,12 +8,13 @@ import {
 } from "./ui/pagination";
 import { usePagination } from "@/hooks/usePagination";
 import { usePlugins } from "@/hooks/usePlugins";
-import { PageInfo, Post, Community } from "@/plugintypes";
+import { PageInfo, Post, Community, SortOption } from "@/plugintypes";
 import React from "react";
 import { FavoriteButton } from "./FavoriteButton";
 import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { ExternalLinkIcon } from "lucide-react";
 import BrowseCommunitiesButton from "./BrowseCommunitiesButton";
+import FeedSortControls from "./FeedSortControls";
 
 type CommunityFeedProps = {
   posts: Post[];
@@ -21,10 +22,13 @@ type CommunityFeedProps = {
   pageInfo?: PageInfo;
   instanceId?: string;
   community?: Community;
+  sortOptions?: SortOption[];
+  sortId?: string;
+  timeRangeId?: string;
 }
 
 const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
-  const { posts, pluginId, pageInfo, instanceId, community } = props;
+  const { posts, pluginId, pageInfo, instanceId, community, sortOptions, sortId, timeRangeId } = props;
   const { nextPage, prevPage, hasNextPage, hasPreviousPage } = usePagination(pageInfo);
   const { plugins } = usePlugins();
   const plugin = plugins.find(p => p.id === pluginId);
@@ -70,6 +74,13 @@ const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
           </Card>
         )}
 
+        {/* Sort Controls */}
+        <FeedSortControls
+          sortOptions={sortOptions}
+          sortId={sortId}
+          timeRangeId={timeRangeId}
+        />
+
         {/* Posts Section */}
         <div className="space-y-2">
           {/* Posts Grid */}
@@ -94,7 +105,7 @@ const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
                     <PaginationItem>
                       <PaginationPrevious
                         to="."
-                        search={{ page: prevPage?.page }}
+                        search={(prev) => ({ ...prev, page: prevPage?.page })}
                         className="hover:bg-muted transition-colors text-sm py-1"
                       />
                     </PaginationItem>
@@ -113,7 +124,7 @@ const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
                     <PaginationItem>
                       <PaginationNext
                         to="."
-                        search={{ page: nextPage?.page }}
+                        search={(prev) => ({ ...prev, page: nextPage?.page })}
                         className="hover:bg-muted transition-colors text-sm py-1"
                       />
                     </PaginationItem>

@@ -1,5 +1,6 @@
 import PostComponent from "@/components/PostComponent";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import FeedSortControls from "@/components/FeedSortControls";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePlugins } from "@/hooks/usePlugins";
 import { createFileRoute, notFound } from "@tanstack/react-router";
@@ -37,7 +38,7 @@ const Stat: React.FC<StatProps> = ({ label, value }) => {
 };
 
 const UserOverview: React.FC = () => {
-  const { user, items } = Route.useLoaderData();
+  const { user, items, sortOptions, sortId, timeRangeId } = Route.useLoaderData();
   const { pluginId } = Route.useParams();
   const { plugins } = usePlugins();
   const plugin = plugins.find((p) => p.id === pluginId);
@@ -158,6 +159,11 @@ const UserOverview: React.FC = () => {
       )}
 
       <div className="space-y-4">
+        <FeedSortControls
+          sortOptions={sortOptions}
+          sortId={sortId}
+          timeRangeId={timeRangeId}
+        />
         {items.map((d) => (
           <PostComponent key={d.apiId} post={d} platformType={platformType} />
         ))}
@@ -171,17 +177,41 @@ export const Route = createFileRoute("/s/$pluginId/user/$apiId")({
   beforeLoad: canonicalizePluginUrl,
   notFoundComponent: pluginNotFoundComponent,
   component: UserOverview,
-  loader: async ({ params, context }) => {
+  loaderDeps: ({ search }) => ({ sortId: search.sortId, timeRangeId: search.timeRangeId }),
+  loader: async ({ params, deps: { sortId, timeRangeId }, context }) => {
     const plugin = context.plugins.find((p) => p.id === params.pluginId);
     if (plugin) {
       if (await plugin.hasDefined.onGetUser()) {
-        const response = await plugin.remote.onGetUser({ apiId: params.apiId });
-        return { user: response.user, items: response.items };
+        const response = await plugin.remote.onGetUser({
+          apiId: params.apiId,
+          sortId,
+          timeRangeId,
+        });
+        return {
+          user: response.user,
+          items: response.items,
+          sortOptions: response.sortOptions,
+          sortId: response.sortId,
+          timeRangeId: response.timeRangeId,
+        };
       } else {
-        return { user: undefined, items: [] };
+        return {
+          user: undefined,
+          items: [],
+          sortOptions: undefined,
+          sortId: undefined,
+          timeRangeId: undefined,
+        };
       }
     } else {
       throw notFound();
     }
+  },
+  validateSearch: (
+    search: Record<string, unknown>
+  ): { sortId?: string; timeRangeId?: string } => {
+    const sortId = search.sortId as string | undefined;
+    const timeRangeId = search.timeRangeId as string | undefined;
+    return { sortId, timeRangeId };
   },
 });

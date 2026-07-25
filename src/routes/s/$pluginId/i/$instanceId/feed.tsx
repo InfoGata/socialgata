@@ -9,11 +9,12 @@ import {
 const InstanceFeed: React.FC = () => {
   const data = Route.useLoaderData();
   const params = Route.useParams();
-  const { feedTypeId } = Route.useSearch();
+  const { sortId, timeRangeId } = Route.useSearch();
 
   return (
     <Feed
-      feedTypeId={feedTypeId}
+      sortId={sortId}
+      timeRangeId={timeRangeId}
       data={data}
       pageInfo={data.pageInfo}
       pluginId={params.pluginId}
@@ -27,23 +28,27 @@ export const Route = createFileRoute('/s/$pluginId/i/$instanceId/feed')({
   beforeLoad: canonicalizePluginUrl,
   notFoundComponent: pluginNotFoundComponent,
   component: InstanceFeed,
-  loaderDeps: ({search}) => ({page: search.page, feedTypeId: search.feedTypeId}),
-  loader: async ({ params, deps: { page, feedTypeId }, context }) => {
+  loaderDeps: ({search}) => ({page: search.page, feedTypeId: search.feedTypeId, sortId: search.sortId, timeRangeId: search.timeRangeId}),
+  loader: async ({ params, deps: { page, feedTypeId, sortId, timeRangeId }, context }) => {
     const plugin = context.plugins.find(p => p.id === params.pluginId);
     if (plugin && await plugin.hasDefined.onGetFeed()) {
       const response = await plugin.remote.onGetFeed({
         instanceId: params.instanceId,
         pageInfo: { page },
         feedTypeId,
+        sortId,
+        timeRangeId,
       });
       return response;
     } else {
       throw notFound();
     }
   },
-  validateSearch: (search: Record<string, unknown>): {page?: string | number, feedTypeId?: string} => {
+  validateSearch: (search: Record<string, unknown>): {page?: string | number, feedTypeId?: string, sortId?: string, timeRangeId?: string} => {
     const page = search.page as string | number | undefined;
     const feedTypeId = search.feedTypeId as string | undefined;
-    return { page, feedTypeId };
+    const sortId = search.sortId as string | undefined;
+    const timeRangeId = search.timeRangeId as string | undefined;
+    return { page, feedTypeId, sortId, timeRangeId };
   }
 })

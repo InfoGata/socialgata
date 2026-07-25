@@ -7,9 +7,11 @@ import { Link } from "@tanstack/react-router";
 import React from "react";
 import { usePlugins } from "@/hooks/usePlugins";
 import BrowseCommunitiesButton from "./BrowseCommunitiesButton";
+import FeedSortControls from "./FeedSortControls";
 
 type FeedProps = {
-  feedTypeId?: string;
+  sortId?: string;
+  timeRangeId?: string;
   data: GetFeedResponse;
   pageInfo?: PageInfo;
   pluginId: string;
@@ -18,7 +20,7 @@ type FeedProps = {
 }
 
 const Feed: React.FC<FeedProps> = (props) => {
-  const { feedTypeId, data, pageInfo, pluginId, instanceId, isLoading } = props;
+  const { sortId, timeRangeId, data, pageInfo, pluginId, instanceId, isLoading } = props;
   const { nextPage, prevPage, hasNextPage, hasPreviousPage } = usePagination(pageInfo);
   const { plugins } = usePlugins();
   const plugin = plugins.find(p => p.id === pluginId);
@@ -50,7 +52,7 @@ const Feed: React.FC<FeedProps> = (props) => {
                       ? { pluginId, instanceId }
                       : { pluginId }
                     }
-                    search={{ feedTypeId: feedType.id }}
+                    search={(prev) => ({ ...prev, feedTypeId: feedType.id, page: undefined })}
                     className={`
                       px-3 py-2 text-sm font-medium transition-colors relative
                       ${isActive
@@ -65,6 +67,13 @@ const Feed: React.FC<FeedProps> = (props) => {
               })}
             </div>
           )}
+
+          {/* Sort Controls */}
+          <FeedSortControls
+            sortOptions={data.sortOptions}
+            sortId={sortId ?? data.sortId}
+            timeRangeId={timeRangeId ?? data.timeRangeId}
+          />
         </div>
 
         {/* Posts */}
@@ -96,7 +105,7 @@ const Feed: React.FC<FeedProps> = (props) => {
                       <PaginationItem>
                         <PaginationPrevious
                           to="."
-                          search={{ page: prevPage?.page, feedTypeId: feedTypeId }}
+                          search={(prev) => ({ ...prev, page: prevPage?.page })}
                           className="text-sm px-4 py-2 rounded-md border border-border hover:bg-muted transition-colors"
                         />
                       </PaginationItem>
@@ -112,7 +121,7 @@ const Feed: React.FC<FeedProps> = (props) => {
                       <PaginationItem>
                         <PaginationNext
                           to="."
-                          search={{ page: nextPage?.page, feedTypeId: feedTypeId }}
+                          search={(prev) => ({ ...prev, page: nextPage?.page })}
                           className="text-sm px-4 py-2 rounded-md border border-border hover:bg-muted transition-colors"
                         />
                       </PaginationItem>
