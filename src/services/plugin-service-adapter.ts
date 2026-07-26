@@ -14,6 +14,8 @@ import {
   GetUserResponse,
   SearchRequest,
   SearchResponse,
+  SearchCommunityRequest,
+  SearchCommunityResponse,
   GetTrendingTopicsRequest,
   GetTrendingTopicsResponse,
   GetTrendingTopicFeedRequest,
@@ -87,6 +89,13 @@ export class PluginServiceAdapter implements ServiceType {
   async search(request: SearchRequest): Promise<SearchResponse> {
     if (await this.plugin.hasDefined.onSearch()) {
       return this.plugin.remote.onSearch(request);
+    }
+    return { items: [] };
+  }
+
+  async searchCommunity(request: SearchCommunityRequest): Promise<SearchCommunityResponse> {
+    if (await this.plugin.hasDefined.onSearchCommunity()) {
+      return this.plugin.remote.onSearchCommunity(request);
     }
     return { items: [] };
   }

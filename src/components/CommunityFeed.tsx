@@ -10,11 +10,14 @@ import { usePagination } from "@/hooks/usePagination";
 import { usePlugins } from "@/hooks/usePlugins";
 import { PageInfo, Post, Community, SortOption } from "@/plugintypes";
 import React from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { FavoriteButton } from "./FavoriteButton";
 import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { ExternalLinkIcon } from "lucide-react";
+import { ExternalLinkIcon, Inbox, XIcon } from "lucide-react";
 import BrowseCommunitiesButton from "./BrowseCommunitiesButton";
 import FeedSortControls from "./FeedSortControls";
+import { SearchBar } from "./SearchBar";
+import { Button } from "./ui/button";
 
 type CommunityFeedProps = {
   posts: Post[];
@@ -25,14 +28,48 @@ type CommunityFeedProps = {
   sortOptions?: SortOption[];
   sortId?: string;
   timeRangeId?: string;
+  /** Active in-community search query, from the route's `q` search param */
+  query?: string;
 }
 
 const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
-  const { posts, pluginId, pageInfo, instanceId, community, sortOptions, sortId, timeRangeId } = props;
+  const { posts, pluginId, pageInfo, instanceId, community, sortOptions, sortId, timeRangeId, query } = props;
   const { nextPage, prevPage, hasNextPage, hasPreviousPage } = usePagination(pageInfo);
   const { plugins } = usePlugins();
   const plugin = plugins.find(p => p.id === pluginId);
   const platformType = plugin?.platformType || "forum";
+  const navigate = useNavigate();
+
+  // Only plugins that implement onSearchCommunity can scope a search to one
+  // community; without this the box would silently return the unfiltered feed.
+  const [canSearch, setCanSearch] = React.useState(false);
+  React.useEffect(() => {
+    let cancelled = false;
+    plugin?.hasDefined.onSearchCommunity().then((defined) => {
+      if (!cancelled) setCanSearch(defined);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [plugin]);
+
+  /**
+   * Search state lives in the URL. `sortId`/`timeRangeId` are cleared because
+   * search sorts and listing sorts are different vocabularies, and `page`
+   * because cursors are specific to the query they were issued for.
+   */
+  const setQuery = (next?: string) => {
+    navigate({
+      to: ".",
+      search: (prev: Record<string, unknown>) => ({
+        ...prev,
+        q: next || undefined,
+        sortId: undefined,
+        timeRangeId: undefined,
+        page: undefined,
+      }),
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -74,6 +111,34 @@ const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
           </Card>
         )}
 
+        {/* In-Community Search */}
+        {canSearch && (
+          <div className="flex items-center gap-2 mb-4">
+            <SearchBar
+              key={query ?? ""}
+              initialQuery={query}
+              onSearch={setQuery}
+              placeholder={
+                community?.name
+                  ? `Search ${community.name}...`
+                  : "Search this community..."
+              }
+              className="flex-1 max-w-md"
+            />
+            {query && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setQuery(undefined)}
+              >
+                <XIcon className="h-4 w-4 mr-1" />
+                Clear
+              </Button>
+            )}
+          </div>
+        )}
+
         {/* Sort Controls */}
         <FeedSortControls
           sortOptions={sortOptions}
@@ -84,17 +149,31 @@ const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
         {/* Posts Section */}
         <div className="space-y-2">
           {/* Posts Grid */}
-          <div className="space-y-2">
-            {posts.map((p, index) => (
-              <div
-                key={p.apiId}
-                className="animate-in fade-in slide-in-from-bottom-1"
-                style={{ animationDelay: `${index * 30}ms` }}
-              >
-                <PostComponent post={p} instanceId={instanceId} platformType={platformType} />
-              </div>
-            ))}
-          </div>
+          {posts.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16">
+              <Inbox className="w-10 h-10 text-muted-foreground/50 mb-2" />
+              <h3 className="text-sm font-medium mb-1">
+                {query ? `No results for "${query}"` : "No posts yet"}
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                {query
+                  ? "Try a different search, or clear it to browse the community."
+                  : "Check back later for new content."}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {posts.map((p, index) => (
+                <div
+                  key={p.apiId}
+                  className="animate-in fade-in slide-in-from-bottom-1"
+                  style={{ animationDelay: `${index * 30}ms` }}
+                >
+                  <PostComponent post={p} instanceId={instanceId} platformType={platformType} />
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Pagination */}
           {(hasNextPage || hasPreviousPage) && (

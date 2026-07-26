@@ -329,6 +329,31 @@ export interface SearchResponse {
   pageInfo?: PageInfo;
 }
 
+export interface SearchCommunityRequest {
+  query: string;
+  /** apiId of the community to search within */
+  communityApiId: string;
+  pageInfo?: PageInfo;
+  instanceId?: string;
+  /** Selected sort order id (matches a SortOption.id from the response) */
+  sortId?: string;
+  /** Selected time range id for sorts that declare time ranges */
+  timeRangeId?: string;
+}
+
+export interface SearchCommunityResponse {
+  items: Post[];
+  pageInfo?: PageInfo;
+  /** The community that was searched, when the plugin can supply it */
+  community?: Community;
+  /** Available sort orders for these search results */
+  sortOptions?: SortOption[];
+  /** Currently applied sort order id */
+  sortId?: string;
+  /** Currently applied time range id */
+  timeRangeId?: string;
+}
+
 export interface TrendingTopic {
   name: string;
   url?: string;

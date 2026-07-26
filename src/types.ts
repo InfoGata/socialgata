@@ -1,6 +1,6 @@
 import React from "react";
 import { LinkOptions } from "@tanstack/react-router";
-import { GetCommentRepliesRequest, GetCommentRepliesResponse, GetCommentsRequest, GetCommentsResponse, GetCommunitiesRequest, GetCommunitiesResponse, GetCommunityRequest, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetInstancesRequest, GetInstancesResponse, GetTrendingTopicFeedRequest, GetTrendingTopicFeedResponse, GetTrendingTopicsRequest, GetTrendingTopicsResponse, GetUserResponse, GetUserRequest, LoginRequest, ManifestAuthentication, SearchRequest, SearchResponse } from "./plugintypes";
+import { GetCommentRepliesRequest, GetCommentRepliesResponse, GetCommentsRequest, GetCommentsResponse, GetCommunitiesRequest, GetCommunitiesResponse, GetCommunityRequest, GetCommunityResponse, GetFeedRequest, GetFeedResponse, GetInstancesRequest, GetInstancesResponse, GetTrendingTopicFeedRequest, GetTrendingTopicFeedResponse, GetTrendingTopicsRequest, GetTrendingTopicsResponse, GetUserResponse, GetUserRequest, LoginRequest, ManifestAuthentication, SearchRequest, SearchResponse, SearchCommunityRequest, SearchCommunityResponse } from "./plugintypes";
 import { RouterType } from "./router";
 
 export interface NetworkRequest {
@@ -79,6 +79,7 @@ export interface ServiceType {
   getCommentReplies?(request: GetCommentRepliesRequest): Promise<GetCommentRepliesResponse>;
   getUser?(request: GetUserRequest): Promise<GetUserResponse>;
   search?(request: SearchRequest): Promise<SearchResponse>;
+  searchCommunity?(request: SearchCommunityRequest): Promise<SearchCommunityResponse>;
   getTrendingTopics?(request?: GetTrendingTopicsRequest): Promise<GetTrendingTopicsResponse>;
   getTrendingTopicFeed?(request: GetTrendingTopicFeedRequest): Promise<GetTrendingTopicFeedResponse>;
   login?(request: LoginRequest): Promise<void>;

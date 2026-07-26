@@ -7,14 +7,17 @@ interface SearchBarProps {
   onSearch: (query: string) => void;
   placeholder?: string;
   className?: string;
+  /** Seeds the input, e.g. from a query already in the URL. Remount (via `key`) to reseed. */
+  initialQuery?: string;
 }
 
-export const SearchBar: React.FC<SearchBarProps> = ({ 
-  onSearch, 
-  placeholder = "Search...", 
-  className 
+export const SearchBar: React.FC<SearchBarProps> = ({
+  onSearch,
+  placeholder = "Search...",
+  className,
+  initialQuery,
 }) => {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery ?? "");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

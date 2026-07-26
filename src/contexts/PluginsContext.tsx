@@ -18,6 +18,8 @@ import {
   GetUserResponse,
   SearchRequest,
   SearchResponse,
+  SearchCommunityRequest,
+  SearchCommunityResponse,
   GetTrendingTopicsRequest,
   GetTrendingTopicsResponse,
   GetTrendingTopicFeedRequest,
@@ -79,6 +81,7 @@ export interface PluginMethodInterface {
   onGetCommentReplies(request: GetCommentRepliesRequest): Promise<GetCommentRepliesResponse>;
   onGetUser(request: GetUserRequest): Promise<GetUserResponse>;
   onSearch(request: SearchRequest): Promise<SearchResponse>;
+  onSearchCommunity(request: SearchCommunityRequest): Promise<SearchCommunityResponse>;
   onGetTrendingTopics(request?: GetTrendingTopicsRequest): Promise<GetTrendingTopicsResponse>;
   onGetTrendingTopicFeed(request: GetTrendingTopicFeedRequest): Promise<GetTrendingTopicFeedResponse>;
   onLogin(request: LoginRequest): Promise<LoginResponse | void>;
@@ -279,6 +282,10 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
           onSearch: (feed: SearchResponse) => {
             feed?.items.forEach(stampPost);
             return feed;
+          },
+          onSearchCommunity: (response: SearchCommunityResponse) => {
+            response?.items.forEach(stampPost);
+            return response;
           },
           onGetTrendingTopicFeed: (feed: GetTrendingTopicFeedResponse) => {
             feed?.items.forEach(stampPost);

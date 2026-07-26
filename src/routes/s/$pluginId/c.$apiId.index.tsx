@@ -9,6 +9,7 @@ import {
 const Community: React.FC = () => {
   const data = Route.useLoaderData();
   const { pluginId } = Route.useParams();
+  const { q } = Route.useSearch();
 
   return (
     <CommunityFeed
@@ -19,6 +20,7 @@ const Community: React.FC = () => {
       sortOptions={data.sortOptions}
       sortId={data.sortId}
       timeRangeId={data.timeRangeId}
+      query={q}
     />
   );
 };
@@ -27,6 +29,7 @@ type CommunitySearch = {
   page?: string | number;
   sortId?: string;
   timeRangeId?: string;
+  q?: string;
 }
 
 export const Route = createFileRoute("/s/$pluginId/c/$apiId/")({
@@ -34,10 +37,24 @@ export const Route = createFileRoute("/s/$pluginId/c/$apiId/")({
   beforeLoad: canonicalizePluginUrl,
   notFoundComponent: pluginNotFoundComponent,
   component: Community,
-  loaderDeps: ({search}) => ({page: search.page, sortId: search.sortId, timeRangeId: search.timeRangeId}),
-  loader: async ({ params, deps: { page, sortId, timeRangeId }, context }) => {
+  loaderDeps: ({search}) => ({page: search.page, sortId: search.sortId, timeRangeId: search.timeRangeId, q: search.q}),
+  loader: async ({ params, deps: { page, sortId, timeRangeId, q }, context }) => {
     const plugin = context.plugins.find(p => p.id === params.pluginId);
-    if (plugin && await plugin.hasDefined.onGetCommunity()) {
+    if (!plugin) throw notFound();
+
+    // A query scopes the listing to a search within this community, when the
+    // plugin supports it; otherwise fall through to the normal listing.
+    if (q && await plugin.hasDefined.onSearchCommunity()) {
+      return plugin.remote.onSearchCommunity({
+        query: q,
+        communityApiId: params.apiId,
+        pageInfo: { page: page },
+        sortId,
+        timeRangeId,
+      });
+    }
+
+    if (await plugin.hasDefined.onGetCommunity()) {
       const response = await plugin.remote.onGetCommunity({
         apiId: params.apiId,
         pageInfo: { page: page },
@@ -45,14 +62,15 @@ export const Route = createFileRoute("/s/$pluginId/c/$apiId/")({
         timeRangeId,
       });
       return response;
-    } else {
-      throw notFound();
     }
+
+    throw notFound();
   },
   validateSearch: (search: Record<string, unknown>): CommunitySearch => {
     const page = search.page as string | number | undefined;
     const sortId = search.sortId as string | undefined;
     const timeRangeId = search.timeRangeId as string | undefined;
-    return {page, sortId, timeRangeId};
+    const q = search.q as string | undefined;
+    return {page, sortId, timeRangeId, q};
   }
 });
