@@ -5,10 +5,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 ### Core Development
-- `npm run dev` - Start Vite development server on port 3000
+- `npm run dev` - Start Vite development server on port 3005
 - `npm run build` - Build for production (TypeScript compile + Vite build)
 - `npm run lint` - Run ESLint with TypeScript support
 - `npm test` - Run Vitest test suite
+
+Ports are unique per app in `~/projects/webapps` and `strictPort` is on, so a
+collision fails instead of drifting: dev 3005, preview 4005, electron renderer 5005.
+The Dropbox OAuth redirect URI in `.env` is pinned to 3005 — changing the dev port
+means re-registering it in the Dropbox app console.
 
 ## Project Architecture
 

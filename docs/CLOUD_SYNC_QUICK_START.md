@@ -17,7 +17,7 @@
 
 3. **Set Redirect URI**
    - In Settings tab, under OAuth 2
-   - Add: `http://localhost:3000/dropbox-auth-popup.html`
+   - Add: `http://localhost:3005/dropbox-auth-popup.html`
    - For production: `https://yourdomain.com/dropbox-auth-popup.html`
 
 4. **Configure App**
@@ -28,7 +28,7 @@
    Edit `.env`:
    ```env
    VITE_DROPBOX_CLIENT_ID=your_app_key_from_settings
-   VITE_DROPBOX_REDIRECT_URI=http://localhost:3000/dropbox-auth-popup.html
+   VITE_DROPBOX_REDIRECT_URI=http://localhost:3005/dropbox-auth-popup.html
    ```
 
 5. **Start App**
@@ -37,7 +37,7 @@
    ```
 
 6. **Connect Dropbox**
-   - Open http://localhost:3000/settings
+   - Open http://localhost:3005/settings
    - Click "Connect Dropbox"
    - Authorize the app
    - Done! Auto-sync is enabled by default
@@ -291,7 +291,7 @@ npm run build
 | Variable | Description | Example |
 |----------|-------------|---------|
 | `VITE_DROPBOX_CLIENT_ID` | Dropbox app key | `abc123xyz` |
-| `VITE_DROPBOX_REDIRECT_URI` | OAuth redirect URL | `http://localhost:3000/auth/dropbox/callback` |
+| `VITE_DROPBOX_REDIRECT_URI` | OAuth redirect URL | `http://localhost:3005/auth/dropbox/callback` |
 | `VITE_GOOGLE_DRIVE_CLIENT_ID` | Google Drive client ID (future) | - |
 | `VITE_ONEDRIVE_CLIENT_ID` | OneDrive client ID (future) | - |
 

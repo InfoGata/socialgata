@@ -53,7 +53,7 @@ In the **"Settings"** tab, under **OAuth 2**:
 
 1. Add redirect URI for development:
    ```
-   http://localhost:3000/dropbox-auth-popup.html
+   http://localhost:3005/dropbox-auth-popup.html
    ```
 
 2. Add redirect URI for production:
@@ -76,7 +76,7 @@ In the **"Settings"** tab, under **OAuth 2**:
 2. Edit `.env` and add your Dropbox App key:
    ```env
    VITE_DROPBOX_CLIENT_ID=your_app_key_here
-   VITE_DROPBOX_REDIRECT_URI=http://localhost:3000/dropbox-auth-popup.html
+   VITE_DROPBOX_REDIRECT_URI=http://localhost:3005/dropbox-auth-popup.html
    ```
 
 3. For production, update the redirect URI to your production domain
@@ -199,7 +199,7 @@ case 'googledrive':
 
 ```env
 VITE_GOOGLE_DRIVE_CLIENT_ID=your_client_id
-VITE_GOOGLE_DRIVE_REDIRECT_URI=http://localhost:3000/auth/googledrive/callback
+VITE_GOOGLE_DRIVE_REDIRECT_URI=http://localhost:3005/auth/googledrive/callback
 ```
 
 ## Troubleshooting

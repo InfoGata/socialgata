@@ -35,6 +35,11 @@ export default defineConfig({
     legacy: {
       inconsistentCjsInterop: true,
     },
+    // Unique renderer port so electron:dev can run alongside the other apps.
+    server: {
+      port: 5005,
+      strictPort: true,
+    },
     root: ".",
     build: {
       // wasm + native top-level await require a modern target; es2022 also avoids

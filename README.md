@@ -45,7 +45,7 @@ npm install
 npm run dev
 ```
 
-The app will be available at `http://localhost:3000`.
+The app will be available at `http://localhost:3005`.
 
 ### Building for Production
 
@@ -78,7 +78,7 @@ src/
 
 ## Available Scripts
 
-- `npm run dev` - Start Vite development server (port 3000)
+- `npm run dev` - Start Vite development server (port 3005)
 - `npm run build` - Build for production
 - `npm run lint` - Run ESLint
 - `npm test` - Run test suite

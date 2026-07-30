@@ -27,9 +27,17 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Unique port per app in ~/projects/webapps; strictPort so a collision fails
+  // loudly instead of drifting to the next free port, which would silently break
+  // the Dropbox OAuth redirect URI pinned to this origin (see .env).
   server: {
-    port: 3000,
+    port: 3005,
+    strictPort: true,
     open: true
+  },
+  preview: {
+    port: 4005,
+    strictPort: true
   },
   test: {
     environment: 'jsdom',

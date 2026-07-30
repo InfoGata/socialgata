@@ -172,7 +172,7 @@ To test the implementation:
 ### Setup
 - [ ] Create Dropbox app at https://www.dropbox.com/developers/apps
 - [ ] Configure app permissions (files.content.read, files.content.write)
-- [ ] Add redirect URI: `http://localhost:3000/auth/dropbox/callback`
+- [ ] Add redirect URI: `http://localhost:3005/auth/dropbox/callback`
 - [ ] Copy `.env.example` to `.env`
 - [ ] Add `VITE_DROPBOX_CLIENT_ID` to `.env`
 - [ ] Run `npm run dev`

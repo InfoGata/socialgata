@@ -151,7 +151,7 @@ If you have an existing Dropbox app configured:
 1. **Update Redirect URI in Dropbox App**:
    - Go to Dropbox app settings
    - Remove old URI: `http://localhost:3000/auth/dropbox/callback`
-   - Add new URI: `http://localhost:3000/dropbox-auth-popup.html`
+   - Add new URI: `http://localhost:3005/dropbox-auth-popup.html`
 
 2. **Update .env file**:
    ```env
@@ -159,7 +159,7 @@ If you have an existing Dropbox app configured:
    VITE_DROPBOX_REDIRECT_URI=http://localhost:3000/auth/dropbox/callback
 
    # New
-   VITE_DROPBOX_REDIRECT_URI=http://localhost:3000/dropbox-auth-popup.html
+   VITE_DROPBOX_REDIRECT_URI=http://localhost:3005/dropbox-auth-popup.html
    ```
 
 3. **Clear existing auth** (if needed):
@@ -216,7 +216,7 @@ window.addEventListener('message', (event) => {
 
 ### Manual Test
 
-1. Open settings: `http://localhost:3000/settings`
+1. Open settings: `http://localhost:3005/settings`
 2. Click "Connect Dropbox"
 3. Verify popup opens centered
 4. Complete Dropbox authorization
