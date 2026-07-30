@@ -31,9 +31,12 @@ import { Route as SPluginIdPostApiIdRouteImport } from './routes/s/$pluginId/pos
 import { Route as SPluginIdCApiIdIndexRouteImport } from './routes/s/$pluginId/c.$apiId.index'
 import { Route as SPluginIdIInstanceIdFeedRouteImport } from './routes/s/$pluginId/i/$instanceId/feed'
 import { Route as SPluginIdIInstanceIdCommunitiesRouteImport } from './routes/s/$pluginId/i/$instanceId/communities'
+import { Route as SPluginIdPostApiIdCommentCommentIdRouteImport } from './routes/s/$pluginId/post.$apiId_.comment.$commentId'
 import { Route as SPluginIdCCommunityIdPostApiIdRouteImport } from './routes/s/$pluginId/c.$communityId.post.$apiId'
 import { Route as SPluginIdIInstanceIdCApiIdIndexRouteImport } from './routes/s/$pluginId/i/$instanceId/c.$apiId.index'
 import { Route as SPluginIdIInstanceIdCCommunityIdPostApiIdRouteImport } from './routes/s/$pluginId/i/$instanceId/c.$communityId.post.$apiId'
+import { Route as SPluginIdCCommunityIdPostApiIdCommentCommentIdRouteImport } from './routes/s/$pluginId/c.$communityId.post.$apiId_.comment.$commentId'
+import { Route as SPluginIdIInstanceIdCCommunityIdPostApiIdCommentCommentIdRouteImport } from './routes/s/$pluginId/i/$instanceId/c.$communityId.post.$apiId_.comment.$commentId'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
@@ -148,6 +151,12 @@ const SPluginIdIInstanceIdCommunitiesRoute =
     path: '/s/$pluginId/i/$instanceId/communities',
     getParentRoute: () => rootRouteImport,
   } as any)
+const SPluginIdPostApiIdCommentCommentIdRoute =
+  SPluginIdPostApiIdCommentCommentIdRouteImport.update({
+    id: '/s/$pluginId/post/$apiId_/comment/$commentId',
+    path: '/s/$pluginId/post/$apiId/comment/$commentId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SPluginIdCCommunityIdPostApiIdRoute =
   SPluginIdCCommunityIdPostApiIdRouteImport.update({
     id: '/s/$pluginId/c/$communityId/post/$apiId',
@@ -164,6 +173,18 @@ const SPluginIdIInstanceIdCCommunityIdPostApiIdRoute =
   SPluginIdIInstanceIdCCommunityIdPostApiIdRouteImport.update({
     id: '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId',
     path: '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SPluginIdCCommunityIdPostApiIdCommentCommentIdRoute =
+  SPluginIdCCommunityIdPostApiIdCommentCommentIdRouteImport.update({
+    id: '/s/$pluginId/c/$communityId/post/$apiId_/comment/$commentId',
+    path: '/s/$pluginId/c/$communityId/post/$apiId/comment/$commentId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SPluginIdIInstanceIdCCommunityIdPostApiIdCommentCommentIdRoute =
+  SPluginIdIInstanceIdCCommunityIdPostApiIdCommentCommentIdRouteImport.update({
+    id: '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId_/comment/$commentId',
+    path: '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId/comment/$commentId',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -191,8 +212,11 @@ export interface FileRoutesByFullPath {
   '/s/$pluginId/i/$instanceId/feed': typeof SPluginIdIInstanceIdFeedRoute
   '/s/$pluginId/c/$apiId/': typeof SPluginIdCApiIdIndexRoute
   '/s/$pluginId/c/$communityId/post/$apiId': typeof SPluginIdCCommunityIdPostApiIdRoute
+  '/s/$pluginId/post/$apiId/comment/$commentId': typeof SPluginIdPostApiIdCommentCommentIdRoute
   '/s/$pluginId/i/$instanceId/c/$apiId/': typeof SPluginIdIInstanceIdCApiIdIndexRoute
+  '/s/$pluginId/c/$communityId/post/$apiId/comment/$commentId': typeof SPluginIdCCommunityIdPostApiIdCommentCommentIdRoute
   '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId': typeof SPluginIdIInstanceIdCCommunityIdPostApiIdRoute
+  '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId/comment/$commentId': typeof SPluginIdIInstanceIdCCommunityIdPostApiIdCommentCommentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -218,8 +242,11 @@ export interface FileRoutesByTo {
   '/s/$pluginId/i/$instanceId/feed': typeof SPluginIdIInstanceIdFeedRoute
   '/s/$pluginId/c/$apiId': typeof SPluginIdCApiIdIndexRoute
   '/s/$pluginId/c/$communityId/post/$apiId': typeof SPluginIdCCommunityIdPostApiIdRoute
+  '/s/$pluginId/post/$apiId/comment/$commentId': typeof SPluginIdPostApiIdCommentCommentIdRoute
   '/s/$pluginId/i/$instanceId/c/$apiId': typeof SPluginIdIInstanceIdCApiIdIndexRoute
+  '/s/$pluginId/c/$communityId/post/$apiId/comment/$commentId': typeof SPluginIdCCommunityIdPostApiIdCommentCommentIdRoute
   '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId': typeof SPluginIdIInstanceIdCCommunityIdPostApiIdRoute
+  '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId/comment/$commentId': typeof SPluginIdIInstanceIdCCommunityIdPostApiIdCommentCommentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -246,8 +273,11 @@ export interface FileRoutesById {
   '/s/$pluginId/i/$instanceId/feed': typeof SPluginIdIInstanceIdFeedRoute
   '/s/$pluginId/c/$apiId/': typeof SPluginIdCApiIdIndexRoute
   '/s/$pluginId/c/$communityId/post/$apiId': typeof SPluginIdCCommunityIdPostApiIdRoute
+  '/s/$pluginId/post/$apiId_/comment/$commentId': typeof SPluginIdPostApiIdCommentCommentIdRoute
   '/s/$pluginId/i/$instanceId/c/$apiId/': typeof SPluginIdIInstanceIdCApiIdIndexRoute
+  '/s/$pluginId/c/$communityId/post/$apiId_/comment/$commentId': typeof SPluginIdCCommunityIdPostApiIdCommentCommentIdRoute
   '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId': typeof SPluginIdIInstanceIdCCommunityIdPostApiIdRoute
+  '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId_/comment/$commentId': typeof SPluginIdIInstanceIdCCommunityIdPostApiIdCommentCommentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -275,8 +305,11 @@ export interface FileRouteTypes {
     | '/s/$pluginId/i/$instanceId/feed'
     | '/s/$pluginId/c/$apiId/'
     | '/s/$pluginId/c/$communityId/post/$apiId'
+    | '/s/$pluginId/post/$apiId/comment/$commentId'
     | '/s/$pluginId/i/$instanceId/c/$apiId/'
+    | '/s/$pluginId/c/$communityId/post/$apiId/comment/$commentId'
     | '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId'
+    | '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId/comment/$commentId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -302,8 +335,11 @@ export interface FileRouteTypes {
     | '/s/$pluginId/i/$instanceId/feed'
     | '/s/$pluginId/c/$apiId'
     | '/s/$pluginId/c/$communityId/post/$apiId'
+    | '/s/$pluginId/post/$apiId/comment/$commentId'
     | '/s/$pluginId/i/$instanceId/c/$apiId'
+    | '/s/$pluginId/c/$communityId/post/$apiId/comment/$commentId'
     | '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId'
+    | '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId/comment/$commentId'
   id:
     | '__root__'
     | '/'
@@ -329,8 +365,11 @@ export interface FileRouteTypes {
     | '/s/$pluginId/i/$instanceId/feed'
     | '/s/$pluginId/c/$apiId/'
     | '/s/$pluginId/c/$communityId/post/$apiId'
+    | '/s/$pluginId/post/$apiId_/comment/$commentId'
     | '/s/$pluginId/i/$instanceId/c/$apiId/'
+    | '/s/$pluginId/c/$communityId/post/$apiId_/comment/$commentId'
     | '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId'
+    | '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId_/comment/$commentId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -357,8 +396,11 @@ export interface RootRouteChildren {
   SPluginIdIInstanceIdFeedRoute: typeof SPluginIdIInstanceIdFeedRoute
   SPluginIdCApiIdIndexRoute: typeof SPluginIdCApiIdIndexRoute
   SPluginIdCCommunityIdPostApiIdRoute: typeof SPluginIdCCommunityIdPostApiIdRoute
+  SPluginIdPostApiIdCommentCommentIdRoute: typeof SPluginIdPostApiIdCommentCommentIdRoute
   SPluginIdIInstanceIdCApiIdIndexRoute: typeof SPluginIdIInstanceIdCApiIdIndexRoute
+  SPluginIdCCommunityIdPostApiIdCommentCommentIdRoute: typeof SPluginIdCCommunityIdPostApiIdCommentCommentIdRoute
   SPluginIdIInstanceIdCCommunityIdPostApiIdRoute: typeof SPluginIdIInstanceIdCCommunityIdPostApiIdRoute
+  SPluginIdIInstanceIdCCommunityIdPostApiIdCommentCommentIdRoute: typeof SPluginIdIInstanceIdCCommunityIdPostApiIdCommentCommentIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -517,6 +559,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SPluginIdIInstanceIdCommunitiesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/s/$pluginId/post/$apiId_/comment/$commentId': {
+      id: '/s/$pluginId/post/$apiId_/comment/$commentId'
+      path: '/s/$pluginId/post/$apiId/comment/$commentId'
+      fullPath: '/s/$pluginId/post/$apiId/comment/$commentId'
+      preLoaderRoute: typeof SPluginIdPostApiIdCommentCommentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/s/$pluginId/c/$communityId/post/$apiId': {
       id: '/s/$pluginId/c/$communityId/post/$apiId'
       path: '/s/$pluginId/c/$communityId/post/$apiId'
@@ -536,6 +585,20 @@ declare module '@tanstack/react-router' {
       path: '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId'
       fullPath: '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId'
       preLoaderRoute: typeof SPluginIdIInstanceIdCCommunityIdPostApiIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/s/$pluginId/c/$communityId/post/$apiId_/comment/$commentId': {
+      id: '/s/$pluginId/c/$communityId/post/$apiId_/comment/$commentId'
+      path: '/s/$pluginId/c/$communityId/post/$apiId/comment/$commentId'
+      fullPath: '/s/$pluginId/c/$communityId/post/$apiId/comment/$commentId'
+      preLoaderRoute: typeof SPluginIdCCommunityIdPostApiIdCommentCommentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId_/comment/$commentId': {
+      id: '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId_/comment/$commentId'
+      path: '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId/comment/$commentId'
+      fullPath: '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId/comment/$commentId'
+      preLoaderRoute: typeof SPluginIdIInstanceIdCCommunityIdPostApiIdCommentCommentIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -565,9 +628,15 @@ const rootRouteChildren: RootRouteChildren = {
   SPluginIdIInstanceIdFeedRoute: SPluginIdIInstanceIdFeedRoute,
   SPluginIdCApiIdIndexRoute: SPluginIdCApiIdIndexRoute,
   SPluginIdCCommunityIdPostApiIdRoute: SPluginIdCCommunityIdPostApiIdRoute,
+  SPluginIdPostApiIdCommentCommentIdRoute:
+    SPluginIdPostApiIdCommentCommentIdRoute,
   SPluginIdIInstanceIdCApiIdIndexRoute: SPluginIdIInstanceIdCApiIdIndexRoute,
+  SPluginIdCCommunityIdPostApiIdCommentCommentIdRoute:
+    SPluginIdCCommunityIdPostApiIdCommentCommentIdRoute,
   SPluginIdIInstanceIdCCommunityIdPostApiIdRoute:
     SPluginIdIInstanceIdCCommunityIdPostApiIdRoute,
+  SPluginIdIInstanceIdCCommunityIdPostApiIdCommentCommentIdRoute:
+    SPluginIdIInstanceIdCCommunityIdPostApiIdCommentCommentIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

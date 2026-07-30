@@ -9,8 +9,15 @@ import {
 
 const CommunityPostComments: React.FC = () => {
   const data = Route.useLoaderData();
-  const pluginId = Route.useParams().pluginId;
-  return <PostWithComments data={data} pluginId={pluginId} />;
+  const { pluginId, instanceId, communityId } = Route.useParams();
+  return (
+    <PostWithComments
+      data={data}
+      pluginId={pluginId}
+      instanceId={instanceId}
+      communityId={communityId}
+    />
+  );
 };
 
 export const Route = createFileRoute(

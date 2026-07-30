@@ -8,14 +8,38 @@ import { usePlugins } from "@/hooks/usePlugins";
 import { ArrowLeftIcon, ExternalLinkIcon, MessageCircleIcon, Users2Icon } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { ImageboardPostsProvider } from "@/contexts/ImageboardPostsContext";
+import {
+  CommentPermalinkContext,
+  FullThreadLink,
+} from "./CommentPermalink";
+
+/** Depth-first search for a comment anywhere in a comment tree. */
+const findComment = (comments: Post[], apiId: string): Post | undefined => {
+  for (const comment of comments) {
+    if (comment.apiId === apiId) return comment;
+    const found = comment.comments
+      ? findComment(comment.comments, apiId)
+      : undefined;
+    if (found) return found;
+  }
+  return undefined;
+};
 
 interface Props {
   data: GetCommentsResponse;
   pluginId?: string;
+  /** Community segment of the url, when the route has one. */
+  communityId?: string;
+  instanceId?: string;
+  /**
+   * Set when the route asked for a single comment thread (a comment
+   * permalink) instead of every comment on the post.
+   */
+  commentId?: string;
 }
 
 const PostWithComments: React.FC<Props> = (props) => {
-  const { data, pluginId } = props;
+  const { data, pluginId, communityId, instanceId, commentId } = props;
   const [replies, setReplies] = React.useState<Post[] | null>(null);
   const [hasFeed, setHasFeed] = React.useState(false);
   const { plugins } = usePlugins();
@@ -41,6 +65,22 @@ const PostWithComments: React.FC<Props> = (props) => {
     setReplies(repliesResponse.items);
   }
 
+
+  // Imageboard replies are numbered posts in one thread rather than a tree of
+  // individually addressable comments, so they get no permalinks.
+  const postApiId = data.post?.apiId;
+  const permalinkContext: CommentPermalinkContext | undefined =
+    pluginId && postApiId && platformType !== "imageboard"
+      ? { pluginId, postApiId, communityId, instanceId }
+      : undefined;
+
+  // A plugin that understands `commentApiId` already returns just the one
+  // thread; narrow it here for the ones that hand back the whole post.
+  const comments = React.useMemo(() => {
+    if (!commentId) return data.items;
+    const comment = findComment(data.items, commentId);
+    return comment ? [comment] : data.items;
+  }, [data.items, commentId]);
 
   const allPosts = React.useMemo(() => {
     const posts: Post[] = [];
@@ -120,8 +160,21 @@ const PostWithComments: React.FC<Props> = (props) => {
         </Card>
       )}
 
+      {/* Single Comment Thread Notice */}
+      {commentId && permalinkContext && (
+        <div className="rounded-md border border-dashed bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
+          <span>You are viewing a single comment thread. </span>
+          <FullThreadLink
+            context={permalinkContext}
+            className="font-medium text-foreground hover:text-primary transition-colors"
+          >
+            View all comments
+          </FullThreadLink>
+        </div>
+      )}
+
       {/* Comments Section */}
-      {data.items.length > 0 && (
+      {comments.length > 0 && (
         <Card>
           <CardHeader className="pb-4">
             <div className="flex items-center gap-2">
@@ -132,8 +185,8 @@ const PostWithComments: React.FC<Props> = (props) => {
             </div>
           </CardHeader>
           <CardContent className="space-y-4 pt-0">
-            {data.items.map((d) => (
-              <CommentComponent key={d.apiId} comment={d} platformType={platformType} routePluginId={pluginId} />
+            {comments.map((d) => (
+              <CommentComponent key={d.apiId} comment={d} platformType={platformType} routePluginId={pluginId} permalinkContext={permalinkContext} />
             ))}
           </CardContent>
         </Card>
@@ -162,7 +215,7 @@ const PostWithComments: React.FC<Props> = (props) => {
           </CardHeader>
           <CardContent className="space-y-4 pt-0">
             {replies.map((r) => (
-              <CommentComponent key={r.apiId} comment={r} platformType={platformType} routePluginId={pluginId} />
+              <CommentComponent key={r.apiId} comment={r} platformType={platformType} routePluginId={pluginId} permalinkContext={permalinkContext} />
             ))}
           </CardContent>
         </Card>

@@ -9,11 +9,17 @@ import ExpandedMedia from "./ExpandedMedia";
 import ReactTimeago from "react-timeago";
 import { FavoriteButton } from "./FavoriteButton";
 import { createImageboardParseOptions } from "./ImageboardQuoteLink";
+import { CommentPermalink, CommentPermalinkContext } from "./CommentPermalink";
 
 type Props = {
   comment: Post;
   platformType?: string;
   routePluginId?: string;
+  /**
+   * Where this comment lives, so it can link to its own thread. Absent when the
+   * post isn't known (or the platform has no per-comment threads).
+   */
+  permalinkContext?: CommentPermalinkContext;
 };
 
 const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
@@ -33,7 +39,7 @@ const distinguishedLabel = (distinguished: string): string => {
 };
 
 const CommentComponent: React.FC<Props> = (props) => {
-  const { comment, platformType = "forum", routePluginId } = props;
+  const { comment, platformType = "forum", routePluginId, permalinkContext } = props;
   const [expand, setExpand] = React.useState(false);
   const [collapsed, setCollapsed] = React.useState(false);
   const toggleExpand = () => {
@@ -253,17 +259,26 @@ const CommentComponent: React.FC<Props> = (props) => {
               />
             )}
 
-            {routePluginId && comment.apiId && (
-              <Link
-                to="/s/$pluginId/post/$apiId"
-                params={{
-                  pluginId: routePluginId,
-                  apiId: comment.apiId,
-                }}
+            {permalinkContext && comment.apiId ? (
+              <CommentPermalink
+                context={permalinkContext}
+                commentApiId={comment.apiId}
                 className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
-              >
-                <MessageCircleIcon className="h-3.5 w-3.5" />
-              </Link>
+              />
+            ) : (
+              routePluginId &&
+              comment.apiId && (
+                <Link
+                  to="/s/$pluginId/post/$apiId"
+                  params={{
+                    pluginId: routePluginId,
+                    apiId: comment.apiId,
+                  }}
+                  className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <MessageCircleIcon className="h-3.5 w-3.5" />
+                </Link>
+              )
             )}
 
             {comment.originalUrl && (
@@ -279,7 +294,7 @@ const CommentComponent: React.FC<Props> = (props) => {
           </div>
           <div className="ml-2">
             {comment.comments?.length
-              ? comment.comments.map((c) => <CommentComponent key={c.apiId} comment={c} platformType={platformType} routePluginId={routePluginId} />)
+              ? comment.comments.map((c) => <CommentComponent key={c.apiId} comment={c} platformType={platformType} routePluginId={routePluginId} permalinkContext={permalinkContext} />)
               : undefined}
           </div>
         </>
