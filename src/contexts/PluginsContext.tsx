@@ -265,13 +265,15 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
       };
 
       const srcUrl = getPluginUrl(plugin.id!, "/pluginframe.html");
-      // Stamp the owning plugin id onto a post and any post it quotes so links
-      // (author, thread) resolve. Nested quoted posts aren't in the top-level
-      // `items` array, so they need stamping explicitly.
+      // Stamp the owning plugin id onto a post, any post it quotes, and its
+      // replies so links (author, thread) and favoriting resolve. Quoted posts
+      // and nested comments aren't in the top-level `items` array, so they need
+      // stamping explicitly.
       const stampPost = (post?: Post) => {
         if (!post) return;
         post.pluginId = plugin.id;
         stampPost(post.quotedPost);
+        post.comments?.forEach(stampPost);
       };
       const host = new PluginFrameContainer(api, {
         completeMethods: {
@@ -301,6 +303,10 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
           },
           onGetComments: (response: GetCommentsResponse) => {
             stampPost(response?.post);
+            response?.items.forEach(stampPost);
+            return response;
+          },
+          onGetCommentReplies: (response: GetCommentRepliesResponse) => {
             response?.items.forEach(stampPost);
             return response;
           },

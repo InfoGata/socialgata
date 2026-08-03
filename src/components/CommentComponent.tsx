@@ -48,6 +48,9 @@ const CommentComponent: React.FC<Props> = (props) => {
   const sanitizer = DOMPurify.sanitize;
 
   const clean = sanitizer(comment.body || "");
+  // Favorites saved before replies were stamped carry no `pluginId` on their
+  // children, so fall back to the plugin the route already knows about.
+  const favoritePluginId = comment.pluginId || routePluginId;
   const imageboardParseOptions = React.useMemo(
     () => createImageboardParseOptions(comment.pluginId || "", comment.communityApiId, comment.instanceId),
     [comment.pluginId, comment.communityApiId, comment.instanceId],
@@ -129,13 +132,13 @@ const CommentComponent: React.FC<Props> = (props) => {
             )}
 
             {/* Favorite Button & Original Link */}
-            {(comment.pluginId && comment.apiId || comment.originalUrl) && (
+            {(favoritePluginId && comment.apiId || comment.originalUrl) && (
               <div className="mt-2 flex items-center gap-2">
-                {comment.pluginId && comment.apiId && (
+                {favoritePluginId && comment.apiId && (
                   <FavoriteButton
                     type="comment"
                     item={comment}
-                    pluginId={comment.pluginId}
+                    pluginId={favoritePluginId}
                     size="sm"
                     className="h-7 w-7"
                   />
@@ -170,7 +173,7 @@ const CommentComponent: React.FC<Props> = (props) => {
         {/* Nested replies */}
         <div className="ml-2">
           {comment.comments?.length
-            ? comment.comments.map((c) => <CommentComponent key={c.apiId} comment={c} platformType={platformType} routePluginId={routePluginId} />)
+            ? comment.comments.map((c) => <CommentComponent key={c.apiId} comment={c} platformType={platformType} routePluginId={routePluginId} permalinkContext={permalinkContext} />)
             : undefined}
         </div>
       </div>
@@ -249,11 +252,11 @@ const CommentComponent: React.FC<Props> = (props) => {
             {parse(clean)}
           </div>
           <div className="flex items-center gap-2 mt-1">
-            {comment.pluginId && comment.apiId && (
+            {favoritePluginId && comment.apiId && (
               <FavoriteButton
                 type="comment"
                 item={comment}
-                pluginId={comment.pluginId}
+                pluginId={favoritePluginId}
                 size="sm"
                 className="h-7 w-7"
               />

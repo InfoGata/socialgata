@@ -61,8 +61,10 @@ export const createFavoriteKey = (pluginId: string, itemId: string): string => {
  * Helper to parse favorite key
  */
 export const parseFavoriteKey = (key: string): { pluginId: string; itemId: string } => {
-  const [pluginId, itemId] = key.split(':');
-  return { pluginId, itemId };
+  // Only the first colon separates the two halves — api ids can contain colons.
+  const separator = key.indexOf(':');
+  if (separator === -1) return { pluginId: key, itemId: '' };
+  return { pluginId: key.slice(0, separator), itemId: key.slice(separator + 1) };
 };
 
 /**

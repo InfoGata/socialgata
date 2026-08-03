@@ -148,7 +148,9 @@ export function useFavoritesMutations() {
 
     toggleComment: (pluginId: string, commentId: string, comment?: Post) => {
       const key = createFavoriteKey(pluginId, commentId);
-      toggleFavorite(handle, 'comments', key, comment);
+      // Replies aren't part of what was favorited, and copying the whole
+      // subtree into the synced document adds up fast on deep threads.
+      toggleFavorite(handle, 'comments', key, comment && { ...comment, comments: undefined });
     },
 
     toggleCommunity: (pluginId: string, communityId: string, community?: Community) => {
