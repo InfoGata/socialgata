@@ -5,8 +5,8 @@ import React from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { usePlugins } from "@/hooks/usePlugins";
-import { ArrowLeftIcon, ExternalLinkIcon, MessageCircleIcon, Users2Icon } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { ArrowLeftIcon, ExternalLinkIcon, MessageCircleIcon, RefreshCwIcon, Users2Icon } from "lucide-react";
+import { Link, useRouter } from "@tanstack/react-router";
 import { ImageboardPostsProvider } from "@/contexts/ImageboardPostsContext";
 import {
   CommentPermalinkContext,
@@ -42,6 +42,8 @@ const PostWithComments: React.FC<Props> = (props) => {
   const { data, pluginId, communityId, instanceId, commentId } = props;
   const [replies, setReplies] = React.useState<Post[] | null>(null);
   const [hasFeed, setHasFeed] = React.useState(false);
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const router = useRouter();
   const { plugins } = usePlugins();
   const plugin = pluginId ? plugins.find(p => p.id === pluginId) : null;
   const platformType = plugin?.platformType || "forum";
@@ -64,6 +66,20 @@ const PostWithComments: React.FC<Props> = (props) => {
     });
     setReplies(repliesResponse.items);
   }
+
+  // The comments live in the route loader, so re-running it is the refresh.
+  const refreshComments = async () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    try {
+      // Replies were fetched separately and would otherwise linger next to the
+      // freshly loaded comments.
+      setReplies(null);
+      await router.invalidate({ sync: true });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
 
   // Imageboard replies are numbered posts in one thread rather than a tree of
@@ -174,23 +190,38 @@ const PostWithComments: React.FC<Props> = (props) => {
       )}
 
       {/* Comments Section */}
-      {comments.length > 0 && (
-        <Card>
-          <CardHeader className="pb-4">
+      <Card>
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <MessageCircleIcon className="h-5 w-5 text-muted-foreground" />
               <h3 className="text-lg font-semibold">
                 Comments
               </h3>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4 pt-0">
-            {comments.map((d) => (
+            <Button
+              onClick={refreshComments}
+              disabled={isRefreshing}
+              variant="outline"
+              size="sm"
+              aria-label="Refresh comments"
+              aria-busy={isRefreshing}
+            >
+              <RefreshCwIcon className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+              Refresh
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4 pt-0">
+          {comments.length > 0 ? (
+            comments.map((d) => (
               <CommentComponent key={d.apiId} comment={d} platformType={platformType} routePluginId={pluginId} permalinkContext={permalinkContext} />
-            ))}
-          </CardContent>
-        </Card>
-      )}
+            ))
+          ) : (
+            <p className="text-sm text-muted-foreground">No comments yet.</p>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Load More Replies */}
       {data.post?.moreRepliesId && !replies && (
