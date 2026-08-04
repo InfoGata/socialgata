@@ -9,7 +9,11 @@ import ExpandedMedia from "./ExpandedMedia";
 import ReactTimeago from "react-timeago";
 import { FavoriteButton } from "./FavoriteButton";
 import { createImageboardParseOptions } from "./ImageboardQuoteLink";
-import { CommentPermalink, CommentPermalinkContext } from "./CommentPermalink";
+import {
+  CommentPermalink,
+  CommentPermalinkContext,
+  FavoriteCommentSource,
+} from "./CommentPermalink";
 
 type Props = {
   comment: Post;
@@ -20,6 +24,13 @@ type Props = {
    * post isn't known (or the platform has no per-comment threads).
    */
   permalinkContext?: CommentPermalinkContext;
+  /**
+   * Saved with the comment when it's favorited, so the favorites page can link
+   * back to the post. Unlike `permalinkContext` this is set for imageboards
+   * too — their replies have no permalink, but the post they live in is still
+   * a real place to link to.
+   */
+  favoriteSource?: FavoriteCommentSource;
 };
 
 const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
@@ -39,7 +50,7 @@ const distinguishedLabel = (distinguished: string): string => {
 };
 
 const CommentComponent: React.FC<Props> = (props) => {
-  const { comment, platformType = "forum", routePluginId, permalinkContext } = props;
+  const { comment, platformType = "forum", routePluginId, permalinkContext, favoriteSource } = props;
   const [expand, setExpand] = React.useState(false);
   const [collapsed, setCollapsed] = React.useState(false);
   const toggleExpand = () => {
@@ -141,6 +152,7 @@ const CommentComponent: React.FC<Props> = (props) => {
                     pluginId={favoritePluginId}
                     size="sm"
                     className="h-7 w-7"
+                    source={favoriteSource}
                   />
                 )}
                 {routePluginId && comment.apiId && (
@@ -173,7 +185,7 @@ const CommentComponent: React.FC<Props> = (props) => {
         {/* Nested replies */}
         <div className="ml-2">
           {comment.comments?.length
-            ? comment.comments.map((c) => <CommentComponent key={c.apiId} comment={c} platformType={platformType} routePluginId={routePluginId} permalinkContext={permalinkContext} />)
+            ? comment.comments.map((c) => <CommentComponent key={c.apiId} comment={c} platformType={platformType} routePluginId={routePluginId} permalinkContext={permalinkContext} favoriteSource={favoriteSource} />)
             : undefined}
         </div>
       </div>
@@ -259,6 +271,7 @@ const CommentComponent: React.FC<Props> = (props) => {
                 pluginId={favoritePluginId}
                 size="sm"
                 className="h-7 w-7"
+                source={favoriteSource}
               />
             )}
 
@@ -297,7 +310,7 @@ const CommentComponent: React.FC<Props> = (props) => {
           </div>
           <div className="ml-2">
             {comment.comments?.length
-              ? comment.comments.map((c) => <CommentComponent key={c.apiId} comment={c} platformType={platformType} routePluginId={routePluginId} permalinkContext={permalinkContext} />)
+              ? comment.comments.map((c) => <CommentComponent key={c.apiId} comment={c} platformType={platformType} routePluginId={routePluginId} permalinkContext={permalinkContext} favoriteSource={favoriteSource} />)
               : undefined}
           </div>
         </>

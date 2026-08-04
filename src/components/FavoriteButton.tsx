@@ -16,6 +16,7 @@ import {
   useFavoritesMutations
 } from '@/sync/useFavorites';
 import type { Instance, Post, Community, User } from '@/plugintypes';
+import type { FavoriteCommentSource } from './CommentPermalink';
 import { cn } from '@/lib/utils';
 
 type FavoriteType = 'instance' | 'post' | 'comment' | 'community' | 'user';
@@ -27,6 +28,8 @@ interface FavoriteButtonProps {
   size?: 'sm' | 'md' | 'lg';
   variant?: 'icon' | 'button';
   className?: string;
+  /** Comments only: where the comment lives, so the favorite can link back. */
+  source?: FavoriteCommentSource;
 }
 
 /**
@@ -40,7 +43,8 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   pluginId,
   size = 'md',
   variant = 'icon',
-  className
+  className,
+  source
 }) => {
   const mutations = useFavoritesMutations();
 
@@ -75,7 +79,7 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
         mutations.togglePost(pluginId, itemId, item as Post);
         break;
       case 'comment':
-        mutations.toggleComment(pluginId, itemId, item as Post);
+        mutations.toggleComment(pluginId, itemId, item as Post, source);
         break;
       case 'community':
         mutations.toggleCommunity(pluginId, itemId, item as Community);

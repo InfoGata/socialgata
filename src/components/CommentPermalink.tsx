@@ -15,6 +15,16 @@ export type CommentPermalinkContext = {
   instanceId?: string;
 };
 
+/**
+ * A permalink context plus what the favorites page needs to label the backlink
+ * and render the comment the way its platform does. Stored on a favorited
+ * comment, since nothing on the comment itself names the post it came from.
+ */
+export type FavoriteCommentSource = CommentPermalinkContext & {
+  postTitle?: string;
+  platformType?: string;
+};
+
 type PermalinkProps = {
   context: CommentPermalinkContext;
   commentApiId: string;

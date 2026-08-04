@@ -1,5 +1,14 @@
 import { Repo, DocHandle, AutomergeUrl } from '@automerge/automerge-repo';
 import type { Instance, Post, Community, User } from '@/plugintypes';
+import type { FavoriteCommentSource } from '@/components/CommentPermalink';
+
+/**
+ * A favorited comment: the comment itself, plus where it came from. `Post` has
+ * no field naming the post a comment belongs to, so the route context is
+ * captured at favorite time and stored alongside it. Absent on comments
+ * favorited before that was recorded.
+ */
+export type FavoriteComment = Post & { source?: FavoriteCommentSource };
 
 /**
  * Favorites document structure
@@ -8,7 +17,7 @@ import type { Instance, Post, Community, User } from '@/plugintypes';
 export type FavoritesDoc = {
   instances: { [key: string]: Instance };
   posts: { [key: string]: Post };
-  comments: { [key: string]: Post };
+  comments: { [key: string]: FavoriteComment };
   communities: { [key: string]: Community };
   users: { [key: string]: User };
 };
@@ -100,7 +109,7 @@ export function toggleFavorite(
   handle: DocHandle<FavoritesDoc>,
   type: 'instances' | 'posts' | 'comments' | 'communities' | 'users',
   key: string,
-  data?: Instance | Post | Community | User
+  data?: Instance | Post | Community | User | FavoriteComment
 ) {
   handle.change(doc => {
     if (!doc[type]) {

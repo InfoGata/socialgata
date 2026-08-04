@@ -14,6 +14,8 @@ import {
 import InstanceCard from '@/components/InstanceCard';
 import PostComponent from '@/components/PostComponent';
 import CommentComponent from '@/components/CommentComponent';
+import { FullThreadLink } from '@/components/CommentPermalink';
+import type { FavoriteComment } from '@/sync/favorites-repo';
 import { Link } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/favorites')({
@@ -165,10 +167,8 @@ function FavoritesPage() {
               {commentsArray.length > 0 && (
                 <Section title="Comments" count={commentsArray.length}>
                   <div className="space-y-4">
-                    {commentsArray.map(({ key, comment }) => (
-                      <div key={key} className="bg-card rounded-lg border p-4">
-                        <CommentComponent comment={comment} platformType="forum" />
-                      </div>
+                    {commentsArray.map(({ key, pluginId, comment }) => (
+                      <FavoriteCommentCard key={key} pluginId={pluginId} comment={comment} />
                     ))}
                   </div>
                 </Section>
@@ -288,15 +288,50 @@ function FavoritesPage() {
             <EmptyState message="No favorited comments" />
           ) : (
             <div className="space-y-4">
-              {commentsArray.map(({ key, comment }) => (
-                <div key={key} className="bg-card rounded-lg border p-4">
-                  <CommentComponent comment={comment} platformType="forum" />
-                </div>
+              {commentsArray.map(({ key, pluginId, comment }) => (
+                <FavoriteCommentCard key={key} pluginId={pluginId} comment={comment} />
               ))}
             </div>
           )}
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+/**
+ * A favorited comment, headed by the post it came from. Comments favorited
+ * before that post was recorded have no `source` and simply render without the
+ * header — re-favoriting one from its post page fills it in.
+ */
+function FavoriteCommentCard({ pluginId, comment }: { pluginId: string; comment: FavoriteComment }) {
+  const source = comment.source;
+  const isImageboard = source?.platformType === 'imageboard';
+
+  return (
+    <div className="bg-card rounded-lg border p-4">
+      {source?.postApiId && (
+        <div className="mb-2 flex flex-wrap items-baseline gap-x-2 text-sm text-muted-foreground border-b pb-2">
+          <span>
+            in{' '}
+            <FullThreadLink
+              context={source}
+              className="font-medium text-foreground hover:text-primary transition-colors"
+            >
+              {source.postTitle || 'this post'}
+            </FullThreadLink>
+          </span>
+          {comment.communityName && (
+            <span className="text-xs">{comment.communityName}</span>
+          )}
+        </div>
+      )}
+      <CommentComponent
+        comment={comment}
+        platformType={source?.platformType || 'forum'}
+        routePluginId={pluginId}
+        permalinkContext={isImageboard ? undefined : source}
+      />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { Instance, Post, Community, User } from '@/plugintypes';
 import { useFavoritesContext } from './useFavoritesContext';
+import type { FavoriteCommentSource } from '@/components/CommentPermalink';
 import {
   createFavoriteKey,
   parseFavoriteKey,
@@ -8,6 +9,7 @@ import {
   isFavorite,
   getFavorites,
 } from './favorites-repo';
+import type { FavoriteComment } from './favorites-repo';
 
 /**
  * Hook to check if an instance is favorited
@@ -90,7 +92,7 @@ export function useFavoritePosts() {
 export function useFavoriteComments() {
   const { doc } = useFavoritesContext();
   return useMemo(() => {
-    const comments = getFavorites(doc, 'comments') as Record<string, Post>;
+    const comments = getFavorites(doc, 'comments') as Record<string, FavoriteComment>;
     return Object.entries(comments).map(([key, comment]) => ({
       key,
       ...parseFavoriteKey(key),
@@ -146,11 +148,18 @@ export function useFavoritesMutations() {
       toggleFavorite(handle, 'posts', key, post);
     },
 
-    toggleComment: (pluginId: string, commentId: string, comment?: Post) => {
+    toggleComment: (
+      pluginId: string,
+      commentId: string,
+      comment?: Post,
+      // Where the comment lives. Nothing on the comment itself names its post,
+      // so without this the favorite can't link back to the discussion.
+      source?: FavoriteCommentSource,
+    ) => {
       const key = createFavoriteKey(pluginId, commentId);
       // Replies aren't part of what was favorited, and copying the whole
       // subtree into the synced document adds up fast on deep threads.
-      toggleFavorite(handle, 'comments', key, comment && { ...comment, comments: undefined });
+      toggleFavorite(handle, 'comments', key, comment && { ...comment, comments: undefined, source });
     },
 
     toggleCommunity: (pluginId: string, communityId: string, community?: Community) => {

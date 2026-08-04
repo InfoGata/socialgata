@@ -10,6 +10,7 @@ import { Link, useRouter } from "@tanstack/react-router";
 import { ImageboardPostsProvider } from "@/contexts/ImageboardPostsContext";
 import {
   CommentPermalinkContext,
+  FavoriteCommentSource,
   FullThreadLink,
 } from "./CommentPermalink";
 
@@ -82,13 +83,26 @@ const PostWithComments: React.FC<Props> = (props) => {
   };
 
 
-  // Imageboard replies are numbered posts in one thread rather than a tree of
-  // individually addressable comments, so they get no permalinks.
+  // Where these comments live. Saved with a comment when it's favorited, since
+  // nothing on the comment itself names the post it came from.
   const postApiId = data.post?.apiId;
-  const permalinkContext: CommentPermalinkContext | undefined =
-    pluginId && postApiId && platformType !== "imageboard"
-      ? { pluginId, postApiId, communityId, instanceId }
+  const favoriteSource: FavoriteCommentSource | undefined =
+    pluginId && postApiId
+      ? {
+          pluginId,
+          postApiId,
+          communityId,
+          instanceId,
+          postTitle: data.post?.title,
+          platformType,
+        }
       : undefined;
+
+  // Imageboard replies are numbered posts in one thread rather than a tree of
+  // individually addressable comments, so they get no permalinks. The post they
+  // live in is still linkable, which is why favoriteSource isn't gated here.
+  const permalinkContext: CommentPermalinkContext | undefined =
+    platformType === "imageboard" ? undefined : favoriteSource;
 
   // A plugin that understands `commentApiId` already returns just the one
   // thread; narrow it here for the ones that hand back the whole post.
@@ -215,7 +229,7 @@ const PostWithComments: React.FC<Props> = (props) => {
         <CardContent className="space-y-4 pt-0">
           {comments.length > 0 ? (
             comments.map((d) => (
-              <CommentComponent key={d.apiId} comment={d} platformType={platformType} routePluginId={pluginId} permalinkContext={permalinkContext} />
+              <CommentComponent key={d.apiId} comment={d} platformType={platformType} routePluginId={pluginId} permalinkContext={permalinkContext} favoriteSource={favoriteSource} />
             ))
           ) : (
             <p className="text-sm text-muted-foreground">No comments yet.</p>
@@ -246,7 +260,7 @@ const PostWithComments: React.FC<Props> = (props) => {
           </CardHeader>
           <CardContent className="space-y-4 pt-0">
             {replies.map((r) => (
-              <CommentComponent key={r.apiId} comment={r} platformType={platformType} routePluginId={pluginId} permalinkContext={permalinkContext} />
+              <CommentComponent key={r.apiId} comment={r} platformType={platformType} routePluginId={pluginId} permalinkContext={permalinkContext} favoriteSource={favoriteSource} />
             ))}
           </CardContent>
         </Card>
