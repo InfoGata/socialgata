@@ -35,20 +35,21 @@ const ImageThumbnail: React.FC<ImageThumbnailProps> = (props) => {
 
   if (isImageUrl(url)) {
     return (
-      <button onClick={toggleExpand} className="cursor-pointer">
-        {thumbnailUrl ? (
-          <img alt="thumbnail" loading="lazy" src={thumbnailUrl} className="rounded-md" />
-        ) : (
-          <img alt="image url" loading="lazy" src={url} className="rounded-md" />
-        )}
+      <button onClick={toggleExpand} className="cursor-pointer block w-full h-full">
+        <img
+          alt={thumbnailUrl ? "thumbnail" : "image url"}
+          loading="lazy"
+          src={thumbnailUrl ?? url}
+          className="rounded-md w-full h-full object-cover"
+        />
       </button>
     );
   }
 
   if (thumbnailUrl) {
     return (
-      <a href={url} target="_blank">
-        <img alt="thumbnail url" loading="lazy" src={thumbnailUrl} className="rounded-md" />
+      <a href={url} target="_blank" className="block w-full h-full">
+        <img alt="thumbnail url" loading="lazy" src={thumbnailUrl} className="rounded-md w-full h-full object-cover" />
       </a>
     );
   }
