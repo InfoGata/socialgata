@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { SortOption } from "@/plugintypes";
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -9,20 +10,23 @@ import {
   SelectValue,
 } from "./ui/select";
 
-type FeedSortControlsProps = {
+type SortControlsProps = {
   sortOptions?: SortOption[];
   sortId?: string;
   timeRangeId?: string;
+  /** Extra classes for the wrapper, for callers with their own spacing. */
+  className?: string;
 };
 
 /**
- * Sort + optional time-range dropdowns for a feed/community/user listing.
- * Renders nothing when the plugin declares no sort options. Selections are
- * written to the current route's search params so they survive reloads and
- * pagination; `page` is cleared on change since cursors are sort-specific.
+ * Sort + optional time-range dropdowns for any sortable listing — feeds,
+ * communities, user pages, and a post's comments. Renders nothing when the
+ * plugin declares no sort options. Selections are written to the current
+ * route's search params so they survive reloads and pagination; `page` is
+ * cleared on change since cursors are sort-specific.
  */
-const FeedSortControls: React.FC<FeedSortControlsProps> = (props) => {
-  const { sortOptions, sortId, timeRangeId } = props;
+const SortControls: React.FC<SortControlsProps> = (props) => {
+  const { sortOptions, sortId, timeRangeId, className } = props;
   const navigate = useNavigate();
 
   if (!sortOptions || sortOptions.length === 0) return null;
@@ -61,7 +65,7 @@ const FeedSortControls: React.FC<FeedSortControlsProps> = (props) => {
   };
 
   return (
-    <div className="flex items-center gap-2 mb-4">
+    <div className={cn("flex items-center gap-2 mb-4", className)}>
       <Select value={activeSort.id} onValueChange={onSortChange}>
         <SelectTrigger className="h-8 w-auto min-w-32 text-sm">
           <SelectValue />
@@ -96,4 +100,4 @@ const FeedSortControls: React.FC<FeedSortControlsProps> = (props) => {
   );
 };
 
-export default FeedSortControls;
+export default SortControls;

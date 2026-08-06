@@ -1,6 +1,6 @@
 import PostComponent from "@/components/PostComponent";
 import { FavoriteButton } from "@/components/FavoriteButton";
-import FeedSortControls from "@/components/FeedSortControls";
+import SortControls from "@/components/SortControls";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePlugins } from "@/hooks/usePlugins";
 import { createFileRoute, notFound } from "@tanstack/react-router";
@@ -159,7 +159,7 @@ const UserOverview: React.FC = () => {
       )}
 
       <div className="space-y-4">
-        <FeedSortControls
+        <SortControls
           sortOptions={sortOptions}
           sortId={sortId}
           timeRangeId={timeRangeId}

@@ -7,7 +7,7 @@ import { Link } from "@tanstack/react-router";
 import React from "react";
 import { usePlugins } from "@/hooks/usePlugins";
 import BrowseCommunitiesButton from "./BrowseCommunitiesButton";
-import FeedSortControls from "./FeedSortControls";
+import SortControls from "./SortControls";
 
 type FeedProps = {
   sortId?: string;
@@ -69,7 +69,7 @@ const Feed: React.FC<FeedProps> = (props) => {
           )}
 
           {/* Sort Controls */}
-          <FeedSortControls
+          <SortControls
             sortOptions={data.sortOptions}
             sortId={sortId ?? data.sortId}
             timeRangeId={timeRangeId ?? data.timeRangeId}

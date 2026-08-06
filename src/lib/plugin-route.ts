@@ -61,6 +61,29 @@ export const canonicalizePluginUrl = ({
 export const pluginNotFoundComponent = PluginNotInstalled;
 
 /**
+ * Search params shared by every route that renders a post's comments: the sort
+ * the user picked from the options a plugin advertised on `GetCommentsResponse`,
+ * echoed back to it on the next load. Kept in the url so a sorted thread is
+ * linkable and survives a reload.
+ */
+export type CommentsSearch = {
+  sortId?: string;
+  timeRangeId?: string;
+};
+
+export const validateCommentsSearch = (
+  search: Record<string, unknown>
+): CommentsSearch => ({
+  sortId: search.sortId as string | undefined,
+  timeRangeId: search.timeRangeId as string | undefined,
+});
+
+export const commentsLoaderDeps = ({ search }: { search: CommentsSearch }) => ({
+  sortId: search.sortId,
+  timeRangeId: search.timeRangeId,
+});
+
+/**
  * Builds a canonical `/s/<alias>/...` path from a plugin segment (an id or an
  * alias) and the path below it, shortening the segments that were renamed when
  * content moved out of `/plugins`. Only the positions where those words are

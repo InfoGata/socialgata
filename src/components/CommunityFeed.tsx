@@ -15,7 +15,7 @@ import { FavoriteButton } from "./FavoriteButton";
 import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { ExternalLinkIcon, Inbox, XIcon } from "lucide-react";
 import BrowseCommunitiesButton from "./BrowseCommunitiesButton";
-import FeedSortControls from "./FeedSortControls";
+import SortControls from "./SortControls";
 import { SearchBar } from "./SearchBar";
 import { Button } from "./ui/button";
 
@@ -140,7 +140,7 @@ const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
         )}
 
         {/* Sort Controls */}
-        <FeedSortControls
+        <SortControls
           sortOptions={sortOptions}
           sortId={sortId}
           timeRangeId={timeRangeId}

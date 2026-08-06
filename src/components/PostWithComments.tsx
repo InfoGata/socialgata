@@ -13,6 +13,7 @@ import {
   FavoriteCommentSource,
   FullThreadLink,
 } from "./CommentPermalink";
+import SortControls from "./SortControls";
 
 /** Depth-first search for a comment anywhere in a comment tree. */
 const findComment = (comments: Post[], apiId: string): Post | undefined => {
@@ -37,10 +38,13 @@ interface Props {
    * permalink) instead of every comment on the post.
    */
   commentId?: string;
+  /** Sort selection from the route's search params, when the route has one. */
+  sortId?: string;
+  timeRangeId?: string;
 }
 
 const PostWithComments: React.FC<Props> = (props) => {
-  const { data, pluginId, communityId, instanceId, commentId } = props;
+  const { data, pluginId, communityId, instanceId, commentId, sortId, timeRangeId } = props;
   const [replies, setReplies] = React.useState<Post[] | null>(null);
   const [hasFeed, setHasFeed] = React.useState(false);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
@@ -82,6 +86,15 @@ const PostWithComments: React.FC<Props> = (props) => {
     }
   };
 
+
+  // Changing the sort re-runs the loader, but the separately-fetched "more
+  // replies" belong to the previous ordering and would linger below the list.
+  const sortKey = `${sortId ?? ""}|${timeRangeId ?? ""}`;
+  const [repliesSortKey, setRepliesSortKey] = React.useState(sortKey);
+  if (sortKey !== repliesSortKey) {
+    setRepliesSortKey(sortKey);
+    setReplies(null);
+  }
 
   // Where these comments live. Saved with a comment when it's favorited, since
   // nothing on the comment itself names the post it came from.
@@ -213,17 +226,25 @@ const PostWithComments: React.FC<Props> = (props) => {
                 Comments
               </h3>
             </div>
-            <Button
-              onClick={refreshComments}
-              disabled={isRefreshing}
-              variant="outline"
-              size="sm"
-              aria-label="Refresh comments"
-              aria-busy={isRefreshing}
-            >
-              <RefreshCwIcon className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-              Refresh
-            </Button>
+            <div className="flex items-center gap-2">
+              <SortControls
+                sortOptions={data.sortOptions}
+                sortId={sortId ?? data.sortId}
+                timeRangeId={timeRangeId ?? data.timeRangeId}
+                className="mb-0"
+              />
+              <Button
+                onClick={refreshComments}
+                disabled={isRefreshing}
+                variant="outline"
+                size="sm"
+                aria-label="Refresh comments"
+                aria-busy={isRefreshing}
+              >
+                <RefreshCwIcon className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+                Refresh
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4 pt-0">

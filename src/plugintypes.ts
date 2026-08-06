@@ -286,6 +286,10 @@ export interface GetCommentsRequest {
    * beneath it. Used for comment permalinks.
    */
   commentApiId?: string;
+  /** Selected sort order id (matches a SortOption.id from the response) */
+  sortId?: string;
+  /** Selected time range id for sorts that declare time ranges */
+  timeRangeId?: string;
 }
 
 export interface GetCommentsResponse {
@@ -293,6 +297,12 @@ export interface GetCommentsResponse {
   post?: Post;
   community?: Community;
   pageInfo?: PageInfo;
+  /** Available sort orders for this post's comments */
+  sortOptions?: SortOption[];
+  /** Currently applied sort order id */
+  sortId?: string;
+  /** Currently applied time range id */
+  timeRangeId?: string;
 }
 
 export type ListingType = "comment" | "post";
