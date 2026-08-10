@@ -15,6 +15,9 @@ import {
 } from "./CommentPermalink";
 import SortControls from "./SortControls";
 
+/** How many top-level comments to add per batch as the reader scrolls. */
+const COMMENT_BATCH_SIZE = 25;
+
 /** Depth-first search for a comment anywhere in a comment tree. */
 const findComment = (comments: Post[], apiId: string): Post | undefined => {
   for (const comment of comments) {
@@ -98,18 +101,24 @@ const PostWithComments: React.FC<Props> = (props) => {
 
   // Where these comments live. Saved with a comment when it's favorited, since
   // nothing on the comment itself names the post it came from.
+  // Memoized so it stays identity-stable across re-renders of this component:
+  // it is passed to every comment, and CommentComponent is memoized on it.
   const postApiId = data.post?.apiId;
-  const favoriteSource: FavoriteCommentSource | undefined =
-    pluginId && postApiId
-      ? {
-          pluginId,
-          postApiId,
-          communityId,
-          instanceId,
-          postTitle: data.post?.title,
-          platformType,
-        }
-      : undefined;
+  const postTitle = data.post?.title;
+  const favoriteSource: FavoriteCommentSource | undefined = React.useMemo(
+    () =>
+      pluginId && postApiId
+        ? {
+            pluginId,
+            postApiId,
+            communityId,
+            instanceId,
+            postTitle,
+            platformType,
+          }
+        : undefined,
+    [pluginId, postApiId, communityId, instanceId, postTitle, platformType],
+  );
 
   // Imageboard replies are numbered posts in one thread rather than a tree of
   // individually addressable comments, so they get no permalinks. The post they
@@ -124,6 +133,49 @@ const PostWithComments: React.FC<Props> = (props) => {
     const comment = findComment(data.items, commentId);
     return comment ? [comment] : data.items;
   }, [data.items, commentId]);
+
+  // A big thread is thousands of components, and mounting them all in one go
+  // blocks the main thread for seconds. Render the top-level comments in
+  // batches instead, growing as the reader approaches the end of the list.
+  const [visibleCount, setVisibleCount] = React.useState(COMMENT_BATCH_SIZE);
+  // Start over whenever the list itself changes — a re-sort, a refresh, or
+  // switching between a permalink and the full thread.
+  const [batchedComments, setBatchedComments] = React.useState(comments);
+  if (comments !== batchedComments) {
+    setBatchedComments(comments);
+    setVisibleCount(COMMENT_BATCH_SIZE);
+  }
+
+  const visibleComments = React.useMemo(
+    () => comments.slice(0, visibleCount),
+    [comments, visibleCount],
+  );
+  const hasMoreComments = visibleCount < comments.length;
+
+  const showMoreComments = React.useCallback(() => {
+    setVisibleCount((count) => count + COMMENT_BATCH_SIZE);
+  }, []);
+
+  // Re-created after each batch so the observer re-reports an intersection
+  // that never stopped (the sentinel can still be on screen once the next
+  // batch renders).
+  const sentinelRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    const sentinel = sentinelRef.current;
+    // Without IntersectionObserver the button below is the only way through,
+    // which is why it renders regardless.
+    if (!hasMoreComments || !sentinel || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) showMoreComments();
+      },
+      // Start the next batch before the reader actually reaches the bottom.
+      { rootMargin: "800px" },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMoreComments, visibleCount, showMoreComments]);
 
   const allPosts = React.useMemo(() => {
     const posts: Post[] = [];
@@ -249,9 +301,21 @@ const PostWithComments: React.FC<Props> = (props) => {
         </CardHeader>
         <CardContent className="space-y-4 pt-0">
           {comments.length > 0 ? (
-            comments.map((d) => (
-              <CommentComponent key={d.apiId} comment={d} platformType={platformType} routePluginId={pluginId} permalinkContext={permalinkContext} favoriteSource={favoriteSource} />
-            ))
+            <>
+              {visibleComments.map((d) => (
+                <CommentComponent key={d.apiId} comment={d} platformType={platformType} routePluginId={pluginId} permalinkContext={permalinkContext} favoriteSource={favoriteSource} />
+              ))}
+              {hasMoreComments && (
+                <div ref={sentinelRef} className="flex justify-center pt-2">
+                  {/* Scrolling here loads the next batch; the button is the
+                      fallback for when the observer can't (no IntersectionObserver,
+                      or the list is short enough to never scroll). */}
+                  <Button onClick={showMoreComments} variant="outline" size="sm">
+                    Show more comments ({comments.length - visibleCount} left)
+                  </Button>
+                </div>
+              )}
+            </>
           ) : (
             <p className="text-sm text-muted-foreground">No comments yet.</p>
           )}

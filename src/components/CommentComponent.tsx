@@ -49,22 +49,36 @@ const distinguishedLabel = (distinguished: string): string => {
   return distinguished.toUpperCase();
 };
 
-const CommentComponent: React.FC<Props> = (props) => {
+// Named separately from the memoized export below so the recursive renders
+// inside go through the memo rather than around it.
+const Comment = (props: Props) => {
   const { comment, platformType = "forum", routePluginId, permalinkContext, favoriteSource } = props;
   const [expand, setExpand] = React.useState(false);
   const [collapsed, setCollapsed] = React.useState(false);
   const toggleExpand = () => {
     setExpand(!expand);
   };
-  const sanitizer = DOMPurify.sanitize;
 
-  const clean = sanitizer(comment.body || "");
   // Favorites saved before replies were stamped carry no `pluginId` on their
   // children, so fall back to the plugin the route already knows about.
   const favoritePluginId = comment.pluginId || routePluginId;
   const imageboardParseOptions = React.useMemo(
     () => createImageboardParseOptions(comment.pluginId || "", comment.communityApiId, comment.instanceId),
     [comment.pluginId, comment.communityApiId, comment.instanceId],
+  );
+
+  // Sanitizing and parsing the body are by far the most expensive things a
+  // comment does, and a thread renders one component per comment. Without
+  // these memos an unrelated re-render higher up redoes the work for every
+  // comment on the page, which is seconds of blocked main thread on a large
+  // thread.
+  const clean = React.useMemo(
+    () => DOMPurify.sanitize(comment.body || ""),
+    [comment.body],
+  );
+  const parsedBody = React.useMemo(
+    () => parse(clean, platformType === "imageboard" ? imageboardParseOptions : undefined),
+    [clean, platformType, imageboardParseOptions],
   );
 
   // Imageboard-style rendering
@@ -137,7 +151,7 @@ const CommentComponent: React.FC<Props> = (props) => {
             {comment.body && (
               <div className="text-sm text-foreground">
                 <div className="whitespace-pre-wrap break-words">
-                  {parse(clean, imageboardParseOptions)}
+                  {parsedBody}
                 </div>
               </div>
             )}
@@ -261,7 +275,7 @@ const CommentComponent: React.FC<Props> = (props) => {
       {!collapsed && (
         <>
           <div className="md-body text-sm text-foreground break-words">
-            {parse(clean)}
+            {parsedBody}
           </div>
           <div className="flex items-center gap-2 mt-1">
             {favoritePluginId && comment.apiId && (
@@ -318,5 +332,13 @@ const CommentComponent: React.FC<Props> = (props) => {
     </div>
   );
 };
+
+/**
+ * Memoized because a thread renders one of these per comment and the props are
+ * stable: state changes in the post above (the feed link resolving, a refresh
+ * finishing) would otherwise re-render every comment in the tree.
+ */
+const CommentComponent = React.memo(Comment);
+CommentComponent.displayName = "CommentComponent";
 
 export default CommentComponent;
