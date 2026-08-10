@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import {
@@ -36,8 +35,11 @@ interface FavoriteButtonProps {
  * FavoriteButton component for adding/removing favorites
  * Works with instances, posts, comments, and communities
  * Uses automerge-repo hooks directly (no Redux)
+ *
+ * Memoized: a comment thread renders one of these per comment, and the tooltip
+ * it mounts is not cheap to rebuild.
  */
-export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
+const FavoriteButtonComponent = ({
   type,
   item,
   pluginId,
@@ -45,7 +47,7 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   variant = 'icon',
   className,
   source
-}) => {
+}: FavoriteButtonProps) => {
   const mutations = useFavoritesMutations();
 
   // Get the item ID based on type
@@ -107,52 +109,53 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   const tooltipText = isFavorite ? 'Remove from favorites' : 'Add to favorites';
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          {variant === 'icon' ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              className={cn(
-                sizeClasses[size],
-                'transition-colors',
-                isFavorite && 'text-yellow-500 hover:text-yellow-600',
-                !isFavorite && 'text-muted-foreground hover:text-yellow-500',
-                className
-              )}
-              onClick={handleToggle}
-              aria-label={tooltipText}
-            >
-              <Star
-                size={iconSizes[size]}
-                fill={isFavorite ? 'currentColor' : 'none'}
-                className="transition-all"
-              />
-            </Button>
-          ) : (
-            <Button
-              variant="outline"
-              size={size === 'md' ? 'default' : size}
-              className={cn(
-                'gap-2',
-                isFavorite && 'text-yellow-500 border-yellow-500/50',
-                className
-              )}
-              onClick={handleToggle}
-            >
-              <Star
-                size={iconSizes[size]}
-                fill={isFavorite ? 'currentColor' : 'none'}
-              />
-              {isFavorite ? 'Favorited' : 'Favorite'}
-            </Button>
-          )}
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{tooltipText}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        {variant === 'icon' ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(
+              sizeClasses[size],
+              'transition-colors',
+              isFavorite && 'text-yellow-500 hover:text-yellow-600',
+              !isFavorite && 'text-muted-foreground hover:text-yellow-500',
+              className
+            )}
+            onClick={handleToggle}
+            aria-label={tooltipText}
+          >
+            <Star
+              size={iconSizes[size]}
+              fill={isFavorite ? 'currentColor' : 'none'}
+              className="transition-all"
+            />
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            size={size === 'md' ? 'default' : size}
+            className={cn(
+              'gap-2',
+              isFavorite && 'text-yellow-500 border-yellow-500/50',
+              className
+            )}
+            onClick={handleToggle}
+          >
+            <Star
+              size={iconSizes[size]}
+              fill={isFavorite ? 'currentColor' : 'none'}
+            />
+            {isFavorite ? 'Favorited' : 'Favorite'}
+          </Button>
+        )}
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{tooltipText}</p>
+      </TooltipContent>
+    </Tooltip>
   );
 };
+
+export const FavoriteButton = React.memo(FavoriteButtonComponent);
+FavoriteButton.displayName = "FavoriteButton";
