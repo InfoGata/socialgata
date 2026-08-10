@@ -1,8 +1,8 @@
-import { afterEach, describe, expect, it } from "vitest";
-import { cleanup, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderWithProviders } from "./renderWithProviders";
-import PostWithComments from "@/components/PostWithComments";
+import PostWithComments, { COMMENT_BATCH_SIZE } from "@/components/PostWithComments";
 import { FavoritesContext } from "@/sync/FavoritesContext";
 import type { FavoritesContextValue } from "@/sync/useFavoritesContext";
 import type { FavoritesDoc } from "@/sync/favorites-repo";
@@ -42,8 +42,30 @@ const renderComments = (count: number) => {
   );
 };
 
+/**
+ * jsdom has no requestIdleCallback, so idle backfill is off unless a test asks
+ * for it. Chains through macrotasks rather than firing synchronously, so React
+ * gets to commit each batch.
+ */
+const enableIdleBackfill = () => {
+  const timers = new Set<ReturnType<typeof setTimeout>>();
+  vi.stubGlobal("requestIdleCallback", (cb: () => void) => {
+    const timer = setTimeout(cb, 0);
+    timers.add(timer);
+    return timer as unknown as number;
+  });
+  vi.stubGlobal("cancelIdleCallback", (handle: number) => {
+    clearTimeout(handle as unknown as ReturnType<typeof setTimeout>);
+    timers.delete(handle as unknown as ReturnType<typeof setTimeout>);
+  });
+  return () => timers.forEach(clearTimeout);
+};
+
 // Vitest globals are off, so testing-library's automatic cleanup isn't wired up.
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
 
 describe("PostWithComments batching", () => {
   it("renders every comment when the thread is small", async () => {
@@ -92,5 +114,45 @@ describe("PostWithComments batching", () => {
 
     expect(screen.getByText("comment body 59")).toBeDefined();
     expect(screen.queryByRole("button", { name: /Show more comments/ })).toBeNull();
+  });
+
+  it("fills the rest of the thread in during idle time", async () => {
+    const stopIdle = enableIdleBackfill();
+    try {
+      // One batch beyond the first, so the assertion doesn't hang on how fast
+      // jsdom can mount comment trees while the rest of the suite runs.
+      renderComments(COMMENT_BATCH_SIZE + 5);
+
+      // Still only the first batch up front — that is what keeps first paint
+      // off the critical path.
+      expect(await screen.findByText("comment body 0")).toBeDefined();
+      expect(screen.queryByText(`comment body ${COMMENT_BATCH_SIZE}`)).toBeNull();
+
+      // ...but the rest arrives without anyone scrolling or clicking, so
+      // find-in-page can reach every comment.
+      await waitFor(
+        () => {
+          expect(screen.getByText(`comment body ${COMMENT_BATCH_SIZE + 4}`)).toBeDefined();
+        },
+        { timeout: 30000 },
+      );
+      expect(screen.queryByText(/Loading \d+ more comments/)).toBeNull();
+    } finally {
+      stopIdle();
+    }
+  });
+
+  it("reports progress instead of a button while backfilling", async () => {
+    const stopIdle = enableIdleBackfill();
+    try {
+      renderComments(60);
+
+      // A button whose count ticks down on its own reads as broken. The exact
+      // number is deliberately not asserted — backfill is already moving it.
+      expect(await screen.findByText(/Loading \d+ more comments/)).toBeDefined();
+      expect(screen.queryByRole("button", { name: /Show more comments/ })).toBeNull();
+    } finally {
+      stopIdle();
+    }
   });
 });

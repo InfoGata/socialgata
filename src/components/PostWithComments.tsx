@@ -15,8 +15,18 @@ import {
 } from "./CommentPermalink";
 import SortControls from "./SortControls";
 
-/** How many top-level comments to add per batch as the reader scrolls. */
-const COMMENT_BATCH_SIZE = 25;
+/** How many top-level comments to add per batch. */
+export const COMMENT_BATCH_SIZE = 25;
+
+/**
+ * Whether the rest of the thread can be filled in during idle time. Where it
+ * can't, the reader has to ask for the remaining comments themselves. Checked
+ * at call time rather than at module load so it reflects the environment doing
+ * the rendering.
+ */
+const canBackfill = () =>
+  typeof requestIdleCallback !== "undefined" &&
+  typeof cancelIdleCallback !== "undefined";
 
 /** Depth-first search for a comment anywhere in a comment tree. */
 const findComment = (comments: Post[], apiId: string): Post | undefined => {
@@ -177,6 +187,21 @@ const PostWithComments: React.FC<Props> = (props) => {
     return () => observer.disconnect();
   }, [hasMoreComments, visibleCount, showMoreComments]);
 
+  // Scrolling alone would leave the rest of the thread out of the DOM, where
+  // find-in-page can't reach it. So keep filling the remaining batches in
+  // during idle time: each one is scheduled when the browser has nothing
+  // better to do, and rendered as a transition so React can interrupt it for
+  // anything the reader does. The chain re-arms itself through visibleCount
+  // until the whole thread is mounted.
+  React.useEffect(() => {
+    if (!hasMoreComments || !canBackfill()) return;
+
+    const handle = requestIdleCallback(() => {
+      React.startTransition(showMoreComments);
+    });
+    return () => cancelIdleCallback(handle);
+  }, [hasMoreComments, visibleCount, showMoreComments]);
+
   const allPosts = React.useMemo(() => {
     const posts: Post[] = [];
     if (data.post) posts.push(data.post);
@@ -307,12 +332,19 @@ const PostWithComments: React.FC<Props> = (props) => {
               ))}
               {hasMoreComments && (
                 <div ref={sentinelRef} className="flex justify-center pt-2">
-                  {/* Scrolling here loads the next batch; the button is the
-                      fallback for when the observer can't (no IntersectionObserver,
-                      or the list is short enough to never scroll). */}
-                  <Button onClick={showMoreComments} variant="outline" size="sm">
-                    Show more comments ({comments.length - visibleCount} left)
-                  </Button>
+                  {/* Scrolling past here pulls the next batch in early. When the
+                      rest is arriving on its own a button would only decrement
+                      its own label, so say what's happening instead; the button
+                      is for when nothing is filling the thread in. */}
+                  {canBackfill() ? (
+                    <p className="text-xs text-muted-foreground">
+                      Loading {comments.length - visibleCount} more comments…
+                    </p>
+                  ) : (
+                    <Button onClick={showMoreComments} variant="outline" size="sm">
+                      Show more comments ({comments.length - visibleCount} left)
+                    </Button>
+                  )}
                 </div>
               )}
             </>
