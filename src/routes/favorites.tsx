@@ -16,6 +16,7 @@ import PostComponent from '@/components/PostComponent';
 import CommentComponent from '@/components/CommentComponent';
 import { FullThreadLink } from '@/components/CommentPermalink';
 import type { FavoriteComment } from '@/sync/favorites-repo';
+import type { Community } from '@/plugintypes';
 import { Link } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/favorites')({
@@ -85,32 +86,7 @@ function FavoritesPage() {
                 <Section title="Communities" count={communitiesArray.length}>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {communitiesArray.map(({ key, pluginId, community }) => (
-                      <Card key={key} className="hover:bg-accent transition-colors">
-                        <CardHeader>
-                          <div className="flex items-start justify-between gap-2">
-                            <Link
-                              to="/s/$pluginId/c/$apiId"
-                              params={{ pluginId, apiId: community.apiId }}
-                              className="block group flex-1 min-w-0"
-                            >
-                              <CardTitle className="group-hover:text-primary transition-colors">
-                                {community.name}
-                              </CardTitle>
-                              {community.description && (
-                                <CardDescription className="mt-2 line-clamp-3">
-                                  {community.description}
-                                </CardDescription>
-                              )}
-                            </Link>
-                            <FavoriteButton
-                              type="community"
-                              item={community}
-                              pluginId={pluginId}
-                              size="sm"
-                            />
-                          </div>
-                        </CardHeader>
-                      </Card>
+                      <FavoriteCommunityCard key={key} pluginId={pluginId} community={community} />
                     ))}
                   </div>
                 </Section>
@@ -197,32 +173,7 @@ function FavoritesPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {communitiesArray.map(({ key, pluginId, community }) => (
-                <Card key={key} className="hover:bg-accent transition-colors">
-                  <CardHeader>
-                    <div className="flex items-start justify-between gap-2">
-                      <Link
-                        to="/s/$pluginId/c/$apiId"
-                        params={{ pluginId, apiId: community.apiId }}
-                        className="block group flex-1 min-w-0"
-                      >
-                        <CardTitle className="group-hover:text-primary transition-colors">
-                          {community.name}
-                        </CardTitle>
-                        {community.description && (
-                          <CardDescription className="mt-2 line-clamp-3">
-                            {community.description}
-                          </CardDescription>
-                        )}
-                      </Link>
-                      <FavoriteButton
-                        type="community"
-                        item={community}
-                        pluginId={pluginId}
-                        size="sm"
-                      />
-                    </div>
-                  </CardHeader>
-                </Card>
+                <FavoriteCommunityCard key={key} pluginId={pluginId} community={community} />
               ))}
             </div>
           )}
@@ -296,6 +247,48 @@ function FavoritesPage() {
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+/**
+ * A favorited community. Communities from a plugin with instances keep their
+ * instance in the link, since the same api id means a different community on
+ * each instance.
+ */
+function FavoriteCommunityCard({ pluginId, community }: { pluginId: string; community: Community }) {
+  const link = community.instanceId
+    ? {
+        to: '/s/$pluginId/i/$instanceId/c/$apiId',
+        params: { pluginId, instanceId: community.instanceId, apiId: community.apiId },
+      } as const
+    : {
+        to: '/s/$pluginId/c/$apiId',
+        params: { pluginId, apiId: community.apiId },
+      } as const;
+
+  return (
+    <Card className="hover:bg-accent transition-colors">
+      <CardHeader>
+        <div className="flex items-start justify-between gap-2">
+          <Link {...link} className="block group flex-1 min-w-0">
+            <CardTitle className="group-hover:text-primary transition-colors">
+              {community.name}
+            </CardTitle>
+            {community.description && (
+              <CardDescription className="mt-2 line-clamp-3">
+                {community.description}
+              </CardDescription>
+            )}
+          </Link>
+          <FavoriteButton
+            type="community"
+            item={community}
+            pluginId={pluginId}
+            size="sm"
+          />
+        </div>
+      </CardHeader>
+    </Card>
   );
 }
 

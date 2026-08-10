@@ -8,7 +8,7 @@ import {
 
 const Community: React.FC = () => {
   const data = Route.useLoaderData();
-  const { pluginId } = Route.useParams();
+  const { pluginId, apiId } = Route.useParams();
   const { q } = Route.useSearch();
 
   return (
@@ -16,6 +16,7 @@ const Community: React.FC = () => {
       posts={data.items}
       pluginId={pluginId}
       pageInfo={data.pageInfo}
+      apiId={apiId}
       community={data.community}
       sortOptions={data.sortOptions}
       sortId={data.sortId}

@@ -24,6 +24,8 @@ type CommunityFeedProps = {
   pluginId: string;
   pageInfo?: PageInfo;
   instanceId?: string;
+  /** The community's api id from the route, used when the plugin returns no community */
+  apiId?: string;
   community?: Community;
   sortOptions?: SortOption[];
   sortId?: string;
@@ -33,12 +35,24 @@ type CommunityFeedProps = {
 }
 
 const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
-  const { posts, pluginId, pageInfo, instanceId, community, sortOptions, sortId, timeRangeId, query } = props;
+  const { posts, pluginId, pageInfo, instanceId, apiId, community, sortOptions, sortId, timeRangeId, query } = props;
   const { nextPage, prevPage, hasNextPage, hasPreviousPage } = usePagination(pageInfo);
   const { plugins } = usePlugins();
   const plugin = plugins.find(p => p.id === pluginId);
   const platformType = plugin?.platformType || "forum";
   const navigate = useNavigate();
+
+  /**
+   * Plugins aren't required to describe the community they served posts for, so
+   * fall back to what the route already tells us. The api id doubles as the
+   * name because that is what community listings show for such plugins, which
+   * keeps a favorite made here identical to one made from the listing.
+   */
+  const headerCommunity: Community | undefined = React.useMemo(() => {
+    if (community) return community;
+    if (!apiId) return undefined;
+    return { apiId, name: apiId, ...(instanceId ? { instanceId } : {}) };
+  }, [community, apiId, instanceId]);
 
   // Only plugins that implement onSearchCommunity can scope a search to one
   // community; without this the box would silently return the unfiltered feed.
@@ -78,18 +92,18 @@ const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
         <BrowseCommunitiesButton pluginId={pluginId} instanceId={instanceId} />
 
         {/* Community Header */}
-        {community && (
+        {headerCommunity && (
           <Card className="mb-4">
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <CardTitle className="text-2xl">{community.name}</CardTitle>
-                  {community.description && (
-                    <CardDescription className="mt-2">{community.description}</CardDescription>
+                  <CardTitle className="text-2xl">{headerCommunity.name}</CardTitle>
+                  {headerCommunity.description && (
+                    <CardDescription className="mt-2">{headerCommunity.description}</CardDescription>
                   )}
-                  {community.originalUrl && (
+                  {headerCommunity.originalUrl && (
                     <a
-                      href={community.originalUrl}
+                      href={headerCommunity.originalUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mt-2"
@@ -101,7 +115,7 @@ const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
                 </div>
                 <FavoriteButton
                   type="community"
-                  item={community}
+                  item={headerCommunity}
                   pluginId={pluginId}
                   size="lg"
                   variant="icon"
@@ -119,8 +133,8 @@ const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
               initialQuery={query}
               onSearch={setQuery}
               placeholder={
-                community?.name
-                  ? `Search ${community.name}...`
+                headerCommunity?.name
+                  ? `Search ${headerCommunity.name}...`
                   : "Search this community..."
               }
               className="flex-1 max-w-md"
