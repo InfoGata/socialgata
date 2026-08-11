@@ -75,5 +75,31 @@
     "pluginNotInstalledTitle": "Plugin not installed",
     "pluginNotInstalledDescription": "No installed plugin answers to \"{{alias}}\".",
     "browsePlugins": "Browse plugins"
+  },
+  "errors": {
+    "blockedTitle": "{{site}} blocked this request",
+    "blockedDescription": "{{site}} refused the request, which usually means this browser has no session for it yet. Open {{site}} once and come back — this page will retry on its own.",
+    "blockedTitleGeneric": "The request was blocked",
+    "blockedDescriptionGeneric": "The site refused the request. Opening it once in a new tab is often enough to get a session, then try again.",
+    "networkTitle": "Can't reach {{site}}",
+    "networkTitleGeneric": "Can't reach the site",
+    "networkDescription": "The request didn't complete. Check your connection and try again.",
+    "unauthorizedTitle": "Sign in again",
+    "unauthorizedDescription": "This plugin's login has expired. Reconnect it in the plugin's options.",
+    "forbiddenTitle": "Not available",
+    "forbiddenDescription": "This content is private or restricted.",
+    "rateLimitedTitle": "Too many requests",
+    "rateLimitedDescription": "The site is rate limiting us. Wait a moment and try again.",
+    "notFoundTitle": "Not found",
+    "notFoundDescription": "The site doesn't have this any more.",
+    "serverErrorTitle": "The site is having problems",
+    "serverErrorDescription": "The site returned an error. This usually isn't something you can fix.",
+    "invalidResponseTitle": "Unexpected response",
+    "invalidResponseDescription": "The response couldn't be read. The site may be serving a block or challenge page.",
+    "unknownTitle": "Something went wrong",
+    "unknownDescription": "This page couldn't be loaded.",
+    "tryAgain": "Try again",
+    "openSite": "Open {{site}}",
+    "showDetails": "Details"
   }
 }

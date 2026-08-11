@@ -52,6 +52,8 @@ import {
 import { Manifest } from "../plugintypes";
 import { useAppSelector } from "../store/hooks";
 import { hasExtension, isCorsDisabled } from "@/utils";
+import { createPluginError, toPluginErrorPayload } from "@/plugin-errors";
+import { NETWORK_TIMEOUT_MS, withTimeout } from "@/lib/network-timeout";
 import {
   aliasForId,
   aliasFromName,
@@ -117,6 +119,8 @@ export class PluginFrameContainer extends PluginFrame<PluginMethodInterface> {
   version?: string;
   manifestUrl?: string;
   platformType?: "forum" | "microblog" | "imageboard";
+  /** Kept so a failure can name the site the plugin talks to. */
+  siteMatch?: string[];
 }
 
 export interface PluginContextInterface {
@@ -167,68 +171,89 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
 
   const loadPlugin = React.useCallback(
     async (plugin: PluginInfo, pluginFiles?: FileList) => {
-      const api: ApplicationPluginInterface = {
-        networkRequest: async (input: string, init?: RequestInit) => {
-          if (hasExtension() && window.InfoGata?.networkRequest) {
-            // Provide the installed manifest's siteMatch authoritatively so the
-            // extension can scope credentialed requests to the plugin's own
-            // domains (the plugin itself can't spoof these).
-            const options = plugin?.manifest?.siteMatch
-              ? { siteMatchPatterns: plugin.manifest.siteMatch }
-              : undefined;
-            return await window.InfoGata.networkRequest(input, init, options);
-          }
-          const pluginAuth = plugin?.id
-            ? await db.pluginAuths.get(plugin.id)
-            : undefined;
-          const newInit = init ?? {};
-
-          if (
-            !plugin?.manifest?.authentication ||
-            !isAuthorizedDomain(
+      const performNetworkRequest = async (
+        input: string,
+        init?: RequestInit
+      ): Promise<NetworkRequest> => {
+        if (hasExtension() && window.InfoGata?.networkRequest) {
+          // Provide the installed manifest's siteMatch authoritatively so the
+          // extension can scope credentialed requests to the plugin's own
+          // domains (the plugin itself can't spoof these).
+          const siteMatchPatterns = plugin?.manifest?.siteMatch;
+          return await withTimeout(
+            window.InfoGata.networkRequest(
               input,
-              plugin.manifest.authentication.loginUrl,
-              plugin.manifest.authentication.domainHeadersToFind
-            )
-          ) {
-            newInit.credentials = "omit";
-          }
+              init,
+              siteMatchPatterns ? { siteMatchPatterns } : undefined
+            ),
+            NETWORK_TIMEOUT_MS,
+            input
+          );
+        }
+        const pluginAuth = plugin?.id
+          ? await db.pluginAuths.get(plugin.id)
+          : undefined;
+        const newInit = init ?? {};
 
-          if (pluginAuth) {
-            if (Object.keys(pluginAuth.headers).length > 0) {
+        if (
+          !plugin?.manifest?.authentication ||
+          !isAuthorizedDomain(
+            input,
+            plugin.manifest.authentication.loginUrl,
+            plugin.manifest.authentication.domainHeadersToFind
+          )
+        ) {
+          newInit.credentials = "omit";
+        }
+
+        if (pluginAuth) {
+          if (Object.keys(pluginAuth.headers).length > 0) {
+            const headers = new Headers(newInit.headers);
+            for (const prop in pluginAuth.headers) {
+              headers.set(prop, pluginAuth.headers[prop]);
+            }
+            newInit.headers = Object.fromEntries(headers.entries());
+          } else if (Object.keys(pluginAuth.domainHeaders ?? {}).length > 0) {
+            const url = new URL(input);
+            const domainHeaderKey = Object.keys(
+              pluginAuth.domainHeaders ?? {}
+            ).find((d) => url.host.endsWith(d));
+            if (domainHeaderKey) {
+              const domainHeaders = pluginAuth.domainHeaders![domainHeaderKey];
               const headers = new Headers(newInit.headers);
-              for (const prop in pluginAuth.headers) {
-                headers.set(prop, pluginAuth.headers[prop]);
+              for (const prop in domainHeaders) {
+                headers.set(prop, domainHeaders[prop]);
               }
               newInit.headers = Object.fromEntries(headers.entries());
-            } else if (Object.keys(pluginAuth.domainHeaders ?? {}).length > 0) {
-              const url = new URL(input);
-              const domainHeaderKey = Object.keys(
-                pluginAuth.domainHeaders ?? {}
-              ).find((d) => url.host.endsWith(d));
-              if (domainHeaderKey) {
-                const domainHeaders = pluginAuth.domainHeaders![domainHeaderKey];
-                const headers = new Headers(newInit.headers);
-                for (const prop in domainHeaders) {
-                  headers.set(prop, domainHeaders[prop]);
-                }
-                newInit.headers = Object.fromEntries(headers.entries());
-              }
             }
           }
+        }
 
-          const response = await fetch(input, newInit);
-          const body = await response.blob();
-          const result: NetworkRequest = {
-            body,
-            headers: Object.fromEntries(response.headers.entries()),
-            status: response.status,
-            statusText: response.statusText,
-            url: response.url,
-          };
-          return result;
+        const response = await fetch(input, newInit);
+        const body = await response.blob();
+        const result: NetworkRequest = {
+          body,
+          headers: Object.fromEntries(response.headers.entries()),
+          status: response.status,
+          statusText: response.statusText,
+          url: response.url,
+        };
+        return result;
+      };
+
+      const api: ApplicationPluginInterface = {
+        networkRequest: async (input: string, init?: RequestInit) => {
+          try {
+            return await performNetworkRequest(input, init);
+          } catch (error) {
+            // Always reject with an object. plugin-frame serializes a rejection
+            // with `Object.keys(error)`, which throws on a bare string or
+            // undefined — and that throw stops the reply being posted at all,
+            // leaving the plugin awaiting a promise that never settles.
+            throw createPluginError(toPluginErrorPayload(error));
+          }
         },
-         
+
         postUiMessage: async (message: any) => {
           setPluginMessage({ pluginId: plugin.id, message });
         },
@@ -323,6 +348,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
       host.fileList = pluginFiles;
       host.optionsSameOrigin = plugin.optionsSameOrigin;
       host.manifestUrl = plugin.manifestUrl;
+      host.siteMatch = plugin.manifest?.siteMatch;
 
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error("Plugin load timeout")), 10000)

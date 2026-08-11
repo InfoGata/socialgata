@@ -9,15 +9,22 @@ import { usePlugins } from "@/hooks/usePlugins";
 import { db } from "@/database";
 import { PluginInfo } from "@/plugintypes";
 
-const frames = vi.hoisted(() => ({ created: 0, destroyed: 0 }));
+const frames = vi.hoisted(() => ({
+  created: 0,
+  destroyed: 0,
+  // The host api the provider hands each frame, so tests can call the same
+  // networkRequest a plugin would.
+  lastApi: undefined as any,
+}));
 
 vi.mock("plugin-frame", () => {
   class PluginFrame {
     hasDefined: Record<string, () => Promise<boolean>>;
     remote: Record<string, () => Promise<unknown>>;
 
-    constructor() {
+    constructor(api?: any) {
       frames.created++;
+      frames.lastApi = api;
       this.hasDefined = new Proxy({}, { get: () => async () => false });
       this.remote = new Proxy({}, { get: () => async () => undefined });
     }
@@ -153,5 +160,90 @@ describe("PluginsProvider", () => {
 
     expect(frames.created).toBe(2);
     expect(loadedStates).toEqual([false, true]);
+  });
+
+  /**
+   * The host api is what a plugin calls for every request, so these exercise the
+   * real provider code rather than the seed helper in isolation.
+   */
+  describe("the networkRequest handed to plugins", () => {
+    const FEED_URL = "https://www.reddit.com/hot.json";
+
+    const extensionResponse = (status: number) => ({
+      body: null,
+      headers: {},
+      status,
+      statusText: "",
+      url: FEED_URL,
+    });
+
+    /** Stands in for the extension, recording what it was asked to fetch. */
+    const stubExtension = (
+      networkRequest: (
+        input: string,
+        init?: RequestInit,
+        options?: unknown
+      ) => Promise<unknown>
+    ) => {
+      vi.stubGlobal("InfoGata", { networkRequest });
+    };
+
+    const hostApi = async () => {
+      renderProvider();
+      await waitFor(() => expect(frames.lastApi).toBeDefined());
+      return frames.lastApi;
+    };
+
+    beforeEach(async () => {
+      frames.lastApi = undefined;
+      // No update available, so the auto-updater stays out of the way.
+      vi.stubGlobal(
+        "fetch",
+        vi.fn(async () =>
+          new Response(
+            JSON.stringify({ name: "Reddit", script: "plugin.js", version: "1.0.0" }),
+            { status: 200 }
+          )
+        )
+      );
+      await db.plugins.clear();
+      await db.plugins.add({
+        ...makePlugin("reddit"),
+        manifest: {
+          name: "Reddit",
+          script: "plugin.js",
+          version: "1.0.0",
+          siteMatch: ["https://www.reddit.com/*"],
+        },
+      });
+    });
+
+    it("passes the plugin's siteMatch to the extension, which scopes cookies to it", async () => {
+      const seen: unknown[] = [];
+      stubExtension(async (_input, _init, options) => {
+        seen.push(options);
+        return extensionResponse(200);
+      });
+
+      const api = await hostApi();
+      await api.networkRequest(FEED_URL);
+
+      expect(seen).toEqual([
+        { siteMatchPatterns: ["https://www.reddit.com/*"] },
+      ]);
+    });
+
+    it("rejects with an object when the extension request fails", async () => {
+      // A bare rejection would break plugin-frame's error serializer and leave
+      // the plugin waiting on a promise that never settles.
+      stubExtension(async () => {
+        throw undefined;
+      });
+
+      const api = await hostApi();
+      await expect(api.networkRequest(FEED_URL)).rejects.toMatchObject({
+        isPluginError: true,
+      });
+    });
   });
 });

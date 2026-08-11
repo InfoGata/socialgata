@@ -7,6 +7,7 @@ import isElectron from "is-electron";
 import { Capacitor } from "@capacitor/core";
 import { routeTree } from "./routeTree.gen";
 import Spinner from "./components/Spinner";
+import RouteErrorComponent from "./components/RouteErrorComponent";
 import { usePlugins } from "./hooks/usePlugins";
 
 export interface MyRouterContext {
@@ -16,6 +17,10 @@ export interface MyRouterContext {
 const router = createRouter({
   routeTree,
   defaultPendingComponent: Spinner,
+  // Set once here rather than per route: every route loads through a plugin and
+  // can fail the same ways, and a new route would otherwise silently fall back
+  // to the router's unstyled built-in error box.
+  defaultErrorComponent: RouteErrorComponent,
   scrollRestoration: true,
   context: {
     plugins: undefined!
