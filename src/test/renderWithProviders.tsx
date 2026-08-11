@@ -16,6 +16,7 @@ import { Provider } from "react-redux";
 import { store } from "../store/store";
 import { I18nextProvider } from "react-i18next";
 import i18n from "../i18n";
+import { Toaster } from "sonner";
 
 export function renderWithProviders(ui: React.ReactElement) {
   function Wrapper({ children }: PropsWithChildren<unknown>): React.JSX.Element {
@@ -36,6 +37,8 @@ export function renderWithProviders(ui: React.ReactElement) {
       <Provider store={store}>
         <I18nextProvider i18n={i18n}>
           <ThemeProvider defaultTheme="dark">
+            {/* Mirrors main.tsx, so toasts are assertable in tests. */}
+            <Toaster />
             <PluginsProvider>
               <ExtensionProvider>
                 <RouterProvider router={router as any} />

@@ -12,6 +12,7 @@ import { PluginsProvider } from "./contexts/PluginsContext";
 import { FavoritesRepoProvider } from "./sync/FavoritesRepoProvider";
 import { FavoritesProvider } from "./sync/FavoritesContext";
 import { PostHogProvider } from "posthog-js/react";
+import { Toaster } from "sonner";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -27,6 +28,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
         <ThemeProvider defaultTheme="system">
+          {/* Above PluginsProvider on purpose: sonner only shows toasts raised
+              after the Toaster mounts, and plugin loading can raise one before
+              the router (and so the app shell) has rendered. */}
+          <Toaster />
           <PluginsProvider>
             <FavoritesRepoProvider>
               <FavoritesProvider>
