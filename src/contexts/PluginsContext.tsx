@@ -526,6 +526,15 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
   React.useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- async data loading on mount
     loadAllPlugins();
+    return () => {
+      // A load still in flight would otherwise finish against a provider that
+      // no longer exists: it would publish its frames where nothing can ever
+      // destroy them, then set state on an unmounted component. Bumping the id
+      // makes it take the same path as a superseded load, which cleans up the
+      // frames it built and returns without touching state.
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- reading the id at cleanup time is the point; it's a counter, not a node
+      loadIdRef.current++;
+    };
   }, [loadAllPlugins]);
 
   // Auto-poll localhost plugins for changes during development. The interval is

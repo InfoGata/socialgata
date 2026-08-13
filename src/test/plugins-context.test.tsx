@@ -142,6 +142,23 @@ describe("PluginsProvider", () => {
     await waitFor(() => expect(frames.created).toBe(4));
   });
 
+  it("cleans up a load still in flight when the provider unmounts", async () => {
+    renderProvider();
+    // Each frame's ready() takes a macrotask, so the initial load is still
+    // running here — this is the window the app never hits but tests do.
+    await new Promise((r) => setTimeout(r, 1));
+    cleanup();
+
+    // Long enough for the abandoned load to run to completion.
+    await new Promise((r) => setTimeout(r, 200));
+
+    expect(frames.created).toBeGreaterThan(0);
+    // Nothing can reach these frames once the provider is gone, so the load has
+    // to tear down what it built rather than publishing it into a dead tree
+    // (which also meant setting state on an unmounted component).
+    expect(frames.destroyed).toBe(frames.created);
+  });
+
   it("does not rebuild plugins when no update is available", async () => {
     vi.stubGlobal(
       "fetch",
