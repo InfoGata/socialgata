@@ -124,6 +124,26 @@
 .md-body a:hover {
   opacity: 0.8;
 }
+/*
+ * Images embedded in a body. Where parse options are in play these are replaced
+ * by EmbeddedImage, which applies the same caps plus click-to-expand; these
+ * rules are the floor for the render paths that parse without options.
+ */
+.md-body img {
+  max-width: 100%;
+  max-height: 400px;
+  width: auto;
+  height: auto;
+  border-radius: 0.375rem;
+}
+/* Custom emoji (Mastodon and friends) are glyphs, not media. */
+.md-body img.emoji {
+  display: inline-block;
+  height: 1.2em;
+  width: auto;
+  max-height: none;
+  vertical-align: -0.15em;
+}
 .md-body strong {
   font-weight: 600;
 }

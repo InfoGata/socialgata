@@ -5,6 +5,7 @@ import {
   type HTMLReactParserOptions,
 } from "html-react-parser";
 import { Link } from "@tanstack/react-router";
+import { replaceEmbeddedMedia } from "@/components/EmbeddedImage";
 import type { Opts } from "linkifyjs";
 import "linkify-plugin-hashtag";
 import { registerMentionPlugin } from "@/lib/linkify-mentions";
@@ -48,14 +49,17 @@ const isMentionAnchor = (attribs: Record<string, string>) =>
 
 /**
  * Turns anchors into either client-side router links or hardened external
- * links. Anchors are the only tag this rewrites; everything else falls through
- * to html-react-parser's default handling.
+ * links, and embedded images into expandable media. Everything else falls
+ * through to html-react-parser's default handling.
  */
 export const createPostBodyParseOptions = (
   pluginId: string,
 ): HTMLReactParserOptions => {
   const options: HTMLReactParserOptions = {
     replace(domNode: DOMNode) {
+      const media = replaceEmbeddedMedia(domNode);
+      if (media) return media;
+
       if (domNode.type !== "tag" || domNode.name !== "a") return;
 
       const attribs = domNode.attribs || {};

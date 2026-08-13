@@ -6,6 +6,7 @@ import parse from "html-react-parser";
 import DOMPurify from "dompurify";
 import ReactTimeago from "react-timeago";
 import { useImageboardPosts } from "@/contexts/ImageboardPostsContext";
+import { replaceEmbeddedMedia } from "./EmbeddedImage";
 import {
   HoverCard,
   HoverCardContent,
@@ -131,6 +132,9 @@ export function createImageboardParseOptions(
 ): HTMLReactParserOptions {
   return {
     replace(domNode: DOMNode) {
+      const media = replaceEmbeddedMedia(domNode);
+      if (media) return media;
+
       if (
         domNode.type === "tag" &&
         (domNode as any).tagName === "a" &&

@@ -9,6 +9,7 @@ import ExpandedMedia from "./ExpandedMedia";
 import ReactTimeago from "react-timeago";
 import { FavoriteButton } from "./FavoriteButton";
 import { createImageboardParseOptions } from "./ImageboardQuoteLink";
+import { createPostBodyParseOptions } from "@/lib/post-body-links";
 import {
   CommentPermalink,
   CommentPermalinkContext,
@@ -62,9 +63,26 @@ const Comment = (props: Props) => {
   // Favorites saved before replies were stamped carry no `pluginId` on their
   // children, so fall back to the plugin the route already knows about.
   const favoritePluginId = comment.pluginId || routePluginId;
-  const imageboardParseOptions = React.useMemo(
-    () => createImageboardParseOptions(comment.pluginId || "", comment.communityApiId, comment.instanceId),
-    [comment.pluginId, comment.communityApiId, comment.instanceId],
+
+  // Both option sets handle embedded images; they differ in what they do with
+  // anchors. Built as one memo so a forum comment never pays for the
+  // imageboard options it won't use.
+  const parseOptions = React.useMemo(
+    () =>
+      platformType === "imageboard"
+        ? createImageboardParseOptions(
+            comment.pluginId || "",
+            comment.communityApiId,
+            comment.instanceId,
+          )
+        : createPostBodyParseOptions(comment.pluginId || routePluginId || ""),
+    [
+      platformType,
+      comment.pluginId,
+      comment.communityApiId,
+      comment.instanceId,
+      routePluginId,
+    ],
   );
 
   // Sanitizing and parsing the body are by far the most expensive things a
@@ -77,8 +95,8 @@ const Comment = (props: Props) => {
     [comment.body],
   );
   const parsedBody = React.useMemo(
-    () => parse(clean, platformType === "imageboard" ? imageboardParseOptions : undefined),
-    [clean, platformType, imageboardParseOptions],
+    () => parse(clean, parseOptions),
+    [clean, parseOptions],
   );
 
   // Imageboard-style rendering

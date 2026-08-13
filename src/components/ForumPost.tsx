@@ -162,7 +162,9 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
                 {parse(sanitizer(post.body))}
               </div>
             ) : (
-              <div className="text-xs text-muted-foreground/70 line-clamp-2 leading-relaxed mb-1.5">
+              // An inline image in a two-line teaser would swallow the clamp,
+              // so the feed preview shows the text only.
+              <div className="text-xs text-muted-foreground/70 line-clamp-2 leading-relaxed mb-1.5 [&_img]:hidden">
                 {parse(sanitizer(post.body))}
               </div>
             ))}
