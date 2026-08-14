@@ -81,7 +81,7 @@ const PluginFeedButtons = ({ pluginId }: PluginFeedButtonsProps) => {
       data-testid={`plugin-feed-${pluginId}`}
       className="overflow-hidden transition-all hover:shadow-md hover:border-primary/30"
     >
-      <CardHeader className={cn("pb-3 bg-gradient-to-r", platform?.gradient ?? "from-muted/50 to-muted/20")}>
+      <CardHeader className={cn("pb-3 bg-linear-to-r", platform?.gradient ?? "from-muted/50 to-muted/20")}>
         <div className="flex items-center gap-3">
           <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-background shadow-sm")}>
             <PlatformIcon className={cn("h-5 w-5", platform?.iconColor ?? "text-muted-foreground")} />

@@ -121,7 +121,7 @@ const Comment = (props: Props) => {
         <div className="flex gap-3">
           {/* Thumbnail - Only shown when not expanded */}
           {!expand && comment.thumbnailUrl && (
-            <div className="rounded-md w-24 h-24 bg-muted overflow-hidden flex-shrink-0">
+            <div className="rounded-md w-24 h-24 bg-muted overflow-hidden shrink-0">
               <ImageThumbnail
                 url={comment.url}
                 thumbnailUrl={comment.thumbnailUrl}
@@ -168,7 +168,7 @@ const Comment = (props: Props) => {
             {/* Body */}
             {comment.body && (
               <div className="text-sm text-foreground">
-                <div className="whitespace-pre-wrap break-words">
+                <div className="whitespace-pre-wrap wrap-break-word">
                   {parsedBody}
                 </div>
               </div>
@@ -292,7 +292,7 @@ const Comment = (props: Props) => {
 
       {!collapsed && (
         <>
-          <div className="md-body text-sm text-foreground break-words">
+          <div className="md-body text-sm text-foreground wrap-break-word">
             {parsedBody}
           </div>
           <div className="flex items-center gap-2 mt-1">

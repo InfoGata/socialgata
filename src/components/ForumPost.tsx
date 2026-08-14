@@ -151,7 +151,7 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
               {post.title}
             </PostLink>
             {isExternal && (
-              <ExternalLinkIcon className="h-3.5 w-3.5 text-muted-foreground/40 flex-shrink-0 mt-0.5" />
+              <ExternalLinkIcon className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0 mt-0.5" />
             )}
           </div>
 
@@ -221,7 +221,7 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
 
         {/* Thumbnail */}
         {hasThumbnail && (
-          <div className="flex-shrink-0 p-2.5 pl-0">
+          <div className="shrink-0 p-2.5 pl-0">
             <div className="rounded-md size-16 sm:size-[72px] bg-muted/40 overflow-hidden ring-1 ring-border/30">
               <ImageThumbnail
                 url={post.url}

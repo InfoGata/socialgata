@@ -50,7 +50,7 @@ const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
         <div className="flex gap-3">
           {/* Thumbnail - Only shown when not expanded */}
           {!expand && post.thumbnailUrl && (
-            <div className="rounded-md w-32 h-32 bg-muted overflow-hidden flex-shrink-0">
+            <div className="rounded-md w-32 h-32 bg-muted overflow-hidden shrink-0">
               <ImageThumbnail
                 url={post.url}
                 thumbnailUrl={post.thumbnailUrl}
@@ -122,7 +122,7 @@ const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
             {/* Body */}
             {post.body && (
               <div className="text-sm text-foreground mb-2 overflow-hidden">
-                <div className="whitespace-pre-wrap break-words line-clamp-4">
+                <div className="whitespace-pre-wrap wrap-break-word line-clamp-4">
                   {parse(sanitizer(post.body), parseOptions)}
                 </div>
               </div>

@@ -38,7 +38,7 @@ const InstanceCard: React.FC<InstanceCardProps> = (props) => {
   return (
     <Card className="group flex flex-col overflow-hidden transition-all hover:border-primary/30 hover:shadow-md">
       {/* Banner */}
-      <div className="relative h-32 bg-gradient-to-br from-muted to-muted/50 overflow-hidden">
+      <div className="relative h-32 bg-linear-to-br from-muted to-muted/50 overflow-hidden">
         {instance.bannerSvg ? (
           <div
             className="absolute inset-0 flex items-center justify-center [&>svg]:max-w-full [&>svg]:max-h-full [&>svg]:object-contain"

@@ -115,7 +115,7 @@ const ImageboardQuoteLink: React.FC<Props> = ({
 
         {/* Body */}
         {sanitizedBody && (
-          <div className="text-xs text-foreground line-clamp-4 whitespace-pre-wrap break-words">
+          <div className="text-xs text-foreground line-clamp-4 whitespace-pre-wrap wrap-break-word">
             {parse(sanitizedBody)}
           </div>
         )}

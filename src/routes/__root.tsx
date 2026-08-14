@@ -17,7 +17,7 @@ export const Root: React.FC = () => {
       <div className="flex min-h-screen">
         <TopBar />
         <NavigationMenu />
-        <main className="flex-grow p-1 pt-16">
+        <main className="grow p-1 pt-16">
           <Outlet />
         </main>
       </div>

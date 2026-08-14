@@ -69,7 +69,7 @@ const QuotedPost: React.FC<{ post: Post; pluginId: string }> = ({
             <PostBody
               body={post.body}
               pluginId={post.pluginId || pluginId}
-              className="whitespace-pre-wrap break-words"
+              className="whitespace-pre-wrap wrap-break-word"
             />
           </div>
         )}
@@ -148,7 +148,7 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
                 <PostBody
                   body={post.body}
                   pluginId={post.pluginId || ""}
-                  className="whitespace-pre-wrap break-words"
+                  className="whitespace-pre-wrap wrap-break-word"
                 />
               )}
             </div>
