@@ -17,7 +17,10 @@ export const Root: React.FC = () => {
       <div className="flex min-h-screen">
         <TopBar />
         <NavigationMenu />
-        <main className="grow p-1 pt-16">
+        {/* The bar is ~49px; the extra top padding here is just breathing room,
+            which a phone screen has less to spare. `min-w-0` keeps a wide child
+            from stretching the flex row into a sideways scroll. */}
+        <main className="grow min-w-0 p-1 pt-14 sm:pt-16">
           <Outlet />
         </main>
       </div>

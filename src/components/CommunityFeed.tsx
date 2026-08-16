@@ -94,10 +94,10 @@ const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
         {/* Community Header */}
         {headerCommunity && (
           <Card className="mb-4">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <CardTitle className="text-2xl">{headerCommunity.name}</CardTitle>
+            <CardHeader className="p-4 sm:p-6">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <CardTitle className="text-xl sm:text-2xl wrap-break-word">{headerCommunity.name}</CardTitle>
                   {headerCommunity.description && (
                     <CardDescription className="mt-2">{headerCommunity.description}</CardDescription>
                   )}

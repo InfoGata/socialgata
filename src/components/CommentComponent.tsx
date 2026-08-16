@@ -32,9 +32,37 @@ type Props = {
    * a real place to link to.
    */
   favoriteSource?: FavoriteCommentSource;
+  /** How deep in the reply tree this comment sits; 0 for a top-level one. */
+  depth?: number;
 };
 
 const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
+
+/**
+ * The colour of a comment's thread line, cycled by nesting depth. Indentation
+ * alone is only a few pixels per level on a phone, which leaves a deep thread
+ * as a stack of identical grey rules; a changing colour says which reply a
+ * reply belongs to. Top level keeps the neutral rule, so the tint only appears
+ * where there is actually nesting to follow.
+ */
+const threadLineColors = [
+  "border-muted",
+  "border-sky-500/60",
+  "border-emerald-500/60",
+  "border-amber-500/60",
+  "border-violet-500/60",
+  "border-rose-500/60",
+];
+
+const threadLineColor = (depth: number) =>
+  threadLineColors[depth % threadLineColors.length];
+
+/**
+ * The small icon links under a comment. Sized as a proper touch target on
+ * phones and tightened back up where there's a mouse.
+ */
+const commentActionClass =
+  "inline-flex size-9 sm:size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-primary transition-colors";
 
 /** Total number of nested replies beneath a comment (all descendants). */
 const countDescendants = (comment: Post): number =>
@@ -53,7 +81,7 @@ const distinguishedLabel = (distinguished: string): string => {
 // Named separately from the memoized export below so the recursive renders
 // inside go through the memo rather than around it.
 const Comment = (props: Props) => {
-  const { comment, platformType = "forum", routePluginId, permalinkContext, favoriteSource } = props;
+  const { comment, platformType = "forum", routePluginId, permalinkContext, favoriteSource, depth = 0 } = props;
   const [expand, setExpand] = React.useState(false);
   const [collapsed, setCollapsed] = React.useState(false);
   const toggleExpand = () => {
@@ -102,7 +130,7 @@ const Comment = (props: Props) => {
   // Imageboard-style rendering
   if (platformType === "imageboard") {
     return (
-      <div className="border-l-2 border-muted pl-4 my-4" data-post-number={comment.number}>
+      <div className={`border-l-2 ${threadLineColor(depth)} pl-2 sm:pl-4 my-3 sm:my-4`} data-post-number={comment.number}>
         {/* Expanded Media - Full Width Above Content */}
         {expand && (comment.url || comment.videoSources?.length) && comment.thumbnailUrl && (
           <div className="mb-3">
@@ -176,14 +204,14 @@ const Comment = (props: Props) => {
 
             {/* Favorite Button & Original Link */}
             {(favoritePluginId && comment.apiId || comment.originalUrl) && (
-              <div className="mt-2 flex items-center gap-2">
+              <div className="mt-1 flex items-center gap-0.5 sm:gap-2 -ml-1.5 sm:ml-0">
                 {favoritePluginId && comment.apiId && (
                   <FavoriteButton
                     type="comment"
                     item={comment}
                     pluginId={favoritePluginId}
                     size="sm"
-                    className="h-7 w-7"
+                    className="h-9 w-9 sm:h-7 sm:w-7"
                     source={favoriteSource}
                   />
                 )}
@@ -194,9 +222,10 @@ const Comment = (props: Props) => {
                       pluginId: routePluginId,
                       apiId: comment.apiId,
                     }}
-                    className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+                    className={commentActionClass}
+                    aria-label="View comment thread"
                   >
-                    <MessageCircleIcon className="h-3.5 w-3.5" />
+                    <MessageCircleIcon className="h-4 w-4" />
                   </Link>
                 )}
                 {comment.originalUrl && (
@@ -204,9 +233,10 @@ const Comment = (props: Props) => {
                     href={comment.originalUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+                    className={commentActionClass}
+                    aria-label="View original"
                   >
-                    <ExternalLinkIcon className="h-3.5 w-3.5" />
+                    <ExternalLinkIcon className="h-4 w-4" />
                   </a>
                 )}
               </div>
@@ -215,9 +245,9 @@ const Comment = (props: Props) => {
         </div>
 
         {/* Nested replies */}
-        <div className="ml-2">
+        <div className="ml-0 sm:ml-2">
           {comment.comments?.length
-            ? comment.comments.map((c) => <CommentComponent key={c.apiId} comment={c} platformType={platformType} routePluginId={routePluginId} permalinkContext={permalinkContext} favoriteSource={favoriteSource} />)
+            ? comment.comments.map((c) => <CommentComponent key={c.apiId} comment={c} platformType={platformType} routePluginId={routePluginId} permalinkContext={permalinkContext} favoriteSource={favoriteSource} depth={depth + 1} />)
             : undefined}
         </div>
       </div>
@@ -228,13 +258,16 @@ const Comment = (props: Props) => {
   const descendants = countDescendants(comment);
 
   return (
-    <div className="border-l-2 border-muted pl-4 my-4">
+    // Indentation is per nesting level, so it stays tight on a phone: any more
+    // and a deep thread is a column one word wide. The line's colour carries
+    // the depth that the indentation no longer can.
+    <div className={`border-l-2 ${threadLineColor(depth)} pl-2 sm:pl-4 my-3 sm:my-4`}>
       {/* Meta line — click the toggle to collapse the whole subtree */}
       <div className="text-sm text-muted-foreground mb-2 flex items-center gap-1.5 flex-wrap">
         <button
           type="button"
           onClick={() => setCollapsed((v) => !v)}
-          className="inline-flex size-4 items-center justify-center rounded font-mono text-xs leading-none text-muted-foreground/60 hover:bg-muted hover:text-foreground transition-colors"
+          className="inline-flex size-6 shrink-0 -ml-1 items-center justify-center rounded font-mono text-sm leading-none text-muted-foreground/60 hover:bg-muted hover:text-foreground transition-colors sm:size-4 sm:ml-0 sm:text-xs"
           aria-label={collapsed ? "Expand comment" : "Collapse comment"}
           aria-expanded={!collapsed}
         >
@@ -265,20 +298,22 @@ const Comment = (props: Props) => {
             Pinned
           </span>
         )}
+        {/* Each separator is bundled with the value it precedes, so a wrap on a
+            narrow screen never strands a bullet at the end of a line. */}
         {comment.score != null && (
-          <>
+          <span className="inline-flex items-center gap-1.5">
             <span className="text-muted-foreground/40">•</span>
             <span>
               {numberFormatter.format(comment.score)}{" "}
               {Math.abs(comment.score) === 1 ? "point" : "points"}
             </span>
-          </>
+          </span>
         )}
         {comment.publishedDate && (
-          <>
+          <span className="inline-flex items-center gap-1.5">
             <span className="text-muted-foreground/40">•</span>
             <ReactTimeago date={comment.publishedDate} />
-          </>
+          </span>
         )}
         {comment.edited && (
           <span className="text-muted-foreground/50 italic">• edited</span>
@@ -295,14 +330,14 @@ const Comment = (props: Props) => {
           <div className="md-body text-sm text-foreground wrap-break-word">
             {parsedBody}
           </div>
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex items-center gap-0.5 sm:gap-2 -ml-1.5 sm:ml-0 mt-0.5">
             {favoritePluginId && comment.apiId && (
               <FavoriteButton
                 type="comment"
                 item={comment}
                 pluginId={favoritePluginId}
                 size="sm"
-                className="h-7 w-7"
+                className="h-9 w-9 sm:h-7 sm:w-7"
                 source={favoriteSource}
               />
             )}
@@ -311,7 +346,7 @@ const Comment = (props: Props) => {
               <CommentPermalink
                 context={permalinkContext}
                 commentApiId={comment.apiId}
-                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+                className={commentActionClass}
               />
             ) : (
               routePluginId &&
@@ -322,9 +357,10 @@ const Comment = (props: Props) => {
                     pluginId: routePluginId,
                     apiId: comment.apiId,
                   }}
-                  className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+                  className={commentActionClass}
+                  aria-label="View comment thread"
                 >
-                  <MessageCircleIcon className="h-3.5 w-3.5" />
+                  <MessageCircleIcon className="h-4 w-4" />
                 </Link>
               )
             )}
@@ -334,15 +370,16 @@ const Comment = (props: Props) => {
                 href={comment.originalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+                className={commentActionClass}
+                aria-label="View original"
               >
-                <ExternalLinkIcon className="h-3.5 w-3.5" />
+                <ExternalLinkIcon className="h-4 w-4" />
               </a>
             )}
           </div>
-          <div className="ml-2">
+          <div className="ml-0 sm:ml-2">
             {comment.comments?.length
-              ? comment.comments.map((c) => <CommentComponent key={c.apiId} comment={c} platformType={platformType} routePluginId={routePluginId} permalinkContext={permalinkContext} favoriteSource={favoriteSource} />)
+              ? comment.comments.map((c) => <CommentComponent key={c.apiId} comment={c} platformType={platformType} routePluginId={routePluginId} permalinkContext={permalinkContext} favoriteSource={favoriteSource} depth={depth + 1} />)
               : undefined}
           </div>
         </>

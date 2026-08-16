@@ -30,13 +30,14 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
   const hasExpandableMedia =
     !!post.videoSources?.length ||
     (!!post.url && (post.isVideo || imageRegex.test(post.url)));
+  const isMediaExpanded = (expand || showFullPost) && hasExpandableMedia;
 
   return (
     <div className="group relative bg-card hover:bg-accent/30 rounded-lg border border-border/50 hover:border-border transition-colors duration-150">
       <div className="flex">
         {/* Vote Column */}
         {post.score != null && (
-          <div className="flex flex-col items-center justify-start gap-0.5 px-2.5 py-3 bg-muted/30 rounded-l-lg border-r border-border/30 min-w-[52px]">
+          <div className="flex flex-col items-center justify-start gap-0.5 px-1.5 py-2.5 sm:px-2.5 sm:py-3 bg-muted/30 rounded-l-lg border-r border-border/30 min-w-[44px] sm:min-w-[52px]">
             <ArrowUpIcon className="h-4 w-4 text-muted-foreground/50" />
             <span className="text-xs font-bold text-foreground/80">
               {numberFormatter.format(post.score)}
@@ -51,9 +52,10 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
         )}
 
         {/* Content */}
-        <div className="flex-1 min-w-0 px-3 py-2.5">
-          {/* Meta line */}
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+        <div className="flex-1 min-w-0 px-2.5 py-2 sm:px-3 sm:py-2.5">
+          {/* Meta line — wraps so a long username or community can't push the
+              card wider than a phone screen */}
+          <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-muted-foreground mb-1">
             {post.number && (
               <span className="font-bold text-muted-foreground/50 mr-1">
                 #{post.number}
@@ -69,7 +71,7 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
             )}
             <Link
               to="/s/$pluginId/user/$apiId"
-              className="font-medium hover:text-primary transition-colors"
+              className="font-medium hover:text-primary transition-colors max-w-[55%] truncate"
               params={{
                 pluginId: post.pluginId || "",
                 apiId: post.authorApiId || "",
@@ -78,14 +80,14 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
               {post.authorName}
             </Link>
             {post.communityName && (
-              <>
+              <span className="inline-flex items-center gap-1.5 min-w-0">
                 <span className="text-muted-foreground/40">in</span>
                 <Link
                   to={instanceId
                     ? "/s/$pluginId/i/$instanceId/c/$apiId"
                     : "/s/$pluginId/c/$apiId"
                   }
-                  className="font-semibold text-primary/80 hover:text-primary transition-colors"
+                  className="font-semibold text-primary/80 hover:text-primary transition-colors min-w-0 truncate"
                   params={{
                     pluginId: post.pluginId || "",
                     apiId: post.communityApiId || "",
@@ -94,15 +96,15 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
                 >
                   {post.communityName}
                 </Link>
-              </>
+              </span>
             )}
             {post.publishedDate && (
-              <>
+              <span className="inline-flex items-center gap-1.5">
                 <span className="text-muted-foreground/40">·</span>
                 <span className="text-muted-foreground/60">
                   <ReactTimeago date={post.publishedDate} />
                 </span>
-              </>
+              </span>
             )}
             {post.edited && (
               <span className="text-muted-foreground/50 italic">· edited</span>
@@ -164,30 +166,32 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
             ) : (
               // An inline image in a two-line teaser would swallow the clamp,
               // so the feed preview shows the text only.
-              <div className="text-xs text-muted-foreground/70 line-clamp-2 leading-relaxed mb-1.5 [&_img]:hidden">
+              <div className="text-xs text-muted-foreground/70 line-clamp-2 leading-relaxed mb-1.5 wrap-break-word [&_img]:hidden">
                 {parse(sanitizer(post.body))}
               </div>
             ))}
 
           {/* Expanded Media */}
-          {(expand || showFullPost) && hasExpandableMedia && (
+          {isMediaExpanded && (
             <ExpandedMedia
               url={post.url ?? ""}
               isVideo={post.isVideo}
               videoSources={post.videoSources}
               thumbnailUrl={post.thumbnailUrl}
               alt={post.title || "Post media"}
-              className="rounded-lg mb-2 max-w-full"
+              // Capped so a tall image doesn't push the comments a screen and a
+              // half down the page.
+              className="rounded-lg mb-2 max-w-full max-h-[70vh]"
               toggleExpand={toggleExpand}
             />
           )}
 
-          {/* Actions */}
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          {/* Actions — padded out to a comfortable touch target */}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 -mb-1 text-xs text-muted-foreground">
             {post.numOfComments !== undefined && (
               <PostLink
                 post={post}
-                className="flex items-center gap-1 hover:text-primary transition-colors font-medium"
+                className="flex items-center gap-1 py-1.5 hover:text-primary transition-colors font-medium"
                 instanceId={instanceId}
               >
                 <MessageCircleIcon className="h-3.5 w-3.5" />
@@ -200,10 +204,13 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
                 href={post.originalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1 hover:text-primary transition-colors font-medium"
+                aria-label="View original"
+                className="flex items-center gap-1 py-1.5 hover:text-primary transition-colors font-medium"
               >
                 <ExternalLinkIcon className="h-3.5 w-3.5" />
-                <span>original</span>
+                {/* The icon carries the meaning; the word is what pushes the
+                    row onto a second line next to a thumbnail on a phone. */}
+                <span className="hidden sm:inline">original</span>
               </a>
             )}
 
@@ -213,15 +220,16 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
                 item={post}
                 pluginId={post.pluginId}
                 size="sm"
-                className="h-6 w-6 text-muted-foreground hover:text-primary"
+                className="h-7 w-7 text-muted-foreground hover:text-primary"
               />
             )}
           </div>
         </div>
 
-        {/* Thumbnail */}
-        {hasThumbnail && (
-          <div className="shrink-0 p-2.5 pl-0">
+        {/* Thumbnail — dropped once the media is expanded below, where it would
+            only be the same picture twice, eating width a phone can't spare */}
+        {hasThumbnail && !isMediaExpanded && (
+          <div className="shrink-0 p-2 pl-0 sm:p-2.5 sm:pl-0">
             <div className="rounded-md size-16 sm:size-[72px] bg-muted/40 overflow-hidden ring-1 ring-border/30">
               <ImageThumbnail
                 url={post.url}

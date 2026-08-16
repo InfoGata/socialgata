@@ -211,7 +211,7 @@ const PostWithComments: React.FC<Props> = (props) => {
   }, [data.post, data.items, replies]);
 
   const content = (
-    <div className="max-w-4xl mx-auto space-y-6 p-4">
+    <div className="max-w-4xl mx-auto space-y-3 sm:space-y-6 p-2 sm:p-4">
       <title>{data.post?.title}</title>
 
       {/* Feed Link */}
@@ -229,8 +229,8 @@ const PostWithComments: React.FC<Props> = (props) => {
       {/* Community Header */}
       {data.community && (
         <Card className="bg-muted/30">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <CardHeader className="p-3 sm:p-6 sm:pb-3">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               <Users2Icon className="h-4 w-4" />
               <span>Community: <Link
                 to={data.community.instanceId
@@ -265,7 +265,7 @@ const PostWithComments: React.FC<Props> = (props) => {
             <PostComponent post={data.post} platformType={platformType} showFullPost={true} />
           </CardContent>
           {data.post.originalUrl && (
-            <CardContent className="pt-0 pb-3 px-4">
+            <CardContent className="pt-0 pb-3 px-3 sm:px-4">
               <a
                 href={data.post.originalUrl}
                 target="_blank"
@@ -295,8 +295,10 @@ const PostWithComments: React.FC<Props> = (props) => {
 
       {/* Comments Section */}
       <Card>
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between gap-2">
+        <CardHeader className="p-3 sm:p-6 sm:pb-4">
+          {/* Wraps on a phone: the sort dropdowns and refresh drop below the
+              heading rather than squeezing it out of the row */}
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <MessageCircleIcon className="h-5 w-5 text-muted-foreground" />
               <h3 className="text-lg font-semibold">
@@ -318,13 +320,13 @@ const PostWithComments: React.FC<Props> = (props) => {
                 aria-label="Refresh comments"
                 aria-busy={isRefreshing}
               >
-                <RefreshCwIcon className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-                Refresh
+                <RefreshCwIcon className={`h-4 w-4 sm:mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
+                <span className="hidden sm:inline">Refresh</span>
               </Button>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4 pt-0">
+        <CardContent className="space-y-4 p-3 pt-0 sm:p-6 sm:pt-0">
           {comments.length > 0 ? (
             <>
               {visibleComments.map((d) => (
@@ -370,12 +372,12 @@ const PostWithComments: React.FC<Props> = (props) => {
       {/* Additional Replies */}
       {replies && replies.length > 0 && (
         <Card>
-          <CardHeader className="pb-4">
+          <CardHeader className="p-3 sm:p-6 sm:pb-4">
             <h3 className="text-lg font-semibold">
               Additional Replies ({replies.length})
             </h3>
           </CardHeader>
-          <CardContent className="space-y-4 pt-0">
+          <CardContent className="space-y-4 p-3 pt-0 sm:p-6 sm:pt-0">
             {replies.map((r) => (
               <CommentComponent key={r.apiId} comment={r} platformType={platformType} routePluginId={pluginId} permalinkContext={permalinkContext} favoriteSource={favoriteSource} />
             ))}

@@ -85,20 +85,22 @@ export const TopBar: React.FC = () => {
 
   return (
     <header className="fixed top-0 left-auto right-0 w-full shadow-lg z-40 bg-background border-b">
-      <div className="flex items-center gap-4 px-6 min-h-12">
-        <Button variant="ghost" size="icon" onClick={onToggleNavigationMenu}>
+      <div className="flex items-center gap-2 sm:gap-4 px-2 sm:px-6 min-h-12">
+        <Button variant="ghost" size="icon" onClick={onToggleNavigationMenu} className="shrink-0" aria-label="Open menu">
           <MenuIcon />
         </Button>
         <h1 className="text-xl font-bold hidden sm:block">
           <Link to="/">SocialGata</Link>
         </h1>
         {searchSources.length > 0 && (
-          <div className="flex items-center gap-2 max-w-md ml-auto">
+          <div className="flex flex-1 items-center gap-1.5 sm:gap-2 min-w-0 max-w-md ml-auto">
+            {/* On a phone the source picker gives up most of its width to the
+                query box, which is the part that actually gets typed in. */}
             <Select
               value={effectiveSearchSource}
               onValueChange={(value) => setSelectedSearchSource(value)}
             >
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-24 shrink-0 sm:w-32">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

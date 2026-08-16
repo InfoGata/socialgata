@@ -33,16 +33,16 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className={`flex items-center gap-2 ${className}`}>
+    <form onSubmit={handleSubmit} className={`flex items-center gap-1 sm:gap-2 min-w-0 ${className}`}>
       <Input
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="flex-1"
+        className="flex-1 min-w-0"
       />
-      <Button type="submit" size="icon" variant="ghost">
+      <Button type="submit" size="icon" variant="ghost" className="shrink-0" aria-label="Search">
         <SearchIcon className="size-4" />
       </Button>
     </form>

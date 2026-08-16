@@ -36,7 +36,7 @@ const Feed: React.FC<FeedProps> = (props) => {
 
           {/* Feed Type Tabs */}
           {data.feedTypes && data.feedTypes.length > 0 && (
-            <div className="flex items-center gap-1 border-b border-border/60 mb-4">
+            <div className="flex items-center gap-1 border-b border-border/60 mb-4 overflow-x-auto">
               {data.feedTypes.map((feedType, index) => {
                 const isActive = data.feedTypeId
                   ? data.feedTypeId === feedType.id
@@ -54,7 +54,7 @@ const Feed: React.FC<FeedProps> = (props) => {
                     }
                     search={(prev) => ({ ...prev, feedTypeId: feedType.id, page: undefined })}
                     className={`
-                      px-3 py-2 text-sm font-medium transition-colors relative
+                      px-3 py-2 text-sm font-medium transition-colors relative shrink-0 whitespace-nowrap
                       ${isActive
                         ? 'text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary after:rounded-full'
                         : 'text-muted-foreground hover:text-foreground'
