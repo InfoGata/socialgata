@@ -92,8 +92,16 @@
   }
 }
 
-* {
-  border-color: hsl(var(--border));
+/*
+ * Default border colour, so an element with a bare `border` reads as a divider.
+ * It has to sit in `base`: Tailwind v4 puts utilities in a cascade layer, and
+ * unlayered rules beat every layer no matter the specificity — outside a layer
+ * this silently overrode every `border-*` colour utility in the app.
+ */
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
 }
 
 /*
