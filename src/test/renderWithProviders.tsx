@@ -39,11 +39,11 @@ export function renderWithProviders(ui: React.ReactElement) {
           <ThemeProvider defaultTheme="dark">
             {/* Mirrors main.tsx, so toasts are assertable in tests. */}
             <Toaster />
-            <PluginsProvider>
-              <ExtensionProvider>
+            <ExtensionProvider>
+              <PluginsProvider>
                 <RouterProvider router={router as any} />
-              </ExtensionProvider>
-            </PluginsProvider>
+              </PluginsProvider>
+            </ExtensionProvider>
           </ThemeProvider>
         </I18nextProvider>
       </Provider>

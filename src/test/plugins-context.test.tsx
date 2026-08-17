@@ -4,6 +4,7 @@ import { Provider } from "react-redux";
 import { ThemeProvider } from "@infogata/shadcn-vite-theme-provider";
 import React from "react";
 import { store } from "../store/store";
+import { ExtensionProvider } from "@/contexts/ExtensionContext";
 import { PluginsProvider } from "@/contexts/PluginsContext";
 import { usePlugins } from "@/hooks/usePlugins";
 import { db } from "@/database";
@@ -88,9 +89,11 @@ const renderProvider = () => {
   render(
     <Provider store={store}>
       <ThemeProvider defaultTheme="dark">
-        <PluginsProvider>
-          <Probe />
-        </PluginsProvider>
+        <ExtensionProvider>
+          <PluginsProvider>
+            <Probe />
+          </PluginsProvider>
+        </ExtensionProvider>
       </ThemeProvider>
     </Provider>
   );

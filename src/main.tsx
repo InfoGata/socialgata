@@ -32,16 +32,19 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               after the Toaster mounts, and plugin loading can raise one before
               the router (and so the app shell) has rendered. */}
           <Toaster />
-          <PluginsProvider>
-            <FavoritesRepoProvider>
-              <FavoritesProvider>
-                <ExtensionProvider>
+          {/* Outside PluginsProvider: the plugin context reads extension
+              detection to re-register site redirects once the extension
+              injects itself, which can happen after the first render. */}
+          <ExtensionProvider>
+            <PluginsProvider>
+              <FavoritesRepoProvider>
+                <FavoritesProvider>
                   <title>SocialGata</title>
                   <Router />
-                </ExtensionProvider>
-              </FavoritesProvider>
-            </FavoritesRepoProvider>
-          </PluginsProvider>
+                </FavoritesProvider>
+              </FavoritesRepoProvider>
+            </PluginsProvider>
+          </ExtensionProvider>
         </ThemeProvider>
       </PersistGate>
       </Provider>

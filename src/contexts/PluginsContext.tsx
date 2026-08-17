@@ -3,6 +3,7 @@ import React from "react";
 import { toast } from "sonner";
 import { db } from "../database";
 import ConfirmUpdatePluginDialog from "../components/Plugins/ConfirmUpdatePluginDialog";
+import { useExtension } from "../hooks/useExtension";
 import {
   GetFeedRequest,
   GetFeedResponse,
@@ -154,6 +155,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
   const [pluginFrames, setPluginFrames] = React.useState<PluginFrameContainer[]>([]);
   const [pluginMessage, setPluginMessage] = React.useState<PluginMessage>();
   const [pendingUpdatePlugin, setPendingUpdatePlugin] = React.useState<PluginInfo | null>(null);
+  const { extensionDetected } = useExtension();
 
   // Mirrors of state that background tasks (dev poll, auto-update) read without
   // re-subscribing, so they don't have to re-run every time a load flips state.
@@ -671,7 +673,9 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
     };
 
     registerRedirects();
-  }, [pluginsLoaded, pluginFrames]);
+    // extensionDetected is a dependency so this retries once the extension
+    // injects window.InfoGata, which can happen after the app has rendered.
+  }, [pluginsLoaded, pluginFrames, extensionDetected]);
 
   const handleConfirmUpdate = React.useCallback(async () => {
     if (pendingUpdatePlugin?.id) {

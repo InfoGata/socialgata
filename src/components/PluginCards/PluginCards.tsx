@@ -7,12 +7,13 @@ import {
   getFileTypeFromPluginUrl,
   getPlugin,
 } from "../../plugin-utils";
-import { isCorsDisabled } from "../../utils";
+import { useCorsDisabled } from "../../hooks/useCorsDisabled";
 import Spinner from "../Spinner";
 import PluginCard from "./PluginCard";
 const PluginCards: React.FC = () => {
   const { plugins, addPlugin, pluginsLoaded } = usePlugins();
   const [backdropOpen, setBackdropOpen] = React.useState(false);
+  const corsDisabled = useCorsDisabled();
 
   const onAddPlugin = async (description: PluginDescription) => {
     if (!description.url) return;
@@ -34,7 +35,7 @@ const PluginCards: React.FC = () => {
     .filter(
       (dp) =>
         !plugins.some((p) => dp.id === p.id) &&
-        (!dp.requiresCorsDisabled || isCorsDisabled())
+        (!dp.requiresCorsDisabled || corsDisabled)
     )
     .map((dp) => (
       <PluginCard addPlugin={onAddPlugin} plugin={dp} key={dp.id} />
