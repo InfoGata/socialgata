@@ -13,11 +13,19 @@ type Props = {
   alt?: string;
   width?: number;
   height?: number;
+  /**
+   * How much room the image gets before the reader expands it. A body image
+   * stays short so a thread stays scannable; a gallery slide is the thing the
+   * reader came for, so it gets most of the viewport.
+   */
+  variant?: "inline" | "gallery";
 };
 
-/** Tallest an unexpanded inline image gets, so a thread stays scannable. */
-const MAX_COLLAPSED_HEIGHT = 400;
-const COLLAPSED = "max-h-[400px]";
+/** Tallest an unexpanded image gets, per variant. */
+const CAPS = {
+  inline: { className: "max-h-[400px]", max: 400 },
+  gallery: { className: "max-h-[70vh]", max: 480 },
+} as const;
 
 /** Held open for an image whose dimensions the plugin couldn't tell us. */
 const UNKNOWN_SIZE_HEIGHT = 200;
@@ -31,10 +39,8 @@ const UNKNOWN_SIZE_HEIGHT = 200;
  * row and then shove the thread down when the bytes land. Reserving the space
  * up front is what stops that.
  */
-const reservedHeight = (width?: number, height?: number) =>
-  width && height
-    ? Math.min(MAX_COLLAPSED_HEIGHT, height)
-    : UNKNOWN_SIZE_HEIGHT;
+const reservedHeight = (max: number, width?: number, height?: number) =>
+  width && height ? Math.min(max, height) : UNKNOWN_SIZE_HEIGHT;
 
 /**
  * An image embedded in a post or comment body. Renders inline at its natural
@@ -54,6 +60,7 @@ const EmbeddedImage: React.FC<Props> = ({
   alt,
   width,
   height,
+  variant = "inline",
 }) => {
   const [expanded, setExpanded] = React.useState(false);
   const [useFallback, setUseFallback] = React.useState(false);
@@ -75,6 +82,7 @@ const EmbeddedImage: React.FC<Props> = ({
 
   const base = useFallback && fallback ? fallback : src;
   const showFull = expanded && !!full;
+  const cap = CAPS[variant];
 
   const handleError = () => {
     // The full-size source failing shouldn't lose the image we already had.
@@ -89,9 +97,13 @@ const EmbeddedImage: React.FC<Props> = ({
   return (
     // A span, not a div: this lands inside the <p> the plugin left in place.
     <span
-      className="relative my-2 block w-fit max-w-full group/media"
+      className={`relative block w-fit max-w-full group/media ${
+        variant === "gallery" ? "mx-auto" : "my-2"
+      }`}
       style={
-        loaded ? undefined : { minHeight: reservedHeight(width, height) }
+        loaded
+          ? undefined
+          : { minHeight: reservedHeight(cap.max, width, height) }
       }
     >
       <button
@@ -110,7 +122,7 @@ const EmbeddedImage: React.FC<Props> = ({
           decoding="async"
           // width/height reserve the box; `w-auto h-auto` keeps the intrinsic
           // ratio while both caps apply.
-          className={`h-auto w-auto max-w-full rounded-md border ${expanded ? "" : COLLAPSED}`}
+          className={`h-auto w-auto max-w-full rounded-md border ${expanded ? "" : cap.className}`}
           onLoad={() => setLoaded(true)}
           onError={handleError}
         />

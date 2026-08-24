@@ -80,6 +80,11 @@ export interface Post {
    * Tried in order, falling back to the next one on failure.
    */
   videoSources?: VideoSource[];
+  /**
+   * Images attached to the post, in display order. More than one renders as a
+   * gallery. `thumbnailUrl` is still set for the feed preview.
+   */
+  images?: PostImage[];
   quotedPost?: Post;
   /** Category/flair label attached to the post (e.g. Reddit link flair) */
   flair?: string;
@@ -106,6 +111,25 @@ export interface VideoSource {
   source: string;
   /** Type of video. For example `video/mp4` or `application/x-mpegURL` */
   type?: string;
+}
+
+/**
+ * A single image attached to a Post. Used for multi-image posts such as Reddit
+ * galleries, Twitter photo tweets and Mastodon attachments.
+ */
+export interface PostImage {
+  /** Url of the image at display resolution */
+  url: string;
+  /** Full resolution url, shown when the reader expands the image */
+  fullUrl?: string;
+  /** Intrinsic width of `url`, used to reserve space before it loads */
+  width?: number;
+  /** Intrinsic height of `url`, used to reserve space before it loads */
+  height?: number;
+  /** Caption the author attached to this image */
+  caption?: string;
+  /** Outbound link the author attached to this image */
+  linkUrl?: string;
 }
 
 export interface User {

@@ -132,12 +132,15 @@ const Comment = (props: Props) => {
     return (
       <div className={`border-l-2 ${threadLineColor(depth)} pl-2 sm:pl-4 my-3 sm:my-4`} data-post-number={comment.number}>
         {/* Expanded Media - Full Width Above Content */}
-        {expand && (comment.url || comment.videoSources?.length) && comment.thumbnailUrl && (
+        {expand &&
+          (comment.url || comment.videoSources?.length || comment.images?.length) &&
+          (comment.thumbnailUrl || comment.images?.length) && (
           <div className="mb-3">
             <ExpandedMedia
               url={comment.url ?? ""}
               isVideo={comment.isVideo}
               videoSources={comment.videoSources}
+              images={comment.images}
               thumbnailUrl={comment.thumbnailUrl}
               alt={comment.title || "Reply image"}
               className="rounded-md max-w-full border w-full"
@@ -148,12 +151,13 @@ const Comment = (props: Props) => {
 
         <div className="flex gap-3">
           {/* Thumbnail - Only shown when not expanded */}
-          {!expand && comment.thumbnailUrl && (
+          {!expand && (comment.thumbnailUrl || comment.images?.length) && (
             <div className="rounded-md w-24 h-24 bg-muted overflow-hidden shrink-0">
               <ImageThumbnail
                 url={comment.url}
                 thumbnailUrl={comment.thumbnailUrl}
                 isVideo={comment.isVideo}
+                imageCount={comment.images?.length}
                 toggleExpand={toggleExpand}
               />
             </div>

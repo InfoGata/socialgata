@@ -95,6 +95,7 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
     setExpand(!expand);
   };
   const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
+  const isGalleryExpanded = (expand || showFullPost) && !!post.images?.length;
 
   return (
     <div className="group relative bg-card rounded-lg border hover:border-primary/50 transition-all duration-200">
@@ -161,24 +162,28 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
               />
             )}
 
-            {/* Image/Media */}
-            {(post.thumbnailUrl || post.url) && (
+            {/* Image/Media — the gallery shows every image itself, so the
+                single-image preview above it would just be image 1 twice. */}
+            {(post.thumbnailUrl || post.url) && !isGalleryExpanded && (
               <div className="mb-2 rounded-xl overflow-hidden border">
                 <ImageThumbnail
                   url={post.url}
                   thumbnailUrl={post.thumbnailUrl}
                   isVideo={post.isVideo}
+                  imageCount={post.images?.length}
                   toggleExpand={toggleExpand}
                 />
               </div>
             )}
 
             {/* Expanded Media */}
-            {(expand || showFullPost) && (post.url || post.videoSources?.length) && (
+            {(expand || showFullPost) &&
+              (post.url || post.videoSources?.length || post.images?.length) && (
               <ExpandedMedia
                 url={post.url ?? ""}
                 isVideo={post.isVideo}
                 videoSources={post.videoSources}
+                images={post.images}
                 thumbnailUrl={post.thumbnailUrl}
                 alt={post.body ? htmlToText(post.body) : "Post media"}
                 className="rounded-xl mb-2 max-w-full border"

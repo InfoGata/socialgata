@@ -24,11 +24,14 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
   const toggleExpand = () => setExpand(!expand);
   const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
   const sanitizer = DOMPurify.sanitize;
-  const hasThumbnail = !!post.thumbnailUrl || (post.url && imageRegex.test(post.url));
+  const hasThumbnail =
+    !!post.thumbnailUrl || !!post.images?.length || (post.url && imageRegex.test(post.url));
   const isExternal = post.url && !post.url.startsWith('/');
-  // Videos may carry sources without a usable `url` (it points at a player page).
+  // Videos may carry sources without a usable `url` (it points at a player page),
+  // and a gallery's url is a reddit.com/gallery link that no regex will match.
   const hasExpandableMedia =
     !!post.videoSources?.length ||
+    !!post.images?.length ||
     (!!post.url && (post.isVideo || imageRegex.test(post.url)));
   const isMediaExpanded = (expand || showFullPost) && hasExpandableMedia;
 
@@ -177,6 +180,7 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
               url={post.url ?? ""}
               isVideo={post.isVideo}
               videoSources={post.videoSources}
+              images={post.images}
               thumbnailUrl={post.thumbnailUrl}
               alt={post.title || "Post media"}
               // Capped so a tall image doesn't push the comments a screen and a
@@ -235,6 +239,7 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
                 url={post.url}
                 thumbnailUrl={post.thumbnailUrl}
                 isVideo={post.isVideo}
+                imageCount={post.images?.length}
                 toggleExpand={toggleExpand}
               />
             </div>

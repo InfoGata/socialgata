@@ -1,9 +1,11 @@
-import { MessageSquareIcon, ExternalLinkIcon, PlayIcon } from "lucide-react";
+import { MessageSquareIcon, ExternalLinkIcon, PlayIcon, ImagesIcon } from "lucide-react";
 
 type ImageThumbnailProps = {
   url?: string;
   thumbnailUrl?: string;
   isVideo?: boolean;
+  /** How many images the post carries; more than one marks it as a gallery. */
+  imageCount?: number;
   toggleExpand: () => void;
 }
 
@@ -16,7 +18,32 @@ function isImageUrl(url: string | undefined) {
 
 
 const ImageThumbnail: React.FC<ImageThumbnailProps> = (props) => {
-  const { url, thumbnailUrl, isVideo, toggleExpand } = props;
+  const { url, thumbnailUrl, isVideo, imageCount, toggleExpand } = props;
+
+  // A gallery's url is a reddit.com/gallery link, so it matches neither the
+  // video branch nor `isImageUrl` and would otherwise fall through to the
+  // open-in-a-new-tab anchor below — bouncing the reader off the site for a
+  // post the app can show in full.
+  if (!isVideo && imageCount && imageCount > 1 && (thumbnailUrl || url)) {
+    return (
+      <button
+        onClick={toggleExpand}
+        aria-label={`Show all ${imageCount} images`}
+        className="relative cursor-pointer block w-full h-full"
+      >
+        <img
+          alt="gallery thumbnail"
+          loading="lazy"
+          src={thumbnailUrl ?? url}
+          className="rounded-md w-full h-full object-cover"
+        />
+        <span className="absolute bottom-0.5 right-0.5 flex items-center gap-0.5 rounded bg-black/70 px-1 py-0.5 text-[10px] font-medium text-white">
+          <ImagesIcon className="h-2.5 w-2.5" />
+          {imageCount}
+        </span>
+      </button>
+    );
+  }
 
   // A video's url points at a player page, not a file, so it must expand
   // in place rather than fall through to the open-in-new-tab branch below.

@@ -47,6 +47,7 @@
     "clsx": "^2.1.1",
     "dexie": "^4.2.1",
     "dompurify": "^3.2.4",
+    "embla-carousel-react": "^8.6.0",
     "hls.js": "^1.6.16",
     "html-react-parser": "^5.2.2",
     "i18next": "^24.2.3",
