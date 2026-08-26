@@ -24,6 +24,32 @@ const IMAGES = [
   galleryImage("5t2c44gjcq1f1", { caption: "after" }),
 ];
 
+/**
+ * Shapes taken from the leftypol thread /leftypol/res/2893761 — an imageboard
+ * post attaching an mp4 and a png, which is why a gallery slide can be a video.
+ * Note the poster is a separate `.jpg`, not the mp4.
+ */
+const MIXED: PostImage[] = [
+  {
+    url: "https://leftypol.org/leftypol/thumb/1786922038642-3-0.jpg",
+    fullUrl: "https://leftypol.org/leftypol/src/1786922038642-3-0.mp4",
+    width: 326,
+    height: 240,
+    videoSources: [
+      {
+        source: "https://leftypol.org/leftypol/src/1786922038642-3-0.mp4",
+        type: "video/mp4",
+      },
+    ],
+  },
+  {
+    url: "https://leftypol.org/leftypol/thumb/1786922038642-5-1.webp",
+    fullUrl: "https://leftypol.org/leftypol/src/1786922038642-5-1.png",
+    width: 1160,
+    height: 1570,
+  },
+];
+
 const emptyDoc: FavoritesDoc = {
   instances: {},
   posts: {},
@@ -61,7 +87,8 @@ const renderPost = (post: Partial<Post>) => {
       <ForumPost post={full} showFullPost />
     </FavoritesContext.Provider>,
   );
-  return within(container);
+  // `container` rides along so tests can reach a <video>, which has no role.
+  return Object.assign(within(container), { container });
 };
 
 type Scope = ReturnType<typeof within>;
@@ -150,9 +177,89 @@ describe("post galleries", () => {
     const scope = within(container);
     // Collapsed in a feed: the thumbnail must say there is more behind it, and
     // must expand rather than link out to reddit.
-    const button = await scope.findByLabelText("Show all 3 images");
+    const button = await scope.findByLabelText("Show all 3 attachments");
 
     expect(button.tagName).toBe("BUTTON");
     expect(within(button).getByText("3")).toBeTruthy();
+  });
+});
+
+describe("galleries mixing video and images", () => {
+  const video = async (scope: ReturnType<typeof renderPost>) => {
+    // The gallery renders synchronously once the router has mounted, which the
+    // first awaited query below settles.
+    await scope.findAllByRole("img");
+    return scope.container.querySelector("video") as HTMLVideoElement | null;
+  };
+
+  it("plays the video slide inline, postered by its thumbnail", async () => {
+    const scope = renderPost({ images: MIXED });
+    const player = await video(scope);
+
+    expect(player).toBeTruthy();
+    expect(player!.getAttribute("poster")).toBe(MIXED[0].url);
+    expect(player!.getAttribute("src")).toBe(MIXED[0].videoSources![0].source);
+  });
+
+  it("keeps the image alongside the video rather than replacing it", async () => {
+    const scope = renderPost({ images: MIXED });
+    await video(scope);
+    const rendered = (await scope.findAllByRole("img")) as HTMLImageElement[];
+
+    expect(rendered.map((i) => i.getAttribute("src"))).toEqual([MIXED[1].url]);
+    expect(scope.getByText("1 / 2")).toBeTruthy();
+  });
+
+  it("never renders the video file as an image", async () => {
+    const scope = renderPost({ images: MIXED });
+    await video(scope);
+    const rendered = (await scope.findAllByRole("img")) as HTMLImageElement[];
+
+    expect(rendered.some((i) => i.getAttribute("src")?.endsWith(".mp4"))).toBe(
+      false,
+    );
+  });
+
+  it("still shows the gallery when the post also carries post-level videoSources", async () => {
+    // The plugin repeats the first slide's sources at the post level for app
+    // builds predating video slides; that must not swallow the second file.
+    const scope = renderPost({
+      images: MIXED,
+      isVideo: true,
+      videoSources: MIXED[0].videoSources,
+      thumbnailUrl: MIXED[0].url,
+    });
+    await video(scope);
+
+    expect(scope.getByText("1 / 2")).toBeTruthy();
+  });
+
+  it("badges the feed thumbnail with both a play icon and the count", async () => {
+    const { container } = renderWithProviders(
+      <FavoritesContext.Provider value={favoritesValue}>
+        <ForumPost
+          post={{
+            apiId: "p3",
+            title: "Haz is Rafiq?",
+            authorName: "Anonymous",
+            authorApiId: "Anonymous",
+            pluginId: PLUGIN_ID,
+            url: MIXED[0].fullUrl,
+            thumbnailUrl: MIXED[0].url,
+            isVideo: true,
+            images: MIXED,
+          }}
+        />
+      </FavoritesContext.Provider>,
+    );
+    const scope = within(container);
+    const button = await scope.findByLabelText("Show all 2 attachments");
+
+    expect(within(button).getByText("2")).toBeTruthy();
+    expect(
+      (within(button).getByRole("img") as HTMLImageElement).getAttribute("src"),
+    ).toBe(MIXED[0].url);
+    // The play icon: a mixed post needs it as well as the count.
+    expect(button.querySelector("svg.lucide-play")).toBeTruthy();
   });
 });

@@ -27,18 +27,23 @@ const ExpandedMedia: React.FC<Props> = ({ url, isVideo, videoSources, images, al
     [videoSources, isVideo, url]
   );
 
-  if (sources) {
-    return (
-      <VideoPlayer sources={sources} poster={thumbnailUrl} className={className} />
-    );
-  }
-
+  // Checked before `sources`: a post can carry both, and only `images` records
+  // the order the author attached them. An imageboard post with a webm and a
+  // png repeats the webm in `videoSources` for older builds, so honouring that
+  // first would drop the png.
+  //
   // Images carry their own click-to-expand, so `toggleExpand` doesn't apply.
   // `className` is deliberately not forwarded: it sizes an <img> (callers cap
   // the height), and the same cap on a carousel wrapper would clip a slide the
   // reader had just expanded to full resolution.
   if (images?.length) {
     return <PostGallery images={images} alt={alt} className="mb-2" />;
+  }
+
+  if (sources) {
+    return (
+      <VideoPlayer sources={sources} poster={thumbnailUrl} className={className} />
+    );
   }
 
   if (toggleExpand) {

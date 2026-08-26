@@ -1,6 +1,7 @@
 import React from "react";
 import { PostImage } from "@/plugintypes";
 import EmbeddedImage from "./EmbeddedImage";
+import VideoPlayer from "./VideoPlayer";
 import {
   Carousel,
   CarouselApi,
@@ -25,21 +26,29 @@ type Props = {
   className?: string;
 };
 
-/** One slide: the image, its caption, and any link the author attached. */
+/**
+ * One slide: the attachment, its caption, and any link the author attached.
+ * A slide carrying `videoSources` is a video and `url` is its poster frame —
+ * an imageboard post can attach a webm alongside its images.
+ */
 const GalleryImage: React.FC<{ image: PostImage; alt: string }> = ({
   image,
   alt,
 }) => (
   <>
-    <EmbeddedImage
-      src={image.url}
-      full={image.fullUrl}
-      link={image.linkUrl}
-      alt={image.caption || alt}
-      width={image.width}
-      height={image.height}
-      variant="gallery"
-    />
+    {image.videoSources?.length ? (
+      <VideoPlayer sources={image.videoSources} poster={image.url} />
+    ) : (
+      <EmbeddedImage
+        src={image.url}
+        full={image.fullUrl}
+        link={image.linkUrl}
+        alt={image.caption || alt}
+        width={image.width}
+        height={image.height}
+        variant="gallery"
+      />
+    )}
     {(image.caption || image.linkUrl) && (
       <div className="mt-1.5 text-center text-xs text-muted-foreground">
         {image.caption}
@@ -59,12 +68,12 @@ const GalleryImage: React.FC<{ image: PostImage; alt: string }> = ({
 );
 
 /**
- * The images of a multi-image post, one at a time, with the count and arrows to
- * move between them. Embla handles touch drag, so there is no separate mobile
- * path; the arrows exist for pointer and keyboard.
+ * The attachments of a multi-attachment post, one at a time, with the count and
+ * arrows to move between them. Embla handles touch drag, so there is no separate
+ * mobile path; the arrows exist for pointer and keyboard.
  *
- * A single-image array skips the carousel entirely — the chrome would only be
- * disabled controls around one picture.
+ * A single-attachment array skips the carousel entirely — the chrome would only
+ * be disabled controls around one picture.
  */
 const PostGallery: React.FC<Props> = ({ images, alt, className = "mb-2" }) => {
   const [api, setApi] = React.useState<CarouselApi>();
@@ -98,7 +107,7 @@ const PostGallery: React.FC<Props> = ({ images, alt, className = "mb-2" }) => {
       className={className}
       setApi={setApi}
       opts={{ align: "center" }}
-      aria-label={`${alt} — gallery of ${images.length} images`}
+      aria-label={`${alt} — gallery of ${images.length} attachments`}
     >
       <CarouselContent>
         {images.map((image, i) => (

@@ -130,6 +130,13 @@ export interface PostImage {
   caption?: string;
   /** Outbound link the author attached to this image */
   linkUrl?: string;
+  /**
+   * Playable sources for this attachment when it is a video rather than an
+   * image, best-quality/most-complete first. When set, `url` is the video's
+   * poster frame. Lets a single gallery carry a mix of images and videos in
+   * the order the author posted them (imageboard posts with several files).
+   */
+  videoSources?: VideoSource[];
 }
 
 export interface User {

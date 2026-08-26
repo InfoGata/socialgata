@@ -24,11 +24,15 @@ const ImageThumbnail: React.FC<ImageThumbnailProps> = (props) => {
   // video branch nor `isImageUrl` and would otherwise fall through to the
   // open-in-a-new-tab anchor below — bouncing the reader off the site for a
   // post the app can show in full.
-  if (!isVideo && imageCount && imageCount > 1 && (thumbnailUrl || url)) {
+  //
+  // Runs before the video branch, and keeps the play icon when `isVideo`: an
+  // imageboard post can attach a webm *and* images, and the reader needs both
+  // affordances — press play, and there is more than one thing here.
+  if (imageCount && imageCount > 1 && (thumbnailUrl || url)) {
     return (
       <button
         onClick={toggleExpand}
-        aria-label={`Show all ${imageCount} images`}
+        aria-label={`Show all ${imageCount} attachments`}
         className="relative cursor-pointer block w-full h-full"
       >
         <img
@@ -37,6 +41,13 @@ const ImageThumbnail: React.FC<ImageThumbnailProps> = (props) => {
           src={thumbnailUrl ?? url}
           className="rounded-md w-full h-full object-cover"
         />
+        {isVideo && (
+          <span className="absolute inset-0 flex items-center justify-center">
+            <span className="rounded-full bg-black/60 p-1.5">
+              <PlayIcon className="h-4 w-4 text-white fill-white" />
+            </span>
+          </span>
+        )}
         <span className="absolute bottom-0.5 right-0.5 flex items-center gap-0.5 rounded bg-black/70 px-1 py-0.5 text-[10px] font-medium text-white">
           <ImagesIcon className="h-2.5 w-2.5" />
           {imageCount}
