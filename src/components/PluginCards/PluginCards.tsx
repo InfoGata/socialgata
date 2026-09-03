@@ -8,12 +8,14 @@ import {
   getPlugin,
 } from "../../plugin-utils";
 import { useCorsDisabled } from "../../hooks/useCorsDisabled";
+import { usePageContextSupport } from "../../hooks/usePageContextSupport";
 import Spinner from "../Spinner";
 import PluginCard from "./PluginCard";
 const PluginCards: React.FC = () => {
   const { plugins, addPlugin, pluginsLoaded } = usePlugins();
   const [backdropOpen, setBackdropOpen] = React.useState(false);
   const corsDisabled = useCorsDisabled();
+  const pageContextSupported = usePageContextSupport();
 
   const onAddPlugin = async (description: PluginDescription) => {
     if (!description.url) return;
@@ -35,7 +37,10 @@ const PluginCards: React.FC = () => {
     .filter(
       (dp) =>
         !plugins.some((p) => dp.id === p.id) &&
-        (!dp.requiresCorsDisabled || corsDisabled)
+        (!dp.requiresCorsDisabled || corsDisabled) &&
+        // Still unknown counts as unsupported: better to show the card a moment
+        // late than to offer a plugin this host cannot run.
+        (!dp.requiresPageContext || pageContextSupported === true)
     )
     .map((dp) => (
       <PluginCard addPlugin={onAddPlugin} plugin={dp} key={dp.id} />

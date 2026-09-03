@@ -135,4 +135,10 @@ export interface PluginDescription {
   description?: string;
   preinstall?: boolean;
   requiresCorsDisabled?: boolean;
+  /**
+   * The plugin only works on a host that can fetch from a page on the site it
+   * reads (a plugin manifest's `pageContextRequests`). Hidden elsewhere, since
+   * installing it there yields a plugin that fails every request.
+   */
+  requiresPageContext?: boolean;
 }

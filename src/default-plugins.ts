@@ -43,6 +43,8 @@ export const defaultPlugins: PluginDescription[] = [
     description: "Browse Twitter/X feeds, trending topics, and user profiles via TWstalker",
     url: "https://cdn.jsdelivr.net/gh/InfoGata/twitter-socialgata@latest/manifest.json",
     requiresCorsDisabled: true,
+    // Reads TWstalker, which only answers requests made from its own pages.
+    requiresPageContext: true,
   },
   {
     id: "x7k9m2p4q8r1w5",
