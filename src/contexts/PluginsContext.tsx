@@ -56,6 +56,10 @@ import { hasExtension, isCorsDisabled } from "@/utils";
 import { createPluginError, toPluginErrorPayload } from "@/plugin-errors";
 import { NETWORK_TIMEOUT_MS, withTimeout } from "@/lib/network-timeout";
 import {
+  needsPageContext,
+  pageContextTransport,
+} from "@/lib/page-context";
+import {
   aliasForId,
   aliasFromName,
   assignAlias,
@@ -182,16 +186,47 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
           // extension can scope credentialed requests to the plugin's own
           // domains (the plugin itself can't spoof these).
           const siteMatchPatterns = plugin?.manifest?.siteMatch;
+          const pageContextPatterns = plugin?.manifest?.pageContextRequests;
+          const options =
+            siteMatchPatterns || pageContextPatterns
+              ? { siteMatchPatterns, pageContextPatterns }
+              : undefined;
           return await withTimeout(
-            window.InfoGata.networkRequest(
-              input,
-              init,
-              siteMatchPatterns ? { siteMatchPatterns } : undefined
-            ),
+            window.InfoGata.networkRequest(input, init, options),
             NETWORK_TIMEOUT_MS,
             input
           );
         }
+        // The desktop and mobile builds can host a hidden page on the target
+        // origin, which is the only way to satisfy sites that answer on where a
+        // request came from rather than on its headers. In the browser the
+        // extension does this instead. See `src/lib/page-context.ts`.
+        const pageContext = pageContextTransport();
+        if (
+          pageContext &&
+          needsPageContext(input, plugin?.manifest?.pageContextRequests)
+        ) {
+          const headers = init?.headers
+            ? Object.fromEntries(new Headers(init.headers).entries())
+            : undefined;
+          const response = await withTimeout(
+            pageContext(input, {
+              method: init?.method,
+              headers,
+              body: typeof init?.body === "string" ? init.body : undefined,
+            }),
+            NETWORK_TIMEOUT_MS,
+            input
+          );
+          return {
+            body: new Blob([response.body]),
+            headers: response.headers,
+            status: response.status,
+            statusText: response.statusText,
+            url: input,
+          };
+        }
+
         const pluginAuth = plugin?.id
           ? await db.pluginAuths.get(plugin.id)
           : undefined;

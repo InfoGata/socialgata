@@ -20,6 +20,12 @@ export interface NetworkRequestOptions {
    * access).
    */
   siteMatchPatterns?: string[];
+  /**
+   * The plugin's declared `pageContextRequests` patterns. A matching request is
+   * issued from a hidden page on the target site rather than from the app, for
+   * sites that answer on the request's origin rather than on its headers.
+   */
+  pageContextPatterns?: string[];
 }
 
 export interface RedirectPatternRule {
@@ -51,9 +57,36 @@ export interface InfoGataExtension {
   registerRedirects?: (rules: SiteRedirectRule[]) => void;
 }
 
+/**
+ * A response fetched from a page on the target site, relayed by the desktop
+ * build's main process. Bodies come back as text because these requests exist
+ * for html pages that a site will only serve to its own origin.
+ */
+export interface PageContextResponse {
+  status: number;
+  statusText: string;
+  headers: Record<string, string>;
+  body: string;
+}
+
+export interface PageContextInit {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: string;
+}
+
+/** Exposed by the Electron preload; absent in the browser and on mobile. */
+export interface DesktopApi {
+  pageContextFetch(
+    url: string,
+    init?: PageContextInit
+  ): Promise<PageContextResponse>;
+}
+
 declare global {
   interface Window {
     InfoGata?: InfoGataExtension;
+    api?: DesktopApi;
   }
 }
 

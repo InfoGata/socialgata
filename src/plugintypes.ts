@@ -31,6 +31,13 @@ export interface Manifest {
   updateUrl?: string;
   authentication?: ManifestAuthentication;
   siteMatch?: string[];
+  /**
+   * Urls the plugin can only fetch from a page on that same site. Some sites
+   * answer on where the request came from rather than on any header, so the
+   * host issues these from a hidden page on the target origin instead of from
+   * the app. Patterns must name a concrete host; a wildcard host is ignored.
+   */
+  pageContextRequests?: string[];
   redirects?: ManifestRedirect[];
 }
 

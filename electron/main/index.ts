@@ -1,4 +1,9 @@
-import { app, shell, BrowserWindow } from "electron";
+import { app, shell, BrowserWindow, ipcMain } from "electron";
+import {
+  closeAllPageContexts,
+  isPageContextWindow,
+  pageContextFetch,
+} from "./page-context";
 import { join } from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 
@@ -37,6 +42,12 @@ function createWindow(): void {
 
   mainWindow.on("ready-to-show", () => {
     mainWindow.show();
+  });
+
+  // Parked windows outlive nothing: without this they keep the process alive
+  // after the last real window goes away.
+  mainWindow.on("closed", () => {
+    closeAllPageContexts();
   });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -79,6 +90,12 @@ function createWindow(): void {
 app.whenReady().then(() => {
   electronApp.setAppUserModelId("com.electron");
 
+  // Requests a site will only answer when they come from one of its own pages.
+  // The renderer decides which urls need this, from the plugin manifest.
+  ipcMain.handle("page-context-fetch", async (_event, url: string, init) => {
+    return await pageContextFetch(url, init);
+  });
+
   app.on("browser-window-created", (_, window) => {
     optimizer.watchWindowShortcuts(window);
   });
@@ -86,8 +103,15 @@ app.whenReady().then(() => {
   createWindow();
 
   app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    const appWindows = BrowserWindow.getAllWindows().filter(
+      (window) => !isPageContextWindow(window)
+    );
+    if (appWindows.length === 0) createWindow();
   });
+});
+
+app.on("before-quit", () => {
+  closeAllPageContexts();
 });
 
 app.on("window-all-closed", () => {
