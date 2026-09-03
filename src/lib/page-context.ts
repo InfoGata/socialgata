@@ -69,7 +69,13 @@ export const needsPageContext = (
   });
 };
 
+import { Capacitor, registerPlugin } from "@capacitor/core";
 import type { PageContextInit, PageContextResponse } from "@/types";
+
+/** The Android/iOS half of the same transport; see `PageContextPlugin.java`. */
+const NativePageContext = registerPlugin<{
+  fetch(options: { url: string } & PageContextInit): Promise<PageContextResponse>;
+}>("PageContext");
 
 /**
  * The host's way of issuing a request from a page on the target site, or
@@ -80,6 +86,9 @@ export const pageContextTransport = ():
   | undefined => {
   if (window.api?.pageContextFetch) {
     return (url, init) => window.api!.pageContextFetch(url, init);
+  }
+  if (Capacitor.isNativePlatform()) {
+    return (url, init) => NativePageContext.fetch({ url, ...(init ?? {}) });
   }
   return undefined;
 };
