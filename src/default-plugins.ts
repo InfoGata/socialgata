@@ -6,6 +6,8 @@ export const defaultPlugins: PluginDescription[] = [
     name: "Reddit Plugin for SocialGata",
     description: "Browse Reddit feeds, communities, and comments",
     url: "https://cdn.jsdelivr.net/gh/InfoGata/reddit-socialgata@latest/manifest.json",
+    // Reddit sends no CORS headers and 403s a plain browser fetch outright.
+    requiresCorsDisabled: true,
   },
   {
     id: "IB4ch4nPl9n",
@@ -51,7 +53,6 @@ export const defaultPlugins: PluginDescription[] = [
     name: "Mastodon Plugin for SocialGata",
     description: "Browse Mastodon feeds, users, and trending topics",
     url: "https://cdn.jsdelivr.net/gh/InfoGata/mastodon-socialgata@latest/manifest.json",
-    requiresCorsDisabled: true
   },
   {
     id: "f7a3e9c2-4b8d-11ef-9e3a-0242ac130002",
