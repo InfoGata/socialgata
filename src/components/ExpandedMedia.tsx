@@ -1,4 +1,5 @@
 import React from "react";
+import { ChevronsDownUpIcon } from "lucide-react";
 import { PostImage, VideoSource } from "@/plugintypes";
 import VideoPlayer from "./VideoPlayer";
 import PostGallery from "./PostGallery";
@@ -14,6 +15,27 @@ type Props = {
   thumbnailUrl?: string;
   toggleExpand?: () => void;
 };
+
+/**
+ * Puts the media back to its thumbnail.
+ *
+ * A single image collapses by clicking it, but a gallery and a video both spend
+ * a click on something else — changing slide, hitting play — so the only way
+ * back has to be its own control. Kept visible rather than revealed on hover:
+ * on a phone there is no hover, and this is the affordance that undoes the one
+ * the reader just used.
+ */
+const CollapseButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    aria-label="Collapse media"
+    className="absolute left-2 top-2 z-20 flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-xs font-medium text-white backdrop-blur transition-colors hover:bg-black/80"
+  >
+    <ChevronsDownUpIcon className="h-3.5 w-3.5" />
+    Collapse
+  </button>
+);
 
 const ExpandedMedia: React.FC<Props> = ({ url, isVideo, videoSources, images, alt, className, thumbnailUrl, toggleExpand }) => {
   // Plugins that predate `videoSources` only give us the bare url.
@@ -32,28 +54,37 @@ const ExpandedMedia: React.FC<Props> = ({ url, isVideo, videoSources, images, al
   // png repeats the webm in `videoSources` for older builds, so honouring that
   // first would drop the png.
   //
-  // Images carry their own click-to-expand, so `toggleExpand` doesn't apply.
+  // Images carry their own click-to-expand, so `toggleExpand` doesn't apply to
+  // the slides themselves — it only collapses the whole gallery, via the button.
   // `className` is deliberately not forwarded: it sizes an <img> (callers cap
   // the height), and the same cap on a carousel wrapper would clip a slide the
   // reader had just expanded to full resolution.
   if (images?.length) {
-    return <PostGallery images={images} alt={alt} className="mb-2" />;
+    return (
+      <div className="relative mb-2">
+        <PostGallery images={images} alt={alt} className="" />
+        {toggleExpand && <CollapseButton onClick={toggleExpand} />}
+      </div>
+    );
   }
 
   if (sources) {
     return (
-      <VideoPlayer sources={sources} poster={thumbnailUrl} className={className} />
+      <div className="relative">
+        <VideoPlayer sources={sources} poster={thumbnailUrl} className={className} />
+        {toggleExpand && <CollapseButton onClick={toggleExpand} />}
+      </div>
     );
   }
 
   if (toggleExpand) {
     return (
-      <button onClick={toggleExpand} className="cursor-pointer">
+      <button onClick={toggleExpand} className="cursor-zoom-out" aria-label="Collapse media">
         <img
           src={url}
           className={className}
-            alt={alt}
-          />
+          alt={alt}
+        />
       </button>
     );
   }

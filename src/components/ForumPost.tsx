@@ -20,7 +20,9 @@ type Props = {
 const imageRegex = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|webp|svg|ico|tiff|tif|raw|heic|heif|avif))/i;
 
 const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) => {
-  const [expand, setExpand] = React.useState(false);
+  // Seeded from `showFullPost` rather than forced by it, so the media on a
+  // post page can be collapsed back to its thumbnail like it can in the feed.
+  const [expand, setExpand] = React.useState(showFullPost);
   const toggleExpand = () => setExpand(!expand);
   const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
   const sanitizer = DOMPurify.sanitize;
@@ -33,7 +35,7 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
     !!post.videoSources?.length ||
     !!post.images?.length ||
     (!!post.url && (post.isVideo || imageRegex.test(post.url)));
-  const isMediaExpanded = (expand || showFullPost) && hasExpandableMedia;
+  const isMediaExpanded = expand && hasExpandableMedia;
 
   return (
     <div className="group relative bg-card hover:bg-accent/30 rounded-lg border border-border/50 hover:border-border transition-colors duration-150">

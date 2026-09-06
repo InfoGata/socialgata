@@ -90,12 +90,14 @@ const QuotedPost: React.FC<{ post: Post; pluginId: string }> = ({
 };
 
 const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) => {
-  const [expand, setExpand] = React.useState(false);
+  // Seeded from `showFullPost` rather than forced by it, so the media on a
+  // post page can be collapsed back to its thumbnail like it can in the feed.
+  const [expand, setExpand] = React.useState(showFullPost);
   const toggleExpand = () => {
     setExpand(!expand);
   };
   const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
-  const isGalleryExpanded = (expand || showFullPost) && !!post.images?.length;
+  const isGalleryExpanded = expand && !!post.images?.length;
 
   return (
     <div className="group relative bg-card rounded-lg border hover:border-primary/50 transition-all duration-200">
@@ -177,7 +179,7 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
             )}
 
             {/* Expanded Media */}
-            {(expand || showFullPost) &&
+            {expand &&
               (post.url || post.videoSources?.length || post.images?.length) && (
               <ExpandedMedia
                 url={post.url ?? ""}
@@ -187,6 +189,7 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
                 thumbnailUrl={post.thumbnailUrl}
                 alt={post.body ? htmlToText(post.body) : "Post media"}
                 className="rounded-xl mb-2 max-w-full border"
+                toggleExpand={toggleExpand}
               />
             )}
 
