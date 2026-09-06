@@ -13,6 +13,10 @@ import { PluginInfo } from "@/plugintypes";
 const frames = vi.hoisted(() => ({
   created: 0,
   destroyed: 0,
+  // ready() calls that have not resolved yet. The load awaits one per plugin
+  // and only microtasks separate them, so a non-zero count means a load is
+  // still running -- which is what settleFrames waits out.
+  booting: 0,
   // The host api the provider hands each frame, so tests can call the same
   // networkRequest a plugin would.
   lastApi: undefined as any,
@@ -33,7 +37,13 @@ vi.mock("plugin-frame", () => {
       // A real plugin boots an iframe over the network. Taking at least one
       // macrotask means React commits the intermediate loading state instead of
       // batching it away, which is what makes the spinner observable.
-      return new Promise<void>((resolve) => setTimeout(resolve, 5));
+      frames.booting++;
+      return new Promise<void>((resolve) =>
+        setTimeout(() => {
+          frames.booting--;
+          resolve();
+        }, 5)
+      );
     }
     executeCode() {
       return Promise.resolve();
@@ -70,7 +80,7 @@ const serveNewerVersions = () => {
           })
         : "// v2";
       return new Response(body, { status: 200 });
-    })
+    }),
   );
 };
 
@@ -95,10 +105,50 @@ const renderProvider = () => {
           </PluginsProvider>
         </ExtensionProvider>
       </ThemeProvider>
-    </Provider>
+    </Provider>,
   );
 
   return loadedStates;
+};
+
+/**
+ * Waits for a load abandoned by unmounting to run itself out.
+ *
+ * Unmounting does not stop a load in flight; it keeps going, and only when it
+ * finishes does it notice it has been superseded and drop what it built. Left
+ * to run into the next test those frames land after beforeEach has zeroed the
+ * counters, so a test sees frames it never asked for -- which is how the
+ * in-flight cleanup test came to read 4 created against 2 destroyed, the extra
+ * pair belonging to the test before it.
+ *
+ * The wait keys on ready() calls outstanding rather than on the counters
+ * holding still for a while. The load awaits one ready() per plugin with only
+ * microtasks in between, so "none outstanding" across a macrotask boundary
+ * means the load is genuinely done -- true however long a frame takes to boot,
+ * where a fixed quiet window is only ever longer than the gaps it has been
+ * tuned against and goes back to guessing under load.
+ *
+ * It deliberately does not wait for the counters to match: a load that
+ * published its frames leaves them alive on unmount by design, since frames are
+ * torn down when a plugin is removed or reloaded, not when the provider goes.
+ */
+const settleFrames = async (timeoutMs = 5000) => {
+  const macrotask = () => new Promise((r) => setTimeout(r, 0));
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    await macrotask();
+    if (frames.booting > 0) continue;
+    // Nothing booting can still be a load between two frames, so give the loop
+    // a turn to start the next one before calling it finished.
+    const created = frames.created;
+    await macrotask();
+    if (frames.booting === 0 && frames.created === created) return;
+  }
+  throw new Error(
+    `Frames never settled: ${frames.booting} still booting, ` +
+      `${frames.created} created, ${frames.destroyed} destroyed. ` +
+      `A load that outlives this is a leak, not a slow test.`
+  );
 };
 
 describe("PluginsProvider", () => {
@@ -109,8 +159,11 @@ describe("PluginsProvider", () => {
     await db.plugins.bulkAdd([makePlugin("a"), makePlugin("b")]);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     cleanup();
+    await settleFrames();
+    // Only once the abandoned load is done with it: it fetches manifests, and
+    // restoring the real fetch under a running load sends it at the network.
     vi.unstubAllGlobals();
   });
 
@@ -152,8 +205,8 @@ describe("PluginsProvider", () => {
     await new Promise((r) => setTimeout(r, 1));
     cleanup();
 
-    // Long enough for the abandoned load to run to completion.
-    await new Promise((r) => setTimeout(r, 200));
+    // Let the abandoned load run to completion, however long its frames take.
+    await settleFrames();
 
     expect(frames.created).toBeGreaterThan(0);
     // Nothing can reach these frames once the provider is gone, so the load has
@@ -165,12 +218,17 @@ describe("PluginsProvider", () => {
   it("does not rebuild plugins when no update is available", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn(async () =>
-        new Response(
-          JSON.stringify({ name: "same", script: "plugin.js", version: "1.0.0" }),
-          { status: 200 }
-        )
-      )
+      vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({
+              name: "same",
+              script: "plugin.js",
+              version: "1.0.0",
+            }),
+            { status: 200 },
+          ),
+      ),
     );
 
     const loadedStates = renderProvider();
@@ -202,8 +260,8 @@ describe("PluginsProvider", () => {
       networkRequest: (
         input: string,
         init?: RequestInit,
-        options?: unknown
-      ) => Promise<unknown>
+        options?: unknown,
+      ) => Promise<unknown>,
     ) => {
       vi.stubGlobal("InfoGata", { networkRequest });
     };
@@ -219,12 +277,17 @@ describe("PluginsProvider", () => {
       // No update available, so the auto-updater stays out of the way.
       vi.stubGlobal(
         "fetch",
-        vi.fn(async () =>
-          new Response(
-            JSON.stringify({ name: "Reddit", script: "plugin.js", version: "1.0.0" }),
-            { status: 200 }
-          )
-        )
+        vi.fn(
+          async () =>
+            new Response(
+              JSON.stringify({
+                name: "Reddit",
+                script: "plugin.js",
+                version: "1.0.0",
+              }),
+              { status: 200 },
+            ),
+        ),
       );
       await db.plugins.clear();
       await db.plugins.add({
