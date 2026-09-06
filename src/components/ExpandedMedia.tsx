@@ -68,10 +68,18 @@ const ExpandedMedia: React.FC<Props> = ({ url, isVideo, videoSources, images, al
     );
   }
 
+  // The video centres itself inside a full-width box rather than the box
+  // shrinking to fit it: the collapse button is absolute against this box, and
+  // a shrunken one would carry the button inward with it, away from the corner
+  // a gallery puts it in.
   if (sources) {
     return (
       <div className="relative">
-        <VideoPlayer sources={sources} poster={thumbnailUrl} className={className} />
+        <VideoPlayer
+          sources={sources}
+          poster={thumbnailUrl}
+          className={`mx-auto block ${className ?? ""}`}
+        />
         {toggleExpand && <CollapseButton onClick={toggleExpand} />}
       </div>
     );
@@ -79,7 +87,11 @@ const ExpandedMedia: React.FC<Props> = ({ url, isVideo, videoSources, images, al
 
   if (toggleExpand) {
     return (
-      <button onClick={toggleExpand} className="cursor-zoom-out" aria-label="Collapse media">
+      <button
+        onClick={toggleExpand}
+        className="mx-auto block w-fit max-w-full cursor-zoom-out"
+        aria-label="Collapse media"
+      >
         <img
           src={url}
           className={className}
@@ -92,7 +104,7 @@ const ExpandedMedia: React.FC<Props> = ({ url, isVideo, videoSources, images, al
   return (
     <img
       src={url}
-      className={className}
+      className={`mx-auto block ${className ?? ""}`}
       alt={alt}
     />
   );
