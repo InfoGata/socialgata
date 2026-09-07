@@ -13,9 +13,19 @@ import { FavoritesRepoProvider } from "./sync/FavoritesRepoProvider";
 import { FavoritesProvider } from "./sync/FavoritesContext";
 import { PostHogProvider } from "posthog-js/react";
 import { Toaster } from "sonner";
+import AppErrorBoundary from "./components/AppErrorBoundary";
+import { runPendingAppDataReset } from "./lib/reset-app-data";
+
+// Awaited before anything renders: a reset can only delete the databases while
+// nothing holds a connection to them, and the providers below open one as soon
+// as they mount. A no-op unless the boundary's reset button was used.
+await runPendingAppDataReset();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
+    {/* Outermost on purpose: everything below can throw during first render,
+        and the router's own error component only covers routes. */}
+    <AppErrorBoundary>
     <PostHogProvider
       apiKey={import.meta.env.VITE_PUBLIC_POSTHOG_KEY}
       options={{
@@ -49,5 +59,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       </PersistGate>
       </Provider>
     </PostHogProvider>
+    </AppErrorBoundary>
   </React.StrictMode>
 );

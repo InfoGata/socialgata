@@ -98,6 +98,11 @@
     "invalidResponseDescription": "The response couldn't be read. The site may be serving a block or challenge page.",
     "unknownTitle": "Something went wrong",
     "unknownDescription": "This page couldn't be loaded.",
+    "appCrashTitle": "SocialGata couldn't start",
+    "appCrashDescription": "Something went wrong before the app finished loading. Trying again is usually enough; if it keeps happening, resetting removes the stored data that's most likely causing it.",
+    "reloadApp": "Reload",
+    "resetAppData": "Reset app data",
+    "resetAppDataConfirm": "This removes your installed plugins, saved logins and locally stored favorites, then reloads. Favorites you've synced to a cloud provider can be downloaded again; nothing else can be undone.",
     "tryAgain": "Try again",
     "openSite": "Open {{site}}",
     "showDetails": "Details"
