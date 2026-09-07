@@ -13,6 +13,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as DonateRouteImport } from './routes/donate'
+import { Route as AbuseRouteImport } from './routes/abuse'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PluginsIndexRouteImport } from './routes/plugins/index'
@@ -56,6 +57,11 @@ const FavoritesRoute = FavoritesRouteImport.update({
 const DonateRoute = DonateRouteImport.update({
   id: '/donate',
   path: '/donate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AbuseRoute = AbuseRouteImport.update({
+  id: '/abuse',
+  path: '/abuse',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -191,6 +197,7 @@ const SPluginIdIInstanceIdCCommunityIdPostApiIdCommentCommentIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/abuse': typeof AbuseRoute
   '/donate': typeof DonateRoute
   '/favorites': typeof FavoritesRoute
   '/privacy': typeof PrivacyRoute
@@ -221,6 +228,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/abuse': typeof AbuseRoute
   '/donate': typeof DonateRoute
   '/favorites': typeof FavoritesRoute
   '/privacy': typeof PrivacyRoute
@@ -252,6 +260,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/abuse': typeof AbuseRoute
   '/donate': typeof DonateRoute
   '/favorites': typeof FavoritesRoute
   '/privacy': typeof PrivacyRoute
@@ -284,6 +293,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/abuse'
     | '/donate'
     | '/favorites'
     | '/privacy'
@@ -314,6 +324,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/abuse'
     | '/donate'
     | '/favorites'
     | '/privacy'
@@ -344,6 +355,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/abuse'
     | '/donate'
     | '/favorites'
     | '/privacy'
@@ -375,6 +387,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AbuseRoute: typeof AbuseRoute
   DonateRoute: typeof DonateRoute
   FavoritesRoute: typeof FavoritesRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -431,6 +444,13 @@ declare module '@tanstack/react-router' {
       path: '/donate'
       fullPath: '/donate'
       preLoaderRoute: typeof DonateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/abuse': {
+      id: '/abuse'
+      path: '/abuse'
+      fullPath: '/abuse'
+      preLoaderRoute: typeof AbuseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -607,6 +627,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AbuseRoute: AbuseRoute,
   DonateRoute: DonateRoute,
   FavoritesRoute: FavoritesRoute,
   PrivacyRoute: PrivacyRoute,
