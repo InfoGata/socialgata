@@ -109,10 +109,6 @@ until they remove it themselves.
 Anyone can also still install any plugin by URL. The catalog is a curated
 starting point, not a permission list, and delisting is not a block.
 
-### Repeat grounds
-
-A plugin delisted twice isn't relisted.
-
 ### Disagreeing with a delisting
 
 Open an issue on this repository or email the address above. We'll explain the
