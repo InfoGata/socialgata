@@ -15,6 +15,7 @@ import {
   CommentPermalinkContext,
   FavoriteCommentSource,
 } from "./CommentPermalink";
+import { useNsfwGate } from "./NsfwGate";
 
 type Props = {
   comment: Post;
@@ -126,6 +127,14 @@ const Comment = (props: Props) => {
     () => parse(clean, parseOptions),
     [clean, parseOptions],
   );
+
+  // Ahead of both layout branches, and using the hook rather than the wrapper,
+  // so a withheld comment doesn't build either of them. The compact placeholder
+  // keeps a thread readable instead of dropping a card into the middle of it.
+  const nsfwGate = useNsfwGate(comment.nsfw, { compact: true });
+  if (nsfwGate.withheld) {
+    return <>{nsfwGate.placeholder}</>;
+  }
 
   // Imageboard-style rendering
   if (platformType === "imageboard") {

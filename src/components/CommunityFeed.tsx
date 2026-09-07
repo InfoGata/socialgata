@@ -16,6 +16,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { ExternalLinkIcon, Inbox, XIcon } from "lucide-react";
 import BrowseCommunitiesButton from "./BrowseCommunitiesButton";
 import SortControls from "./SortControls";
+import NsfwBadge from "./NsfwBadge";
 import { SearchBar } from "./SearchBar";
 import { Button } from "./ui/button";
 
@@ -97,7 +98,10 @@ const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
             <CardHeader className="p-4 sm:p-6">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                  <CardTitle className="text-xl sm:text-2xl wrap-break-word">{headerCommunity.name}</CardTitle>
+                  <CardTitle className="text-xl sm:text-2xl wrap-break-word flex items-center gap-2">
+                    <NsfwBadge show={headerCommunity.nsfw} />
+                    {headerCommunity.name}
+                  </CardTitle>
                   {headerCommunity.description && (
                     <CardDescription className="mt-2">{headerCommunity.description}</CardDescription>
                   )}
@@ -183,7 +187,14 @@ const CommunityFeed: React.FC<CommunityFeedProps> = (props) => {
                   className="animate-in fade-in slide-in-from-bottom-1"
                   style={{ animationDelay: `${index * 30}ms` }}
                 >
-                  <PostComponent post={p} instanceId={instanceId} platformType={platformType} />
+                  <PostComponent
+                    post={p}
+                    instanceId={instanceId}
+                    platformType={platformType}
+                    // An imageboard classifies the board, not the reply, so
+                    // without this nothing inside an adult board is gated.
+                    communityNsfw={headerCommunity?.nsfw}
+                  />
                 </div>
               ))}
             </div>

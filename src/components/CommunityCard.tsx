@@ -3,6 +3,8 @@ import { Card, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import { Link } from "@tanstack/react-router";
 import { ExternalLinkIcon } from "lucide-react";
 import { FavoriteButton } from "./FavoriteButton";
+import NsfwGate from "./NsfwGate";
+import NsfwBadge from "./NsfwBadge";
 
 interface CommunityCardProps {
   community: Community;
@@ -12,11 +14,13 @@ interface CommunityCardProps {
 const CommunityCard: React.FC<CommunityCardProps> = (props) => {
   const { community, pluginId } = props;
   return (
+    <NsfwGate nsfw={community.nsfw} community>
     <Card className="flex flex-col hover:bg-accent transition-colors">
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <NsfwBadge show={community.nsfw} />
               {community.instanceId ? (
                 <Link
                   to="/s/$pluginId/i/$instanceId/c/$apiId"
@@ -67,6 +71,7 @@ const CommunityCard: React.FC<CommunityCardProps> = (props) => {
         </div>
       </CardHeader>
     </Card>
+    </NsfwGate>
   );
 }
 

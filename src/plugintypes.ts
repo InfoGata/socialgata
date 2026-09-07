@@ -178,6 +178,13 @@ export interface Community {
   instanceId?: string;
   description?: string;
   originalUrl?: string;
+  /**
+   * Whether the whole community is marked as adult content. Some sources
+   * classify only at this level and never flag the posts themselves, so every
+   * post in a community marked this way is treated as adult regardless of its
+   * own `nsfw`.
+   */
+  nsfw?: boolean;
 }
 
 export interface Instance {

@@ -9,13 +9,22 @@ interface CloudSyncSettings {
   pluginId?: string;
 }
 
+/**
+ * What to do with a post or community marked adult. Defaults to `warn`:
+ * omitting them outright makes a feed look broken rather than filtered, and a
+ * per-item reveal is a better answer than making someone flip a global switch
+ * to see one thing.
+ */
+export type NsfwDisplay = "hide" | "warn" | "show";
+
 export interface UiState {
   isNavigationMenuOpen: boolean;
   cloudSync: CloudSyncSettings;
   disableAutoUpdatePlugins: boolean;
+  nsfwDisplay: NsfwDisplay;
 }
 
-const initialState: UiState = {
+export const initialState: UiState = {
   isNavigationMenuOpen: false,
   cloudSync: {
     enabled: false,
@@ -23,6 +32,7 @@ const initialState: UiState = {
     syncIntervalSeconds: 30,
   },
   disableAutoUpdatePlugins: false,
+  nsfwDisplay: "warn",
 }
 
 export const uiSlice = createSlice({
@@ -50,6 +60,9 @@ export const uiSlice = createSlice({
     },
     setDisableAutoUpdatePlugins: (state, action: PayloadAction<boolean>) => {
       state.disableAutoUpdatePlugins = action.payload;
+    },
+    setNsfwDisplay: (state, action: PayloadAction<NsfwDisplay>) => {
+      state.nsfwDisplay = action.payload;
     }
   }
 })
@@ -61,6 +74,7 @@ export const {
   setCloudSyncInterval,
   setCloudSyncPluginProvider,
   disconnectCloudSync,
-  setDisableAutoUpdatePlugins
+  setDisableAutoUpdatePlugins,
+  setNsfwDisplay
 } = uiSlice.actions;
 export default uiSlice.reducer;

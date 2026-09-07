@@ -5,10 +5,22 @@ import storage from "redux-persist/lib/storage";
 import authReducer from "./reducers/authSlice";
 import uiReducer, { type UiState } from "./reducers/uiSlice";
 
+/**
+ * Every ui preference that should survive a reload. A key missing from here
+ * doesn't fail loudly — it silently resets to its default on every load, which
+ * looks like the setting working right up until the page is refreshed.
+ * Exported so a test can hold it against UiState.
+ */
+export const uiPersistWhitelist = [
+  "cloudSync",
+  "disableAutoUpdatePlugins",
+  "nsfwDisplay",
+] as const;
+
 const uiPersistConfig: PersistConfig<UiState> = {
   key: "ui",
   storage,
-  whitelist: ["cloudSync", "disableAutoUpdatePlugins"],
+  whitelist: [...uiPersistWhitelist],
 };
 
 export const store = configureStore({

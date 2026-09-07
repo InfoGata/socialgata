@@ -110,5 +110,21 @@
     "tryAgain": "Try again",
     "openSite": "Open {{site}}",
     "showDetails": "Details"
+  },
+  "nsfw": {
+    "hiddenTitle": "Adult content",
+    "hiddenDescription": "This post is marked as adult content.",
+    "show": "Show",
+    "communityHiddenTitle": "Adult community",
+    "communityHiddenDescription": "This community is marked as adult content.",
+    "badge": "NSFW",
+    "settingsTitle": "Adult content",
+    "settingsDescription": "How to handle posts and communities that the source has marked as adult. This is a display preference, not an age check.",
+    "optionWarn": "Ask before showing",
+    "optionWarnDescription": "Adult content is withheld behind a prompt you can open one item at a time. Nothing is loaded until you do.",
+    "optionHide": "Hide entirely",
+    "optionHideDescription": "Adult content is left out of feeds and listings completely.",
+    "optionShow": "Always show",
+    "optionShowDescription": "Adult content appears like anything else."
   }
 }
