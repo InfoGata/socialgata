@@ -16,6 +16,7 @@ import {
   type NsfwDisplay,
   type UiState,
 } from "@/store/reducers/uiSlice";
+import { shouldRequestNsfw } from "@/lib/nsfw";
 
 afterEach(cleanup);
 
@@ -161,5 +162,16 @@ describe("NsfwGate on a community", () => {
     // what this community is.
     expect(await screen.findByText("NSFW")).toBeInTheDocument();
     expect(screen.getByText("A post that exists")).toBeInTheDocument();
+  });
+});
+
+describe("what the host tells a plugin", () => {
+  it("only stops the fetch when the reader wants nothing shown", () => {
+    // The subtle one. Under "warn" the reader can still reveal an item, so the
+    // content has to be fetched and withheld on display — a plugin told not to
+    // request it would leave the reveal button with nothing behind it.
+    expect(shouldRequestNsfw("warn")).toBe(true);
+    expect(shouldRequestNsfw("show")).toBe(true);
+    expect(shouldRequestNsfw("hide")).toBe(false);
   });
 });

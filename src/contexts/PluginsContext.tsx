@@ -52,6 +52,7 @@ import {
 } from "../plugin-utils";
 import { Manifest } from "../plugintypes";
 import { useAppSelector } from "../store/hooks";
+import { shouldRequestNsfw } from "@/lib/nsfw";
 import { hasExtension, isCorsDisabled } from "@/utils";
 import { createPluginError, toPluginErrorPayload } from "@/plugin-errors";
 import { NETWORK_TIMEOUT_MS, withTimeout } from "@/lib/network-timeout";
@@ -76,6 +77,7 @@ interface ApplicationPluginInterface extends PluginInterface {
   isNetworkRequestCorsDisabled(): Promise<boolean>;
   isLoggedIn(): Promise<boolean>;
   getTheme(): Promise<Theme>;
+  getShowNsfw(): Promise<boolean>;
   createNotification(notification: NotificationMessage): Promise<void>;
 }
 
@@ -174,6 +176,12 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
   React.useEffect(() => {
     themeRef.current = theme.theme;
   }, [theme.theme]);
+
+  const nsfwDisplay = useAppSelector((state) => state.ui.nsfwDisplay);
+  const nsfwDisplayRef = React.useRef(nsfwDisplay);
+  React.useEffect(() => {
+    nsfwDisplayRef.current = nsfwDisplay;
+  }, [nsfwDisplay]);
 
   const loadPlugin = React.useCallback(
     async (plugin: PluginInfo, pluginFiles?: FileList) => {
@@ -306,6 +314,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
           return false;
         },
         getTheme: async () => themeRef.current,
+        getShowNsfw: async () => shouldRequestNsfw(nsfwDisplayRef.current),
         createNotification: async (notification: NotificationMessage) => {
           let toaster = toast.message;
           switch (notification.type) {
