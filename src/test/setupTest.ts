@@ -1,4 +1,22 @@
-import { vi } from "vitest";
+import { afterEach, vi } from "vitest";
+import { cleanup } from "@testing-library/react";
+
+/**
+ * Vitest globals are off, so testing-library never registers its own automatic
+ * cleanup. Without this, a file's last render stays mounted past the end of the
+ * file, and React's scheduled work then runs against a torn-down JSDOM — which
+ * surfaces as an intermittent unhandled `window is not defined` and a non-zero
+ * exit code even when every test passed. Registered here rather than per file so
+ * a new test can't reintroduce it.
+ */
+afterEach(cleanup);
+
+/**
+ * JSDOM has no layout, so it implements none of the scroll methods. TanStack
+ * Router calls scrollTo on every navigation, and each unimplemented call is
+ * reported as an error rather than ignored.
+ */
+window.scrollTo = vi.fn();
 
 /**
  * JSDOM doesn't implement PointerEvent so we need to mock our own implementation
