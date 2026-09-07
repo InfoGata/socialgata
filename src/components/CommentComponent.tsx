@@ -15,7 +15,7 @@ import {
   CommentPermalinkContext,
   FavoriteCommentSource,
 } from "./CommentPermalink";
-import { useNsfwGate } from "./NsfwGate";
+import { useNsfwGate } from "@/hooks/useNsfwGate";
 
 type Props = {
   comment: Post;
