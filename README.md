@@ -8,7 +8,6 @@ A unified social media aggregator that brings together content from multiple pla
 - **Dynamic Plugin System**: Install and manage plugins at runtime from a curated list or custom URLs
 - **Instance Support**: Connect to different instances of federated platforms (Lemmy, Mastodon)
 - **Dark/Light Theme**: Customizable UI with theme support
-- **Internationalization**: Multi-language support with i18next
 - **Modern UI**: Clean, responsive design using Tailwind CSS and Radix UI components
 
 ## Tech Stack

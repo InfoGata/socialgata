@@ -34,7 +34,7 @@ a client-side reader can do.
 
 ## How to report
 
-Email **contact@socialgata.com**. Include enough that we can find the thing
+Email **abuse@socialgata.com**. Include enough that we can find the thing
 you're describing without guessing.
 
 ### Copyright
