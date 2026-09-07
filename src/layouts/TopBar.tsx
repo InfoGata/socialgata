@@ -4,54 +4,53 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setIsNavigationMenuOpen } from "@/store/reducers/uiSlice";
 import { Link, useNavigate, useParams } from "@tanstack/react-router";
 import { MenuIcon } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
-import React, { useState } from "react";
+import React from "react";
 import { usePlugins } from "@/hooks/usePlugins";
+
+interface SearchSource {
+  pluginId: string;
+  name: string;
+}
+
+/** The installed plugins that implement onSearch, in install order. */
+const useSearchSources = (): SearchSource[] => {
+  const { plugins } = usePlugins();
+  const [searchSources, setSearchSources] = React.useState<SearchSource[]>([]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+
+    const buildSearchSources = async () => {
+      const searchable = await Promise.all(
+        plugins.map(async (plugin) => {
+          if (!plugin.id || !plugin.name) return undefined;
+          const hasSearch = await plugin.hasDefined.onSearch();
+          return hasSearch ? { pluginId: plugin.id, name: plugin.name } : undefined;
+        })
+      );
+
+      // A later plugins change may have already resolved; don't clobber it.
+      if (!cancelled) {
+        setSearchSources(searchable.filter((s): s is SearchSource => s !== undefined));
+      }
+    };
+
+    buildSearchSources();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [plugins]);
+
+  return searchSources;
+};
 
 export const TopBar: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const params = useParams({ strict: false });
   const isNavigationMenuOpen = useAppSelector((state) => state.ui.isNavigationMenuOpen);
-  const { plugins } = usePlugins();
-
-  const [searchSources, setSearchSources] = React.useState<Array<{
-    id: string;
-    name: string;
-    pluginId: string;
-  }>>([]);
-
-  // Build search sources from dynamic plugins that have onSearch defined
-  React.useEffect(() => {
-    const buildSearchSources = async () => {
-      const sources: Array<{ id: string; name: string; pluginId: string }> = [];
-
-      for (const plugin of plugins) {
-        if (plugin.id && plugin.name) {
-          const hasSearch = await plugin.hasDefined.onSearch();
-          if (hasSearch) {
-            sources.push({
-              id: plugin.id,
-              name: plugin.name,
-              pluginId: plugin.id
-            });
-          }
-        }
-      }
-
-      setSearchSources(sources);
-    };
-
-    buildSearchSources();
-  }, [plugins]);
-
-  const [selectedSearchSource, setSelectedSearchSource] = useState<string>("");
+  const searchSources = useSearchSources();
 
   const onToggleNavigationMenu = () => {
     dispatch(setIsNavigationMenuOpen(!isNavigationMenuOpen));
@@ -59,28 +58,18 @@ export const TopBar: React.FC = () => {
 
   const pluginId = (params as Record<string, string | undefined>)?.pluginId;
 
-  // Compute effective search source: prefer pluginId match, then user selection, then first source
-  const effectiveSearchSource = React.useMemo(() => {
-    if (searchSources.length === 0) return "";
-    if (pluginId) {
-      const source = searchSources.find(s => s.pluginId === pluginId);
-      if (source) return source.id;
-    }
-    if (selectedSearchSource && searchSources.find(s => s.id === selectedSearchSource)) {
-      return selectedSearchSource;
-    }
-    return searchSources[0].id;
-  }, [searchSources, selectedSearchSource, pluginId]);
+  // Search follows whichever plugin the current route is on, falling back to
+  // the first plugin that can search.
+  const activeSource =
+    searchSources.find((s) => s.pluginId === pluginId) ?? searchSources[0];
 
   const handleSearch = (query: string) => {
-    const selectedSource = searchSources.find(source => source.id === effectiveSearchSource);
-    if (selectedSource) {
-      navigate({
-        to: '/s/$pluginId/feed',
-        params: { pluginId: selectedSource.pluginId },
-        search: { q: query }
-      });
-    }
+    if (!activeSource) return;
+    navigate({
+      to: '/s/$pluginId/feed',
+      params: { pluginId: activeSource.pluginId },
+      search: { q: query }
+    });
   };
 
   return (
@@ -92,31 +81,12 @@ export const TopBar: React.FC = () => {
         <h1 className="text-xl font-bold hidden sm:block">
           <Link to="/">SocialGata</Link>
         </h1>
-        {searchSources.length > 0 && (
-          <div className="flex flex-1 items-center gap-1.5 sm:gap-2 min-w-0 max-w-md ml-auto">
-            {/* On a phone the source picker gives up most of its width to the
-                query box, which is the part that actually gets typed in. */}
-            <Select
-              value={effectiveSearchSource}
-              onValueChange={(value) => setSelectedSearchSource(value)}
-            >
-              <SelectTrigger className="w-24 shrink-0 sm:w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {searchSources.map((source) => (
-                  <SelectItem key={source.id} value={source.id}>
-                    {source.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <SearchBar
-              onSearch={handleSearch}
-              placeholder={`Search ${searchSources.find(source => source.id === effectiveSearchSource)?.name ?? ""}...`}
-              className="flex-1"
-            />
-          </div>
+        {activeSource && (
+          <SearchBar
+            onSearch={handleSearch}
+            placeholder={`Search ${activeSource.name}...`}
+            className="flex-1 min-w-0 max-w-md ml-auto"
+          />
         )}
       </div>
     </header>

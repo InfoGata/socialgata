@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { SearchIcon } from "lucide-react";
 
 interface SearchBarProps {
@@ -21,24 +22,18 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (query.trim()) {
-      onSearch(query.trim());
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSubmit(e);
+    const trimmed = query.trim();
+    if (trimmed) {
+      onSearch(trimmed);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className={`flex items-center gap-1 sm:gap-2 min-w-0 ${className}`}>
+    <form onSubmit={handleSubmit} className={cn("flex items-center gap-1 sm:gap-2 min-w-0", className)}>
       <Input
-        type="text"
+        type="search"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        onKeyDown={handleKeyDown}
         placeholder={placeholder}
         className="flex-1 min-w-0"
       />
