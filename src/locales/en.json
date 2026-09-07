@@ -10,7 +10,10 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "save": "Save",
-    "notFound": "Not found"
+    "notFound": "Not found",
+    "version": "Version",
+    "buildDetailsCopied": "Build details copied",
+    "buildDetailsCopyFailed": "Couldn't copy the build details"
   },
   "settings": {
     "theme": "Theme",

@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
 import wasm from "vite-plugin-wasm";
+import { buildInfoDefine } from "./build-info";
 
 export default defineConfig({
   main: {
@@ -31,6 +32,8 @@ export default defineConfig({
     },
   },
   renderer: {
+    // Same build identity as the web build; see vite.config.ts.
+    define: buildInfoDefine(),
     // Restore pre-Vite-8 CJS default-import interop (see vite.config.ts).
     legacy: {
       inconsistentCjsInterop: true,

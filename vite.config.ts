@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
 import wasm from "vite-plugin-wasm";
+import { buildInfoDefine } from "./build-info";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -15,6 +16,8 @@ export default defineConfig({
   legacy: {
     inconsistentCjsInterop: true,
   },
+  // Version and commit, so a bug report can name the build it came from.
+  define: buildInfoDefine(),
   // wasm (automerge) + native top-level await require a modern target; es2022 also
   // avoids esbuild's destructuring-downlevel failure on Rolldown output under Vite 8.
   // With the es2022 target, Vite 8 handles top-level await natively, so

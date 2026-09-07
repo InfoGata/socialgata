@@ -13,7 +13,7 @@ A unified social media aggregator that brings together content from multiple pla
 
 ## Tech Stack
 
-- **Frontend Framework**: React 18 with TypeScript
+- **Frontend Framework**: React 19 with TypeScript
 - **Build Tool**: Vite
 - **Routing**: TanStack Router (file-based routing)
 - **State Management**: Redux Toolkit
@@ -83,6 +83,21 @@ src/
 - `npm run lint` - Run ESLint
 - `npm test` - Run test suite
 - `npm run preview` - Preview production build
+
+## Versioning
+
+`package.json` holds the version, and nothing else should carry a copy of it.
+`npm version <major|minor|patch>` is the only thing that changes it:
+
+- the web and desktop builds read it through `build-info.ts`, which stamps in
+  the commit (`git describe --always --dirty`) alongside it
+- the Android build reads it in `android/app/build.gradle` and derives
+  `versionCode` from it, so `0.1.0` becomes `100` and `1.2.3` becomes `10203`
+- the About page shows both, and tapping the version copies the build, the
+  platform and the user agent — everything a bug report needs
+
+The app is pre-1.0 while the plugin API is still moving: a minor bump means
+plugins may need changes, a patch means they won't.
 
 ## Contributing
 

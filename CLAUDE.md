@@ -18,7 +18,7 @@ means re-registering it in the Dropbox app console.
 ## Project Architecture
 
 ### Core Framework
-React 18 + TypeScript application using:
+React 19 + TypeScript application using:
 - **TanStack Router** for file-based routing (`src/routes/`)
 - **Redux Toolkit** for state management (`src/store/`)
 - **Vite** as build tool with `@/` path alias for `src/`
@@ -95,6 +95,13 @@ Redux store with slices:
 - `src/components/Settings/CloudSyncSettings.tsx` - Settings UI for connecting providers
 - Settings stored in Redux `uiSlice.cloudSync`: pluginId, enabled, autoSync, syncIntervalSeconds
 - Setup docs: `docs/CLOUD_SYNC_SETUP.md`
+
+### Versioning
+`package.json` is the single source of truth; see the Versioning section of the
+README. `build-info.ts` injects `__APP_VERSION__` and `__APP_COMMIT__` into both
+vite configs, `src/lib/app-version.ts` is what the app reads, and
+`android/app/build.gradle` derives `versionCode`/`versionName` from the same
+file. Never hardcode a version anywhere else.
 
 ### Testing
 Vitest with jsdom environment, testing utilities in `src/test/`
