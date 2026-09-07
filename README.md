@@ -9,6 +9,7 @@ A unified social media aggregator that brings together content from multiple pla
 - **Instance Support**: Connect to different instances of federated platforms (Lemmy, Mastodon)
 - **Dark/Light Theme**: Customizable UI with theme support
 - **Modern UI**: Clean, responsive design using Tailwind CSS and Radix UI components
+- **Installable & Offline**: Installs as a PWA and opens without a connection — plugins, favorites and settings all live on the device
 
 ## Tech Stack
 

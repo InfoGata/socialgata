@@ -96,6 +96,21 @@ Redux store with slices:
 - Settings stored in Redux `uiSlice.cloudSync`: pluginId, enabled, autoSync, syncIntervalSeconds
 - Setup docs: `docs/CLOUD_SYNC_SETUP.md`
 
+### Service Worker / PWA
+`vite-plugin-pwa` (same library as the other InfoGata apps) in `vite.config.ts`,
+web build only — the electron and capacitor builds are not wired to it.
+`registerType: "autoUpdate"` so a client on a stale precached shell recovers
+without needing the page to post SKIP_WAITING.
+
+The `navigateFallbackDenylist` is load-bearing: `public/` holds real pages
+(`pluginframe.html`, `ui.html`, `login_popup.html`) and without the denylist the
+SPA fallback hands them the app shell, which breaks every plugin. Any new file
+added to `public/` is covered by the existing `/\.html$/` rule; anything
+extensionless would need its own entry.
+
+`maximumFileSizeToCacheInBytes` must stay above the automerge wasm (~2.7MB) or
+the app installs and then won't open offline, and it fails silently.
+
 ### Versioning
 `package.json` is the single source of truth; see the Versioning section of the
 README. `build-info.ts` injects `__APP_VERSION__` and `__APP_COMMIT__` into both
