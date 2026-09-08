@@ -7,13 +7,36 @@
 
 <body>
     <h1>Authenticating...</h1>
+    <p id="status"></p>
 
     <script>
+        // This page receives an OAuth authorization code in its url and hands it
+        // to the window that opened it. Who that window is decides who gets the
+        // code, so it is named exactly rather than left as "*".
+        //
+        // The target is this page's own origin because that is always the app's:
+        // the plugin builds its redirect uri from the host's origin, and the host
+        // is what opened this popup. Deriving it beats an allowlist -- production,
+        // preview and a local dev server are all correct without being listed,
+        // and none of them can drift out of date.
+        //
+        // With "*" any page could run this flow, catch the code in its own opener
+        // and redeem it. Naming the origin means a page on another origin receives
+        // nothing at all.
+        //
+        // It fails closed on purpose: if the opener is somewhere else, sign-in
+        // does not complete rather than the code going somewhere it shouldn't.
+        const status = document.getElementById("status");
+
         if (window.opener) {
             const data = {
                 url: window.location.href,
             };
-            window.opener.postMessage(data, "*");
+            window.opener.postMessage(data, window.location.origin);
+            status.textContent = "You can close this window.";
+        } else {
+            status.textContent =
+                "This page was opened directly. Start sign-in from the app instead.";
         }
     </script>
 
