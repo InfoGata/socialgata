@@ -27,17 +27,34 @@
         // It fails closed on purpose: if the opener is somewhere else, sign-in
         // does not complete rather than the code going somewhere it shouldn't.
         const status = document.getElementById("status");
+        const data = { url: window.location.href };
+        let delivered = false;
 
-        if (window.opener) {
-            const data = {
-                url: window.location.href,
-            };
-            window.opener.postMessage(data, window.location.origin);
-            status.textContent = "You can close this window.";
-        } else {
-            status.textContent =
-                "This page was opened directly. Start sign-in from the app instead.";
+        // A BroadcastChannel reaches the app whether or not this window still
+        // has an opener. Opener is easy to lose -- a popup the browser blocked
+        // and the user then allowed is reopened without one, and some providers
+        // sever it on the way through -- and losing it used to mean sign-in
+        // simply never completed, with this page sitting on "Authenticating..."
+        // forever. A channel is same-origin by definition, so it carries the
+        // same guarantee as naming the origin below.
+        try {
+            const channel = new BroadcastChannel("socialgata-oauth");
+            channel.postMessage(data);
+            channel.close();
+            delivered = true;
+        } catch (e) {
+            // No BroadcastChannel: fall through to the opener.
         }
+
+        // Kept as well, so nothing that already worked stops working.
+        if (window.opener) {
+            window.opener.postMessage(data, window.location.origin);
+            delivered = true;
+        }
+
+        status.textContent = delivered
+            ? "You can close this window."
+            : "Sign-in couldn't be handed back to the app. Please try again from the app.";
     </script>
 
 </body>
