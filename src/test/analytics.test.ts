@@ -13,6 +13,8 @@ describe("analytics preference", () => {
   });
 
   it("captures when the reader allows it and the browser doesn't object", () => {
+    // Independent of whether a key is configured: that is enforced by not
+    // rendering a provider at all, so this stays true on a machine with no .env.
     expect(shouldCapture(true, false)).toBe(true);
   });
 

@@ -24,8 +24,17 @@ export const doNotTrackEnabled = (): boolean => {
   );
 };
 
-/** What the app actually asks PostHog to do: the reader's choice, with Do Not Track able to veto it but never to enable it. */
+/**
+ * What the app asks PostHog to do: the reader's choice, with Do Not Track able
+ * to veto it but never to enable it.
+ *
+ * Deliberately says nothing about whether a key is configured. That guarantee
+ * is structural -- AnalyticsProvider renders no provider without one, so there
+ * is no client to capture through -- and folding it in here made this function
+ * depend on the ambient build environment, which meant it answered differently
+ * on a machine with a .env than on one without.
+ */
 export const shouldCapture = (
   analyticsEnabled: boolean,
   doNotTrack: boolean
-): boolean => analyticsConfigured && analyticsEnabled && !doNotTrack;
+): boolean => analyticsEnabled && !doNotTrack;
