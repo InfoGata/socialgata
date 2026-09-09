@@ -15,6 +15,7 @@ export const uiPersistWhitelist = [
   "cloudSync",
   "disableAutoUpdatePlugins",
   "nsfwDisplay",
+  "analyticsEnabled",
 ] as const;
 
 const uiPersistConfig: PersistConfig<UiState> = {

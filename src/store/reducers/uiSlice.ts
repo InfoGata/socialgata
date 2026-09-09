@@ -22,6 +22,7 @@ export interface UiState {
   cloudSync: CloudSyncSettings;
   disableAutoUpdatePlugins: boolean;
   nsfwDisplay: NsfwDisplay;
+  analyticsEnabled: boolean;
 }
 
 export const initialState: UiState = {
@@ -33,6 +34,9 @@ export const initialState: UiState = {
   },
   disableAutoUpdatePlugins: false,
   nsfwDisplay: "warn",
+  // On by default, but Do Not Track overrides it and no key at all means there
+  // is nothing to enable; see lib/analytics.
+  analyticsEnabled: true,
 }
 
 export const uiSlice = createSlice({
@@ -63,6 +67,9 @@ export const uiSlice = createSlice({
     },
     setNsfwDisplay: (state, action: PayloadAction<NsfwDisplay>) => {
       state.nsfwDisplay = action.payload;
+    },
+    setAnalyticsEnabled: (state, action: PayloadAction<boolean>) => {
+      state.analyticsEnabled = action.payload;
     }
   }
 })
@@ -75,6 +82,7 @@ export const {
   setCloudSyncPluginProvider,
   disconnectCloudSync,
   setDisableAutoUpdatePlugins,
-  setNsfwDisplay
+  setNsfwDisplay,
+  setAnalyticsEnabled
 } = uiSlice.actions;
 export default uiSlice.reducer;

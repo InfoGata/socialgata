@@ -126,5 +126,14 @@
     "optionHideDescription": "Adult content is left out of feeds and listings completely.",
     "optionShow": "Always show",
     "optionShowDescription": "Adult content appears like anything else."
+  },
+  "analytics": {
+    "title": "Analytics",
+    "description": "Anonymous, cookieless usage data that helps us see which parts of the app get used and what breaks. No account, no profile, and nothing that identifies you.",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "doNotTrackTitle": "Turned off by your browser",
+    "doNotTrackDescription": "Your browser sends Do Not Track, so nothing is collected regardless of this setting.",
+    "privacyLink": "Read what's collected"
   }
 }

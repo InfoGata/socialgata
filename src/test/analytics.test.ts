@@ -1,0 +1,51 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { doNotTrackEnabled, shouldCapture } from "@/lib/analytics";
+import { initialState } from "@/store/reducers/uiSlice";
+
+afterEach(() => vi.unstubAllGlobals());
+
+const withDnt = (value: string | null) =>
+  vi.stubGlobal("navigator", { ...navigator, doNotTrack: value });
+
+describe("analytics preference", () => {
+  it("is on by default", () => {
+    expect(initialState.analyticsEnabled).toBe(true);
+  });
+
+  it("captures when the reader allows it and the browser doesn't object", () => {
+    expect(shouldCapture(true, false)).toBe(true);
+  });
+
+  it("doesn't capture when the reader turned it off", () => {
+    expect(shouldCapture(false, false)).toBe(false);
+  });
+
+  it("lets Do Not Track veto the setting", () => {
+    // The whole point of honouring it: the browser's request wins over a
+    // setting the reader may never have looked at.
+    expect(shouldCapture(true, true)).toBe(false);
+  });
+
+  it("never lets Do Not Track turn capturing on", () => {
+    expect(shouldCapture(false, true)).toBe(false);
+  });
+});
+
+describe("doNotTrackEnabled", () => {
+  it("reads the browser's signal", () => {
+    withDnt("1");
+    expect(doNotTrackEnabled()).toBe(true);
+
+    // Firefox and some others historically sent "yes" rather than "1".
+    withDnt("yes");
+    expect(doNotTrackEnabled()).toBe(true);
+  });
+
+  it("treats an explicit opt-in to tracking, or no signal, as no objection", () => {
+    withDnt("0");
+    expect(doNotTrackEnabled()).toBe(false);
+
+    withDnt(null);
+    expect(doNotTrackEnabled()).toBe(false);
+  });
+});

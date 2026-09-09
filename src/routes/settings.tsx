@@ -2,6 +2,7 @@ import ThemeChangeSettings from '@/components/Settings/ThemeChangeSettings'
 import CloudSyncSettings from '@/components/Settings/CloudSyncSettings'
 import PluginSettings from '@/components/Settings/PluginSettings'
 import NsfwSettings from '@/components/Settings/NsfwSettings'
+import AnalyticsSettings from '@/components/Settings/AnalyticsSettings'
 import { createFileRoute } from '@tanstack/react-router'
 
 const Settings: React.FC  = () => {
@@ -11,6 +12,7 @@ const Settings: React.FC  = () => {
       <NsfwSettings />
       <PluginSettings />
       <CloudSyncSettings />
+      <AnalyticsSettings />
     </div>
   )
 }
