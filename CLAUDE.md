@@ -12,8 +12,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Ports are unique per app in `~/projects/webapps` and `strictPort` is on, so a
 collision fails instead of drifting: dev 3005, preview 4005, electron renderer 5005.
-The Dropbox OAuth redirect URI in `.env` is pinned to 3005 — changing the dev port
-means re-registering it in the Dropbox app console.
+The dev port is part of every plugin's OAuth redirect uri: a plugin derives it
+from the app's origin as `<origin>/login_popup.html`, so on 3005 that is
+`http://localhost:3005/login_popup.html`. Changing the port means re-registering
+that uri with each provider (Dropbox, Reddit) or their sign-in stops matching.
 
 ## Project Architecture
 
@@ -94,7 +96,9 @@ Redux store with slices:
 - `src/sync/cloud/PluginSyncProviderAdapter.ts` - Wraps a sync-capable plugin to implement `CloudSyncProvider`
 - `src/components/Settings/CloudSyncSettings.tsx` - Settings UI for connecting providers
 - Settings stored in Redux `uiSlice.cloudSync`: pluginId, enabled, autoSync, syncIntervalSeconds
-- Setup docs: `docs/CLOUD_SYNC_SETUP.md`
+- No setup to document: install a sync-capable plugin and connect it from
+  Settings. The provider's client id lives in that plugin, not in this app's
+  environment.
 
 ### Service Worker / PWA
 `vite-plugin-pwa` (same library as the other InfoGata apps) in `vite.config.ts`,
