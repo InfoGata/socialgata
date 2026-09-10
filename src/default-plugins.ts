@@ -6,8 +6,11 @@ export const defaultPlugins: PluginDescription[] = [
     name: "Reddit Plugin for SocialGata",
     description: "Browse Reddit feeds, communities, and comments",
     url: "https://cdn.jsdelivr.net/gh/InfoGata/reddit-socialgata@latest/manifest.json",
-    // Reddit sends no CORS headers and 403s a plain browser fetch outright.
+    // Reddit sends no CORS headers and 403s a plain browser fetch outright --
+    // but only on the anonymous json endpoints. oauth.reddit.com is
+    // CORS-enabled, so a signed-in reader needs no extension at all.
     requiresCorsDisabled: true,
+    signInReplacesCorsRequirement: true,
   },
   {
     id: "IB4ch4nPl9n",

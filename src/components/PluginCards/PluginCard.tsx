@@ -7,15 +7,21 @@ import {
 } from "../ui/card";
 import { Button } from "../ui/button";
 import { useTranslation } from "react-i18next";
-import { Plus } from "lucide-react";
+import { KeyRound, Plus } from "lucide-react";
 
 type Props = {
   plugin: PluginDescription;
   addPlugin: (description: PluginDescription) => Promise<void>;
+  /**
+   * This host can't make the plugin's anonymous requests, so the plugin only
+   * works once an account is connected. Said on the card rather than left to be
+   * discovered as an error page on the first feed.
+   */
+  needsSignIn?: boolean;
 };
 
 const PluginCard = (props: Props) => {
-  const { plugin, addPlugin } = props;
+  const { plugin, addPlugin, needsSignIn } = props;
   const onClickAdd = () => {
     addPlugin(plugin);
   };
@@ -29,6 +35,12 @@ const PluginCard = (props: Props) => {
           <CardDescription className="text-sm mt-1">
             {plugin.description}
           </CardDescription>
+        )}
+        {needsSignIn && (
+          <p className="mt-2 flex items-start gap-1.5 text-sm text-muted-foreground">
+            <KeyRound className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            <span>{t("signInRequiredWithoutExtension")}</span>
+          </p>
         )}
       </CardHeader>
       <div className="px-6 pb-4">

@@ -141,4 +141,17 @@ export interface PluginDescription {
    * installing it there yields a plugin that fails every request.
    */
   requiresPageContext?: boolean;
+  /**
+   * The plugin needs `requiresCorsDisabled` only for anonymous reading; signing
+   * in gives it an api that a plain browser can reach. Reddit is the case:
+   * oauth.reddit.com sends CORS headers and never touches the endpoints that
+   * get blocked, while the anonymous json endpoints do both.
+   *
+   * Such a plugin is offered everywhere rather than hidden without the
+   * extension -- hiding it would mean the reader can't install the plugin they
+   * would need in order to sign in, which is the very thing that makes it work.
+   * The card says so, since without either the extension or an account the
+   * feeds will error.
+   */
+  signInReplacesCorsRequirement?: boolean;
 }

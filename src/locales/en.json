@@ -81,7 +81,8 @@
     "browsePlugins": "Browse plugins",
     "pluginUpdated": "{{name}} updated to {{version}}",
     "pluginsUpdated_one": "{{count}} plugin updated",
-    "pluginsUpdated_other": "{{count}} plugins updated"
+    "pluginsUpdated_other": "{{count}} plugins updated",
+    "signInRequiredWithoutExtension": "Needs a connected account on this browser, or the browser extension. Feeds will error without one of them."
   },
   "errors": {
     "blockedTitle": "{{site}} blocked this request",
