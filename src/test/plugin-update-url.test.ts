@@ -26,6 +26,25 @@ const serve = (body: object) =>
 
 afterEach(() => vi.unstubAllGlobals());
 
+describe("fetching plugin files", () => {
+  it("revalidates instead of trusting a cached copy", async () => {
+    // jsdelivr caches the mutable refs in the browser for a week, so a plain
+    // fetch can answer an update check with a build from seven days ago.
+    serve(manifest());
+
+    await getPlugin(getFileTypeFromPluginUrl(INSTALLED_FROM));
+
+    const calls = (globalThis.fetch as unknown as { mock: { calls: unknown[][] } })
+      .mock.calls;
+    expect(calls.length).toBeGreaterThan(1);
+    // The manifest and the script are separate cache entries; both have to be
+    // fresh or a version can be paired with code that isn't it.
+    for (const [, init] of calls) {
+      expect((init as RequestInit).cache).toBe("no-cache");
+    }
+  });
+});
+
 describe("where the next update is fetched from", () => {
   it("takes the url the new manifest asks for", async () => {
     // This is what lets a plugin be moved to another host. Without it every
