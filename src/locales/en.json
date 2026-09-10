@@ -78,7 +78,10 @@
     "aliasErrorTaken": "Already used by another plugin",
     "pluginNotInstalledTitle": "Plugin not installed",
     "pluginNotInstalledDescription": "No installed plugin answers to \"{{alias}}\".",
-    "browsePlugins": "Browse plugins"
+    "browsePlugins": "Browse plugins",
+    "pluginUpdated": "{{name}} updated to {{version}}",
+    "pluginsUpdated_one": "{{count}} plugin updated",
+    "pluginsUpdated_other": "{{count}} plugins updated"
   },
   "errors": {
     "blockedTitle": "{{site}} blocked this request",

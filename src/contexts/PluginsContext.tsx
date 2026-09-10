@@ -53,6 +53,7 @@ import {
 import { Manifest } from "../plugintypes";
 import { useAppSelector } from "../store/hooks";
 import { shouldRequestNsfw } from "@/lib/nsfw";
+import i18next from "i18next";
 import { hasExtension, isCorsDisabled } from "@/utils";
 import { createPluginError, toPluginErrorPayload } from "@/plugin-errors";
 import { NETWORK_TIMEOUT_MS, withTimeout } from "@/lib/network-timeout";
@@ -646,7 +647,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
     hasUpdated.current = true;
 
     const checkUpdate = async () => {
-      let changed = false;
+      const updated: { name: string; version: string }[] = [];
 
       for (const p of pluginFramesRef.current) {
         if (!p.manifestUrl) continue;
@@ -675,7 +676,10 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
               // fetched from when a manifest declares no updateUrl, so a plugin
               // that says nothing keeps the channel it had.
               await db.plugins.put(newPlugin);
-              changed = true;
+              updated.push({
+                name: p.name || newPlugin.name || p.id,
+                version: manifest.version,
+              });
             }
           }
         } catch {
@@ -683,7 +687,32 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
         }
       }
 
-      if (changed) await loadAllPlugins({ silent: true });
+      if (updated.length === 0) return;
+
+      // Logged as well as shown. A toast is easy to miss or to land while the
+      // tab is in the background, and plugin code changing underneath someone
+      // is worth being able to find afterwards.
+      console.info(
+        "[plugins] Updated:",
+        updated.map((u) => `${u.name} ${u.version}`).join(", ")
+      );
+
+      if (updated.length === 1) {
+        toast.message(
+          i18next.t("pluginUpdated", {
+            ns: "plugins",
+            name: updated[0].name,
+            version: updated[0].version,
+          })
+        );
+      } else {
+        toast.message(
+          i18next.t("pluginsUpdated", { ns: "plugins", count: updated.length }),
+          { description: updated.map((u) => `${u.name} ${u.version}`).join(", ") }
+        );
+      }
+
+      await loadAllPlugins({ silent: true });
     };
     checkUpdate();
   }, [pluginsLoaded, disableAutoUpdatePlugins, loadAllPlugins]);
