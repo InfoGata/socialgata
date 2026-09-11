@@ -1,88 +1,122 @@
 # SocialGata
 
-A unified social media aggregator that brings together content from multiple platforms into a single, customizable interface. Built with React, TypeScript, and modern web technologies.
+[![CI](https://github.com/InfoGata/socialgata/actions/workflows/ci.yml/badge.svg)](https://github.com/InfoGata/socialgata/actions/workflows/ci.yml)
 
-## Features
+Read Reddit, Lemmy, Mastodon, Bluesky, Hacker News, Lobsters and imageboards in
+one place — through plugins you choose, on a site that stores none of it.
 
-- **Multi-Platform Support**: Aggregate content from Lemmy, Mastodon, Bluesky, and more via installable plugins
-- **Dynamic Plugin System**: Install and manage plugins at runtime from a curated list or custom URLs
-- **Instance Support**: Connect to different instances of federated platforms (Lemmy, Mastodon)
-- **Dark/Light Theme**: Customizable UI with theme support
-- **Modern UI**: Clean, responsive design using Tailwind CSS and Radix UI components
-- **Installable & Offline**: Installs as a PWA and opens without a connection — plugins, favorites and settings all live on the device
+**[www.socialgata.com](https://www.socialgata.com)**
 
-## Tech Stack
+## What it is
 
-- **Frontend Framework**: React 19 with TypeScript
-- **Build Tool**: Vite
-- **Routing**: TanStack Router (file-based routing)
-- **State Management**: Redux Toolkit
-- **Styling**: Tailwind CSS with custom theme system
-- **UI Components**: Radix UI + shadcn/ui
-- **Testing**: Vitest with jsdom
+SocialGata is a reader, not a service. It holds no accounts and no content of
+its own. Each platform is a plugin, and when you open a feed that plugin fetches
+from that platform directly, from your device, over your connection. Nothing is
+copied to a server of ours on the way, because there isn't one.
 
-## Getting Started
+That shapes everything else:
 
-### Prerequisites
+- **Your data stays yours.** Installed plugins, logins, favorites and settings
+  live in your browser. There is no sign-up.
+- **Works offline.** It installs as a PWA and opens without a connection.
+  Favorites are a CRDT, so edits on two devices merge rather than clobber.
+- **Sync is optional and yours to pick.** A sync plugin backs favorites up to
+  storage you already have — Dropbox today — and nothing syncs without one.
+- **Plugins are sandboxed.** Each runs in an iframe on its own origin, so one
+  plugin can't read another's data or the page around it.
 
-- Node.js 18+ and npm
+## Plugins
 
-### Installation
+Nine ship in the catalog. Install what you want from the plugins page, or point
+it at any manifest URL.
+
+| Plugin | Needs |
+| --- | --- |
+| Lemmy, Mastodon, Bluesky | nothing |
+| Hacker News, Lobsters | nothing |
+| Imageboards (4chan, lainchan, leftypol, endchan, 2ch.hk) | nothing |
+| Reddit | a Reddit account, **or** the browser extension |
+| Twitter/X | the browser extension |
+| Dropbox Sync | a Dropbox account |
+
+### Why some need the extension
+
+Some sites refuse requests that don't come from a page on their own domain, and
+a browser enforces that. The [InfoGata
+extension](https://github.com/InfoGata/infogata-extension) makes those requests
+on the plugin's behalf, from your browser, on your connection. Plugins that
+can't work without it are hidden rather than offered and broken.
+
+Reddit is the exception: signing in uses an API that a plain browser can reach,
+so an account works instead of the extension.
+
+Adult content is withheld by default — a post or community the source marks as
+adult is held behind a prompt until you ask for it. Settings has hide, ask and
+show.
+
+## Development
+
+Requires Node 22 (what CI builds against).
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/socialgata.git
+git clone https://github.com/InfoGata/socialgata.git
 cd socialgata
-
-# Install dependencies
 npm install
+npm run dev          # http://localhost:3005
 ```
 
-### Development
+| | |
+| --- | --- |
+| `npm run dev` | dev server, port 3005 |
+| `npm run build` | typecheck and build for production |
+| `npm run preview` | serve the production build, port 4005 |
+| `npm test` | Vitest suite |
+| `npm run lint` | ESLint |
+| `npm run electron:dev` / `electron:build` | desktop build (renderer on 5005) |
+| `npm run android` | build and run via Capacitor |
+
+Ports are fixed (`strictPort`), because plugin OAuth redirect URIs are derived
+from the app's origin — drifting to another port breaks sign-in.
+
+Built with React 19, TypeScript, Vite, TanStack Router, Redux Toolkit, Tailwind
+and Radix/shadcn. Architecture notes for contributors are in
+[CLAUDE.md](CLAUDE.md).
+
+## Writing a plugin
+
+A plugin is a manifest plus a script. It implements the `on*` callbacks it
+supports — `onGetFeed`, `onGetCommunity`, `onGetComments`, `onSearch` and so on
+— and the host calls whichever exist, so a plugin can be as small as one feed.
+
+Types are published, and are the API contract:
 
 ```bash
-# Start development server
-npm run dev
+npm install --save-dev @infogata/socialgata-plugin-typings
 ```
 
-The app will be available at `http://localhost:3005`.
+Every callback and every field is documented in
+[index.d.ts](https://github.com/InfoGata/socialgata-plugin-typings/blob/master/index.d.ts).
+The existing plugins under the [InfoGata org](https://github.com/InfoGata) are
+working examples.
+[hackernews](https://github.com/InfoGata/hackernews-socialgata) is the one to
+read first — about 300 lines, a plain JSON api, and it needs neither auth nor
+the extension, so nothing in it is there to work around a restriction.
 
-### Building for Production
+To develop against a local copy: serve the plugin folder
+(`npx serve . -p 8080 --cors`), install it by URL from the plugins page
+(`http://localhost:8080/manifest.json`), and run the plugin's build in watch
+mode. Plugins installed from localhost are polled every few seconds and reload
+themselves as you build.
 
-```bash
-# Run TypeScript checks and build
-npm run build
+## Privacy
 
-# Preview production build
-npm run preview
-```
+No accounts, no profiles, and no content passing through us. Anonymous,
+cookieless analytics is on by default and can be turned off in Settings; Do Not
+Track turns it off regardless, and a build with no analytics key configured
+loads none at all. See [the privacy page](https://www.socialgata.com/privacy).
 
-## Project Structure
-
-```
-src/
-├── components/        # React components
-│   ├── ui/           # shadcn/ui components
-│   └── ...           # Feature components
-├── contexts/         # React contexts (PluginsContext, etc.)
-├── routes/           # File-based routing (TanStack Router)
-│   ├── plugins/      # Plugin-specific routes
-│   └── ...
-├── services/         # Service implementations and adapters
-├── store/            # Redux store and slices
-│   ├── authSlice.ts
-│   └── uiSlice.ts
-├── lib/              # Utilities and helpers
-└── test/             # Test utilities and setup
-```
-
-## Available Scripts
-
-- `npm run dev` - Start Vite development server (port 3005)
-- `npm run build` - Build for production
-- `npm run lint` - Run ESLint
-- `npm test` - Run test suite
-- `npm run preview` - Preview production build
+To report abuse or a copyright concern, and for what we can and can't act on,
+see [ABUSE.md](ABUSE.md).
 
 ## Versioning
 
@@ -101,8 +135,15 @@ plugins may need changes, a patch means they won't.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Issues and pull requests are welcome. `npm run lint`, `npm test` and
+`npm run build` all need to pass — CI runs the same three on every push, plus
+the Electron build.
+
+New plugins don't need to live here. Publish the manifest anywhere and it can
+be installed by URL; the catalog in `src/default-plugins.ts` is a starting
+point, not a permission list.
 
 ## License
 
-AGPL-3.0 - GNU Affero General Public License v3.0
+[AGPL-3.0](LICENSE). If you run a modified copy as a service, the source has to
+be available to its users.
