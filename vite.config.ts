@@ -11,8 +11,16 @@ import { buildInfoDefine } from "./build-info";
 export default defineConfig({
   plugins: [
     wasm(),
+    // Each route becomes its own chunk, so opening the app parses the shell and
+    // the route being visited rather than all thirty of them. The service worker
+    // still precaches every chunk, so this changes when code is parsed rather
+    // than how much is eventually downloaded -- but first paint only waits for
+    // the part actually being shown.
+    //
+    // Must come before the react plugin: it rewrites route files and has to see
+    // them before JSX is transformed. The build fails loudly if reordered.
+    tanstackRouter({ target: "react", autoCodeSplitting: true }),
     react(),
-    tanstackRouter({ target: "react" }),
     tailwindcss(),
     VitePWA({
       // "autoUpdate" bakes skipWaiting/clientsClaim into the generated sw.js, so

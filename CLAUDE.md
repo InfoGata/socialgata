@@ -100,6 +100,19 @@ Redux store with slices:
   Settings. The provider's client id lives in that plugin, not in this app's
   environment.
 
+### Bundle
+`autoCodeSplitting` on the tanstackRouter plugin gives each route its own
+chunk, so a visit parses the shell plus the route being shown rather than all
+thirty. The plugin must be listed **before** `react()` in `vite.config.ts` --
+it rewrites route files and has to see them before JSX is transformed. The
+build fails with an explicit plugin-order error if that is swapped.
+
+This moves code off the critical path; it does not reduce what is eventually
+downloaded, since the service worker precaches every chunk either way. hls.js
+is separately lazy (a dynamic import in `VideoPlayer`). The automerge wasm
+(~2.7MB) is still loaded at boot because the favorites repo is created above
+the router.
+
 ### Service Worker / PWA
 `vite-plugin-pwa` (same library as the other InfoGata apps) in `vite.config.ts`,
 web build only — the electron and capacitor builds are not wired to it.
