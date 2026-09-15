@@ -15,8 +15,7 @@ import { ExtensionProvider } from "./contexts/ExtensionContext";
 import { PluginsProvider } from "./contexts/PluginsContext";
 import { FavoritesRepoProvider } from "./sync/FavoritesRepoProvider";
 import { FavoritesProvider } from "./sync/FavoritesContext";
-import AnalyticsProvider from "./components/AnalyticsProvider";
-import AnalyticsPreference from "./components/AnalyticsPreference";
+import Analytics from "./components/Analytics";
 import { Toaster } from "sonner";
 import AppErrorBoundary from "./components/AppErrorBoundary";
 
@@ -25,12 +24,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* Outermost on purpose: everything below can throw during first render,
         and the router's own error component only covers routes. */}
     <AppErrorBoundary>
-    <AnalyticsProvider>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
         {/* Inside PersistGate so it acts on the remembered choice rather than
-            the default, and inside the provider so there is a client to tell. */}
-        <AnalyticsPreference />
+            the default. */}
+        <Analytics />
         <ThemeProvider defaultTheme="system">
           {/* Above PluginsProvider on purpose: sonner only shows toasts raised
               after the Toaster mounts, and plugin loading can raise one before
@@ -52,7 +50,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         </ThemeProvider>
       </PersistGate>
       </Provider>
-    </AnalyticsProvider>
     </AppErrorBoundary>
   </React.StrictMode>
 );

@@ -1,7 +1,7 @@
 /**
  * Whether this build has analytics at all. An AGPL fork or a self-hoster that
- * never sets a key gets no provider, no script and no switch — rather than a
- * provider trusted to stay quiet on its own.
+ * never sets a key gets no initialised client, no requests and no switch —
+ * rather than a client trusted to stay quiet on its own.
  */
 export const analyticsConfigured = Boolean(
   import.meta.env.VITE_PUBLIC_POSTHOG_KEY
@@ -10,11 +10,9 @@ export const analyticsConfigured = Boolean(
 /**
  * Whether the browser is asking not to be tracked.
  *
- * PostHog checks this itself when `respect_dnt` is set, but the answer is
- * needed here too: the preference has to be shown as overridden rather than as
- * a switch that appears to do nothing, and the app decides what to send rather
- * than depending on how the SDK resolves an explicit opt-in against a Do Not
- * Track header.
+ * Checked by the app rather than left to PostHog's `respect_dnt`, which the SDK
+ * ignores in cookieless "always" mode. It is also needed to show the preference
+ * as overridden rather than as a switch that appears to do nothing.
  */
 export const doNotTrackEnabled = (): boolean => {
   const nav = navigator as Navigator & { msDoNotTrack?: string | null };
@@ -29,10 +27,10 @@ export const doNotTrackEnabled = (): boolean => {
  * to veto it but never to enable it.
  *
  * Deliberately says nothing about whether a key is configured. That guarantee
- * is structural -- AnalyticsProvider renders no provider without one, so there
- * is no client to capture through -- and folding it in here made this function
- * depend on the ambient build environment, which meant it answered differently
- * on a machine with a .env than on one without.
+ * is structural -- the Analytics component never initialises PostHog without
+ * one, so there is no client to capture through -- and folding it in here made
+ * this function depend on the ambient build environment, which meant it
+ * answered differently on a machine with a .env than on one without.
  */
 export const shouldCapture = (
   analyticsEnabled: boolean,
