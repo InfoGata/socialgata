@@ -24,6 +24,14 @@ const KNOWN_DATABASES = ["SocialGataDatabase", "socialgata-favorites"];
 /** Everything redux-persist owns; see the persist configs in store/store.ts. */
 const LOCAL_STORAGE_PREFIX = "persist:";
 
+/**
+ * localStorage keys that point into the databases above and so have to go with
+ * them. The favorites document url is the one that matters: left behind, the
+ * next boot asks automerge for a document whose storage was just deleted, and
+ * the app never renders. Keep in sync with sync/favorites-repo.ts.
+ */
+const KEYS_TIED_TO_DATABASES = ["socialgata-favorites-doc-url"];
+
 /** localStorage throws outright when site data is blocked, so every use is guarded. */
 const readFlag = (): boolean => {
   try {
@@ -84,8 +92,10 @@ export const runPendingAppDataReset = async (): Promise<void> => {
   // than sit in a reset loop.
   try {
     window.localStorage.removeItem(RESET_FLAG);
-    const persisted = Object.keys(window.localStorage).filter((key) =>
-      key.startsWith(LOCAL_STORAGE_PREFIX)
+    const persisted = Object.keys(window.localStorage).filter(
+      (key) =>
+        key.startsWith(LOCAL_STORAGE_PREFIX) ||
+        KEYS_TIED_TO_DATABASES.includes(key)
     );
     for (const key of persisted) {
       window.localStorage.removeItem(key);

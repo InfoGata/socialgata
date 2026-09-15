@@ -149,12 +149,16 @@ describe("app data reset", () => {
       open.onerror = reject;
     });
     window.localStorage.setItem("persist:ui", "{}");
+    window.localStorage.setItem("socialgata-favorites-doc-url", "automerge:gone");
     window.localStorage.setItem("vite-ui-theme", "dark");
 
     requestAppDataReset();
     await runPendingAppDataReset();
 
     expect(window.localStorage.getItem("persist:ui")).toBeNull();
+    // Points into the favorites database being deleted. Left behind, the next
+    // boot asks automerge for a document that no longer exists and never renders.
+    expect(window.localStorage.getItem("socialgata-favorites-doc-url")).toBeNull();
     // The flag itself is cleared first, so a hung deletion can't loop the reset.
     expect(window.localStorage.getItem("socialgata:reset-app-data")).toBeNull();
     // Untouched: a theme preference can't be what's stopping the app booting.
