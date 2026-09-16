@@ -58,10 +58,9 @@ export const TopBar: React.FC = () => {
 
   const pluginId = (params as Record<string, string | undefined>)?.pluginId;
 
-  // Search follows whichever plugin the current route is on, falling back to
-  // the first plugin that can search.
-  const activeSource =
-    searchSources.find((s) => s.pluginId === pluginId) ?? searchSources[0];
+  // Search follows whichever plugin the current route is on; off a plugin
+  // route, or on one that can't search, there is no search bar.
+  const activeSource = searchSources.find((s) => s.pluginId === pluginId);
 
   const handleSearch = (query: string) => {
     if (!activeSource) return;
