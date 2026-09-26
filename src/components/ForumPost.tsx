@@ -10,6 +10,7 @@ import parse from 'html-react-parser';
 import DOMPurify from "dompurify";
 import ExpandedMedia from "./ExpandedMedia";
 import { FavoriteButton } from "./FavoriteButton";
+import { getYouTubeEmbed } from "@/lib/embeds";
 
 type Props = {
   post: Post;
@@ -23,17 +24,25 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
   // Seeded from `showFullPost` rather than forced by it, so the media on a
   // post page can be collapsed back to its thumbnail like it can in the feed.
   const [expand, setExpand] = React.useState(showFullPost);
-  const toggleExpand = () => setExpand(!expand);
+  // Only a reader's own click starts a player; a post page that opens
+  // expanded doesn't start talking at them.
+  const [userExpanded, setUserExpanded] = React.useState(false);
+  const toggleExpand = () => {
+    setUserExpanded(true);
+    setExpand(!expand);
+  };
+  const isYouTube = !!getYouTubeEmbed(post.url);
   const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
   const sanitizer = DOMPurify.sanitize;
   const hasThumbnail =
-    !!post.thumbnailUrl || !!post.images?.length || (post.url && imageRegex.test(post.url));
+    !!post.thumbnailUrl || !!post.images?.length || isYouTube || (post.url && imageRegex.test(post.url));
   const isExternal = post.url && !post.url.startsWith('/');
   // Videos may carry sources without a usable `url` (it points at a player page),
   // and a gallery's url is a reddit.com/gallery link that no regex will match.
   const hasExpandableMedia =
     !!post.videoSources?.length ||
     !!post.images?.length ||
+    isYouTube ||
     (!!post.url && (post.isVideo || imageRegex.test(post.url)));
   const isMediaExpanded = expand && hasExpandableMedia;
 
@@ -189,6 +198,7 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
               // half down the page.
               className="rounded-lg mb-2 max-w-full max-h-[70vh]"
               toggleExpand={toggleExpand}
+              autoPlay={userExpanded}
             />
           )}
 

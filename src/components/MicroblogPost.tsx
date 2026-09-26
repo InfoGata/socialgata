@@ -11,6 +11,7 @@ import ExpandedMedia from "./ExpandedMedia";
 import PostBody from "./PostBody";
 import { htmlToText } from "@/lib/post-body-links";
 import { FavoriteButton } from "./FavoriteButton";
+import { getYouTubeEmbed } from "@/lib/embeds";
 
 type Props = {
   post: Post;
@@ -81,7 +82,6 @@ const QuotedPost: React.FC<{ post: Post; pluginId: string }> = ({
           <ImageThumbnail
             url={post.url}
             thumbnailUrl={post.thumbnailUrl}
-            toggleExpand={() => {}}
           />
         </div>
       )}
@@ -93,11 +93,18 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
   // Seeded from `showFullPost` rather than forced by it, so the media on a
   // post page can be collapsed back to its thumbnail like it can in the feed.
   const [expand, setExpand] = React.useState(showFullPost);
+  // Only a reader's own click starts a player; a post page that opens
+  // expanded doesn't start talking at them.
+  const [userExpanded, setUserExpanded] = React.useState(false);
   const toggleExpand = () => {
+    setUserExpanded(true);
     setExpand(!expand);
   };
   const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
-  const isGalleryExpanded = expand && !!post.images?.length;
+  // A gallery or a player shows the picture itself, so the preview above it
+  // would be the same thing twice.
+  const isGalleryExpanded =
+    expand && (!!post.images?.length || !!getYouTubeEmbed(post.url));
 
   return (
     <div className="group relative bg-card rounded-lg border hover:border-primary/50 transition-all duration-200">
@@ -190,6 +197,7 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
                 alt={post.body ? htmlToText(post.body) : "Post media"}
                 className="rounded-xl mb-2 max-w-full border"
                 toggleExpand={toggleExpand}
+                autoPlay={userExpanded}
               />
             )}
 

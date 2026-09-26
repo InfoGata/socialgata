@@ -3,6 +3,8 @@ import { ChevronsDownUpIcon } from "lucide-react";
 import { PostImage, VideoSource } from "@/plugintypes";
 import VideoPlayer from "./VideoPlayer";
 import PostGallery from "./PostGallery";
+import YouTubeEmbed from "./YouTubeEmbed";
+import { getYouTubeEmbed } from "@/lib/embeds";
 
 type Props = {
   url: string;
@@ -14,6 +16,8 @@ type Props = {
   className?: string;
   thumbnailUrl?: string;
   toggleExpand?: () => void;
+  /** Start an embedded player straight away; only for a reader's own click. */
+  autoPlay?: boolean;
 };
 
 /**
@@ -37,7 +41,7 @@ const CollapseButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   </button>
 );
 
-const ExpandedMedia: React.FC<Props> = ({ url, isVideo, videoSources, images, alt, className, thumbnailUrl, toggleExpand }) => {
+const ExpandedMedia: React.FC<Props> = ({ url, isVideo, videoSources, images, alt, className, thumbnailUrl, toggleExpand, autoPlay }) => {
   // Plugins that predate `videoSources` only give us the bare url.
   const sources = React.useMemo(
     () =>
@@ -80,6 +84,18 @@ const ExpandedMedia: React.FC<Props> = ({ url, isVideo, videoSources, images, al
           poster={thumbnailUrl}
           className={`mx-auto block ${className ?? ""}`}
         />
+        {toggleExpand && <CollapseButton onClick={toggleExpand} />}
+      </div>
+    );
+  }
+
+  // After `sources`, so a plugin that has the video file itself still gets
+  // the native player.
+  const youTube = getYouTubeEmbed(url);
+  if (youTube) {
+    return (
+      <div className="relative">
+        <YouTubeEmbed embed={youTube} title={alt} autoPlay={autoPlay} />
         {toggleExpand && <CollapseButton onClick={toggleExpand} />}
       </div>
     );

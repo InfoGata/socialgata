@@ -1,4 +1,5 @@
 import { MessageSquareIcon, ExternalLinkIcon, PlayIcon, ImagesIcon } from "lucide-react";
+import { getYouTubeEmbed, youTubeThumbnail } from "@/lib/embeds";
 
 type ImageThumbnailProps = {
   url?: string;
@@ -6,7 +7,8 @@ type ImageThumbnailProps = {
   isVideo?: boolean;
   /** How many images the post carries; more than one marks it as a gallery. */
   imageCount?: number;
-  toggleExpand: () => void;
+  /** Left out where there is nowhere to expand into, e.g. a quoted post. */
+  toggleExpand?: () => void;
 }
 
 const imageRegex = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|webp|svg|ico|tiff|tif|raw|heic|heif|avif))/i;
@@ -58,10 +60,17 @@ const ImageThumbnail: React.FC<ImageThumbnailProps> = (props) => {
 
   // A video's url points at a player page, not a file, so it must expand
   // in place rather than fall through to the open-in-new-tab branch below.
-  if (isVideo && (thumbnailUrl || url)) {
+  // A YouTube link plays in place too, rather than sending the reader off to
+  // youtube.com. YouTube serves a preview for every video, so it gets one even
+  // when the plugin had none. Without somewhere to expand into, it stays a
+  // link.
+  const youTube = toggleExpand ? getYouTubeEmbed(url) : undefined;
+  if (isVideo || youTube) {
+    const src = thumbnailUrl ?? (youTube ? youTubeThumbnail(youTube.id) : url);
+    if (!src) return <MessageSquareIcon className="w-full h-full p-2" />;
     return (
       <button onClick={toggleExpand} className="relative cursor-pointer block w-full h-full">
-        <img alt="video thumbnail" loading="lazy" src={thumbnailUrl ?? url} className="rounded-md w-full h-full object-cover" />
+        <img alt="video thumbnail" loading="lazy" src={src} className="rounded-md w-full h-full object-cover" />
         <span className="absolute inset-0 flex items-center justify-center">
           <span className="rounded-full bg-black/60 p-1.5">
             <PlayIcon className="h-4 w-4 text-white fill-white" />

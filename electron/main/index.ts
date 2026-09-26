@@ -64,6 +64,15 @@ function createWindow(): void {
     (details, callback) => {
       const { requestHeaders } = details;
       UpsertKeyValue(requestHeaders, "Access-Control-Allow-Origin", ["*"]);
+      // The packaged app runs from file://, which gives YouTube no Referer to
+      // check, and its player refuses to load without one (error 153). Stand
+      // in the web app's origin for it.
+      if (
+        details.url.startsWith("https://www.youtube-nocookie.com/embed/") &&
+        !details.referrer.startsWith("http")
+      ) {
+        UpsertKeyValue(requestHeaders, "Referer", ["https://www.socialgata.com/"]);
+      }
       callback({ requestHeaders });
     }
   );
