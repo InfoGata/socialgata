@@ -1,13 +1,42 @@
 import React, { createContext, useEffect, useState } from 'react';
 import { useRepo, useDocument } from '@automerge/automerge-repo-react-hooks';
 import type { DocHandle } from '@automerge/automerge-repo';
-import { getOrCreateFavoritesHandle, type FavoritesDoc } from './favorites-repo';
+import * as A from '@automerge/automerge';
+import {
+  copyFavorites,
+  getOrCreateFavoritesHandle,
+  isFavoritesDoc,
+  type FavoritesDoc,
+} from './favorites-repo';
+import type { CloudSyncProvider } from './cloud/CloudSyncProvider';
 import type { FavoritesContextValue } from './useFavoritesContext';
 import { cloudSyncManager } from './cloudSyncManager';
 import { PluginSyncProviderAdapter } from './cloud/PluginSyncProviderAdapter';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store/store';
 import { usePlugins } from '@/hooks/usePlugins';
+
+/**
+ * Name of the cloud file. "-v2" because the file before it held a document
+ * with its own history, which can't be merged; older versions of the app keep
+ * writing that one, so they can't overwrite this.
+ */
+const FAVORITES_SYNC_FILE = 'socialgata-favorites-v2';
+const LEGACY_SYNC_FILE = 'socialgata-favorites';
+
+/**
+ * The first sync to the new file brings in whatever the old one had. It is a
+ * one-off copy, not a merge, so favorites removed since won't be removed here.
+ */
+async function importLegacyCloudFavorites(
+  provider: CloudSyncProvider,
+  handle: DocHandle<FavoritesDoc>
+) {
+  const bytes = await provider.download(LEGACY_SYNC_FILE);
+  if (!bytes) return;
+  const legacy = A.load<FavoritesDoc>(bytes);
+  handle.change((doc) => copyFavorites(doc, legacy));
+}
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const FavoritesContext = createContext<FavoritesContextValue | null>(null);
@@ -31,8 +60,6 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     getOrCreateFavoritesHandle(repo).then(h => {
       if (mounted) {
         setHandle(h);
-        // Set handle in cloud sync manager
-        cloudSyncManager.setHandle(h);
       }
     });
 
@@ -41,57 +68,54 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     };
   }, [repo]);
 
-  // Set up cloud sync provider based on settings
+  // Keep the document synced with the plugin chosen in Settings. The cleanup
+  // always stops syncing, so turning auto sync off or switching plugins takes
+  // effect straight away.
+  const plugin = plugins.find(p => p.id === cloudSync.pluginId);
   useEffect(() => {
-    // Wait for plugins to load before setting up sync
-    if (!cloudSync.enabled || !cloudSync.pluginId || !pluginsLoaded) {
-      cloudSyncManager.setProvider(null);
-      cloudSyncManager.stopPeriodicSync();
+    if (!handle || !cloudSync.enabled || !pluginsLoaded || !plugin) {
+      cloudSyncManager.configure(null);
       return;
     }
 
-    const plugin = plugins.find(p => p.id === cloudSync.pluginId);
-    if (!plugin) {
-      console.warn("Plugin sync provider not found");
-      cloudSyncManager.setProvider(null);
-      cloudSyncManager.stopPeriodicSync();
-      return;
-    }
-
-    // Check if plugin has sync capabilities
+    let cancelled = false;
     const setupSync = async () => {
-      const hasUpload = await plugin.hasDefined.onSyncUpload();
-      const hasDownload = await plugin.hasDefined.onSyncDownload();
-      if (!hasUpload || !hasDownload) {
+      const canSync =
+        (await plugin.hasDefined.onSyncUpload()) &&
+        (await plugin.hasDefined.onSyncDownload());
+      if (cancelled) return;
+      if (!canSync) {
         console.warn("Plugin does not have sync capability");
-        cloudSyncManager.setProvider(null);
-        cloudSyncManager.stopPeriodicSync();
+        cloudSyncManager.configure(null);
         return;
       }
-
-      const adapter = new PluginSyncProviderAdapter(plugin);
-      cloudSyncManager.setProvider(adapter);
-
-      if (cloudSync.autoSync) {
-        const intervalMs = cloudSync.syncIntervalSeconds * 1000;
-        cloudSyncManager.startPeriodicSync(intervalMs);
-      }
+      cloudSyncManager.configure({
+        provider: new PluginSyncProviderAdapter(plugin),
+        repo,
+        handle,
+        docUrl: FAVORITES_SYNC_FILE,
+        isValidRemote: isFavoritesDoc,
+        onNoRemote: (provider) => importLegacyCloudFavorites(provider, handle),
+        autoSync: cloudSync.autoSync,
+        intervalMs: cloudSync.syncIntervalSeconds * 1000,
+        lockName: 'socialgata-cloud-sync',
+      });
     };
 
     setupSync();
 
     return () => {
-      if (!cloudSync.autoSync) {
-        cloudSyncManager.stopPeriodicSync();
-      }
+      cancelled = true;
+      cloudSyncManager.configure(null);
     };
   }, [
+    repo,
+    handle,
+    plugin,
+    pluginsLoaded,
     cloudSync.enabled,
     cloudSync.autoSync,
     cloudSync.syncIntervalSeconds,
-    cloudSync.pluginId,
-    plugins,
-    pluginsLoaded,
   ]);
 
   // Don't provide context until handle is ready

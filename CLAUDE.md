@@ -87,12 +87,25 @@ Redux store with slices:
 - Local sync: Cross-tab via BroadcastChannel
 - Cloud sync: Provided by plugins implementing `onSyncUpload`/`onSyncDownload`
 
-**Cloud Sync Architecture** (Hybrid Approach):
-- **Primary storage**: IndexedDB (fast, offline-first)
-- **Cloud backup**: Periodic uploads via sync-capable plugins
-- **Conflict resolution**: Automerge CRDT automatically merges changes
-- `src/sync/cloud/CloudSyncProvider.ts` - Interface for all cloud providers
-- `src/sync/cloud/CloudSyncManager.ts` - Orchestrates sync operations (periodic uploads, downloads, CRDT merging). Uses a stable file ID (`socialgata-favorites`) so all devices share the same cloud file.
+**Cloud Sync Architecture**:
+- **Primary storage**: IndexedDB (fast, offline-first); the cloud file is a copy
+- **Shared genesis**: every device starts its document from the fixed bytes in
+  `favorites-repo.ts` (`GENESIS_BASE64`), never `repo.create()`. Documents
+  without a common first change can't be merged -- each has its own root maps.
+  Never regenerate it. A local document from before it is copied onto a new
+  genesis document once (`getOrCreateFavoritesHandle`).
+- **Merge**: a sync downloads the cloud copy, merges it with
+  `repo.import(bytes, { docId })` (a real automerge merge, so removals sync),
+  and uploads only if the cloud copy was missing something.
+- `src/sync/cloud/CloudSyncManager.ts` - `configure(config | null)` starts or
+  stops syncing; it is idempotent and `FavoritesContext`'s effect cleanup always
+  calls `configure(null)`. With auto sync on it syncs on startup, ~5s after a
+  local change, on the interval, when the page is hidden or shown, and when
+  back online; one tab at a time via a Web Lock. The same file is in AudioGata
+  (`src/sync/cloud/`); keep them in step.
+- Cloud file id `socialgata-favorites-v2`. The first sync to it copies in the
+  old `socialgata-favorites` file (`importLegacyCloudFavorites`); older app
+  versions keep writing that one, so they can't clobber v2.
 - `src/sync/cloud/PluginSyncProviderAdapter.ts` - Wraps a sync-capable plugin to implement `CloudSyncProvider`
 - `src/components/Settings/CloudSyncSettings.tsx` - Settings UI for connecting providers
 - Settings stored in Redux `uiSlice.cloudSync`: pluginId, enabled, autoSync, syncIntervalSeconds

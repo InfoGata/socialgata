@@ -1,11 +1,19 @@
-import type { CloudSyncProvider } from "./CloudSyncProvider";
-import { CloudSyncError } from "./CloudSyncProvider";
 import type { PluginFrameContainer } from "@/contexts/PluginsContext";
+import { CloudSyncError, type CloudSyncProvider } from "./CloudSyncProvider";
 
-/**
- * Adapter that wraps a sync-capable PluginFrameContainer to implement CloudSyncProvider.
- * Allows plugins to be used as cloud sync providers.
- */
+const toBase64 = (data: Uint8Array): string => {
+  let binary = "";
+  // Chunked: String.fromCharCode(...data) overflows the stack on large documents.
+  for (let i = 0; i < data.length; i += 0x8000) {
+    binary += String.fromCharCode(...data.subarray(i, i + 0x8000));
+  }
+  return btoa(binary);
+};
+
+const fromBase64 = (base64: string): Uint8Array =>
+  Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+
+/** Stores the document through a plugin's onSyncUpload/onSyncDownload. */
 export class PluginSyncProviderAdapter implements CloudSyncProvider {
   readonly pluginId: string;
 
@@ -14,61 +22,20 @@ export class PluginSyncProviderAdapter implements CloudSyncProvider {
   }
 
   async upload(docUrl: string, data: Uint8Array): Promise<void> {
-    if (!(await this.plugin.hasDefined.onSyncUpload())) {
-      throw this.createError("Plugin does not implement onSyncUpload");
-    }
-
-    // Convert Uint8Array to Base64
-    const base64Data = this.uint8ArrayToBase64(data);
-
     const response = await this.plugin.remote.onSyncUpload({
       docUrl,
-      data: base64Data,
+      data: toBase64(data),
     });
-
-    if (!response.success) {
-      throw this.createError(response.error || "Upload failed");
+    if (!response?.success) {
+      throw new CloudSyncError(response?.error || "Upload failed", this.pluginId);
     }
   }
 
   async download(docUrl: string): Promise<Uint8Array | null> {
-    if (!(await this.plugin.hasDefined.onSyncDownload())) {
-      throw this.createError("Plugin does not implement onSyncDownload");
-    }
-
     const response = await this.plugin.remote.onSyncDownload({ docUrl });
-
-    if (response.error) {
-      throw this.createError(response.error);
+    if (response?.error) {
+      throw new CloudSyncError(response.error, this.pluginId);
     }
-
-    if (!response.data) {
-      return null;
-    }
-
-    // Convert Base64 back to Uint8Array
-    return this.base64ToUint8Array(response.data);
-  }
-
-  private createError(message: string): CloudSyncError {
-    return new CloudSyncError(message, this.pluginId);
-  }
-
-  private uint8ArrayToBase64(data: Uint8Array): string {
-    let binary = "";
-    const len = data.byteLength;
-    for (let i = 0; i < len; i++) {
-      binary += String.fromCharCode(data[i]);
-    }
-    return btoa(binary);
-  }
-
-  private base64ToUint8Array(base64: string): Uint8Array {
-    const binaryString = atob(base64);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    return bytes;
+    return response?.data ? fromBase64(response.data) : null;
   }
 }

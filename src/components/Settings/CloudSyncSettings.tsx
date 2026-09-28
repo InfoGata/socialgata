@@ -1,20 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useSyncExternalStore } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Cloud, RefreshCw, Check, AlertCircle, LogIn, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   setCloudSyncAutoSync,
   setCloudSyncEnabled,
+  setCloudSyncInterval,
   setCloudSyncPluginProvider,
   disconnectCloudSync,
 } from '@/store/reducers/uiSlice';
 import type { RootState } from '@/store/store';
 import { cloudSyncManager } from '@/sync/cloudSyncManager';
-import type { SyncStatus } from '@/sync/cloud/CloudSyncProvider';
-import { PluginSyncProviderAdapter } from '@/sync/cloud/PluginSyncProviderAdapter';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { usePlugins } from '@/hooks/usePlugins';
 import { usePluginLogin } from '@/hooks/usePluginLogin';
 import type { PluginFrameContainer } from '@/contexts/PluginsContext';
+
+const SYNC_INTERVALS: [number, string][] = [
+  [30, '30 seconds'],
+  [60, '1 minute'],
+  [300, '5 minutes'],
+  [900, '15 minutes'],
+];
 
 /**
  * Cloud Sync Settings Component
@@ -23,8 +36,11 @@ import type { PluginFrameContainer } from '@/contexts/PluginsContext';
 const CloudSyncSettings: React.FC = () => {
   const dispatch = useDispatch();
   const cloudSync = useSelector((state: RootState) => state.ui.cloudSync);
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>(() => cloudSyncManager.getStatus());
-  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(() => cloudSyncManager.getLastSyncTime());
+  const syncState = useSyncExternalStore(
+    (onChange) => cloudSyncManager.subscribe(onChange),
+    () => cloudSyncManager.getState()
+  );
+  const { status: syncStatus, lastSyncTime, lastError } = syncState;
   const { plugins } = usePlugins();
   const [syncCapablePlugins, setSyncCapablePlugins] = useState<PluginFrameContainer[]>([]);
   const connectedPlugin = plugins.find(p => p.id === cloudSync.pluginId);
@@ -46,32 +62,21 @@ const CloudSyncSettings: React.FC = () => {
     checkSyncCapabilities();
   }, [plugins]);
 
-  // Subscribe to sync status changes
-  useEffect(() => {
-    const unsubscribe = cloudSyncManager.onStatusChange((status) => {
-      setSyncStatus(status);
-      setLastSyncTime(cloudSyncManager.getLastSyncTime());
-    });
-
-    return unsubscribe;
-  }, []);
-
-  // Connect a sync-capable plugin
+  // Connect a sync-capable plugin. FavoritesProvider starts syncing once the
+  // settings change.
   const handleConnect = (plugin: PluginFrameContainer) => {
-    const adapter = new PluginSyncProviderAdapter(plugin);
-    cloudSyncManager.setProvider(adapter);
     dispatch(setCloudSyncPluginProvider({ pluginId: plugin.id! }));
     dispatch(setCloudSyncEnabled(true));
-    if (cloudSync.autoSync) {
-      cloudSyncManager.startPeriodicSync(cloudSync.syncIntervalSeconds * 1000);
-    }
   };
 
-  // Disconnect the current provider
+  // Disconnect the current provider; FavoritesProvider stops syncing.
   const handleDisconnect = () => {
-    cloudSyncManager.stopPeriodicSync();
-    cloudSyncManager.setProvider(null);
     dispatch(disconnectCloudSync());
+  };
+
+  const handleLogin = async () => {
+    await login();
+    cloudSyncManager.syncNow();
   };
 
   // Handle manual sync
@@ -170,7 +175,7 @@ const CloudSyncSettings: React.FC = () => {
                     Log Out
                   </Button>
                 ) : (
-                  <Button variant="outline" size="sm" onClick={() => login()}>
+                  <Button variant="outline" size="sm" onClick={handleLogin}>
                     <LogIn className="mr-2 h-4 w-4" />
                     Log In
                   </Button>
@@ -186,7 +191,7 @@ const CloudSyncSettings: React.FC = () => {
             <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-100">
               <p className="font-medium">Authentication may have expired</p>
               <p className="mt-1">If sync keeps failing, try logging in again to refresh credentials.</p>
-              <Button variant="outline" size="sm" className="mt-2" onClick={() => login()}>
+              <Button variant="outline" size="sm" className="mt-2" onClick={handleLogin}>
                 <LogIn className="mr-2 h-4 w-4" />
                 Re-authenticate
               </Button>
@@ -198,7 +203,8 @@ const CloudSyncSettings: React.FC = () => {
               <div>
                 <p className="font-medium">Auto Sync</p>
                 <p className="text-sm text-muted-foreground">
-                  Automatically sync changes every {cloudSync.syncIntervalSeconds} seconds
+                  Sync shortly after changes, when the app is opened or hidden,
+                  and on a timer
                 </p>
               </div>
               <Button
@@ -209,6 +215,27 @@ const CloudSyncSettings: React.FC = () => {
                 {cloudSync.autoSync ? 'Enabled' : 'Disabled'}
               </Button>
             </div>
+
+            {cloudSync.autoSync && (
+              <div className="flex items-center justify-between">
+                <p className="font-medium">Also check every</p>
+                <Select
+                  value={String(cloudSync.syncIntervalSeconds)}
+                  onValueChange={(value) => dispatch(setCloudSyncInterval(Number(value)))}
+                >
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SYNC_INTERVALS.map(([seconds, label]) => (
+                      <SelectItem key={seconds} value={String(seconds)}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="flex items-center justify-between rounded-lg border p-4">
               <div className="flex-1">
@@ -226,10 +253,10 @@ const CloudSyncSettings: React.FC = () => {
               </Button>
             </div>
 
-            {cloudSyncManager.getLastError() && (
+            {lastError && (
               <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-100">
                 <p className="font-medium">Sync Error</p>
-                <p className="mt-1">{cloudSyncManager.getLastError()?.message}</p>
+                <p className="mt-1">{lastError.message}</p>
               </div>
             )}
           </div>

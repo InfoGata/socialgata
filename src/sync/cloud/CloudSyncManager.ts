@@ -1,187 +1,206 @@
-import { DocHandle } from '@automerge/automerge-repo';
-import { load, save } from '@automerge/automerge';
-import type { CloudSyncProvider, SyncStatus, CloudSyncError } from './CloudSyncProvider';
-import type { FavoritesDoc } from '../favorites-repo';
+import * as A from "@automerge/automerge";
+import type { DocHandle, Repo } from "@automerge/automerge-repo";
+import {
+  CloudSyncError,
+  type CloudSyncProvider,
+  type SyncStatus,
+} from "./CloudSyncProvider";
 
-const FAVORITES_SYNC_FILE_ID = 'socialgata-favorites';
+export interface SyncConfig<T> {
+  provider: CloudSyncProvider;
+  repo: Repo;
+  handle: DocHandle<T>;
+  /** Name of the file the provider keeps the document in. */
+  docUrl: string;
+  /** Rejects a cloud copy this document can't be merged with. */
+  isValidRemote: (doc: A.Doc<unknown>) => boolean;
+  /**
+   * Runs when the cloud has no copy yet, before the first upload -- the place
+   * to bring in data from an older format stored elsewhere.
+   */
+  onNoRemote?: (provider: CloudSyncProvider) => Promise<void>;
+  /** Sync on local edits, on a timer and when the app is hidden or shown. */
+  autoSync: boolean;
+  intervalMs: number;
+  /** Web lock name, so only one tab syncs at a time. */
+  lockName: string;
+}
+
+export interface SyncState {
+  status: SyncStatus;
+  lastSyncTime: Date | null;
+  lastError: Error | null;
+}
+
+/** How long after a local edit to sync, so a burst of edits is one upload. */
+export const CHANGE_DEBOUNCE_MS = 5000;
+const MAX_BACKOFF_MS = 10 * 60 * 1000;
+
+const sameHeads = (a: string[] | null, b: string[]) =>
+  !!a && a.length === b.length && [...a].sort().join() === [...b].sort().join();
 
 /**
- * Cloud Sync Manager
+ * Keeps a document in step with a copy in cloud storage.
  *
- * Orchestrates syncing of automerge documents with cloud storage providers.
- * Handles periodic uploads, conflict resolution via CRDT merge, and error handling.
+ * A sync downloads the cloud copy, merges it into the local document with
+ * automerge, and uploads the result if the cloud copy was missing anything.
+ * The cloud file is simply overwritten, so two devices uploading at once
+ * leaves one of their versions there -- but each still has its own changes
+ * locally and puts them back on its next sync, so they converge.
  */
-export class CloudSyncManager {
-  private provider: CloudSyncProvider | null = null;
-  private syncInterval: number = 30000; // 30 seconds
-  private syncTimer: NodeJS.Timeout | null = null;
-  private isSyncing = false;
-  private lastSyncTime: Date | null = null;
-  private lastError: CloudSyncError | null = null;
-  private statusListeners: Set<(status: SyncStatus) => void> = new Set();
-  private handle: DocHandle<FavoritesDoc> | null = null;
+export class CloudSyncManager<T> {
+  private config: SyncConfig<T> | null = null;
+  private state: SyncState = { status: "idle", lastSyncTime: null, lastError: null };
+  private listeners = new Set<(state: SyncState) => void>();
+  private running: Promise<void> | null = null;
+  private lastSyncedHeads: string[] | null = null;
+  private failures = 0;
+  private timer: ReturnType<typeof setTimeout> | null = null;
+  private debounce: ReturnType<typeof setTimeout> | null = null;
+  private teardown: (() => void)[] = [];
 
   /**
-   * Set the cloud provider to use for syncing
+   * Start syncing with this configuration, replacing any previous one, or stop
+   * with null. Safe to call repeatedly: every call first undoes the last.
    */
-  setProvider(provider: CloudSyncProvider | null) {
-    this.provider = provider;
-    if (!provider) {
-      this.stopPeriodicSync();
-    }
-  }
-
-  /**
-   * Set the document handle to sync
-   */
-  setHandle(handle: DocHandle<FavoritesDoc> | null) {
-    this.handle = handle;
-  }
-
-  /**
-   * Get current sync status
-   */
-  getStatus(): SyncStatus {
-    if (this.lastError) return 'error';
-    if (this.isSyncing) return 'syncing';
-    if (this.lastSyncTime) return 'success';
-    return 'idle';
-  }
-
-  /**
-   * Get last sync time
-   */
-  getLastSyncTime(): Date | null {
-    return this.lastSyncTime;
-  }
-
-  /**
-   * Get last error
-   */
-  getLastError(): CloudSyncError | null {
-    return this.lastError;
-  }
-
-  /**
-   * Subscribe to status changes
-   */
-  onStatusChange(listener: (status: SyncStatus) => void): () => void {
-    this.statusListeners.add(listener);
-    return () => this.statusListeners.delete(listener);
-  }
-
-  /**
-   * Notify status listeners
-   */
-  private notifyStatusChange() {
-    const status = this.getStatus();
-    this.statusListeners.forEach(listener => listener(status));
-  }
-
-  /**
-   * Start periodic sync
-   * @param intervalMs - Sync interval in milliseconds (default: 30s)
-   */
-  startPeriodicSync(intervalMs: number = this.syncInterval) {
-    this.syncInterval = intervalMs;
-    this.stopPeriodicSync();
-
-    // Initial sync
-    this.syncNow();
-
-    // Set up periodic sync
-    this.syncTimer = setInterval(() => {
-      this.syncNow();
-    }, this.syncInterval);
-  }
-
-  /**
-   * Stop periodic sync
-   */
-  stopPeriodicSync() {
-    if (this.syncTimer) {
-      clearInterval(this.syncTimer);
-      this.syncTimer = null;
-    }
-  }
-
-  /**
-   * Manually trigger a sync now
-   */
-  async syncNow(): Promise<void> {
-    if (!this.provider || !this.handle) {
-      console.warn('CloudSyncManager: Cannot sync - provider or handle not set');
+  configure(config: SyncConfig<T> | null) {
+    this.stop();
+    this.config = config;
+    this.failures = 0;
+    this.lastSyncedHeads = null;
+    if (!config) {
+      this.setState({ status: "idle", lastError: null });
       return;
     }
+    if (!config.autoSync) return;
 
-    if (this.isSyncing) {
-      console.log('CloudSyncManager: Sync already in progress, skipping');
-      return;
+    const onChange = () => this.scheduleChangeSync();
+    config.handle.on("change", onChange);
+    this.teardown.push(() => config.handle.off("change", onChange));
+
+    if (typeof document !== "undefined") {
+      // Hidden is often the last chance before the app is closed or frozen;
+      // visible is when another device has most likely changed something.
+      const onVisibility = () => void this.syncNow();
+      document.addEventListener("visibilitychange", onVisibility);
+      this.teardown.push(() =>
+        document.removeEventListener("visibilitychange", onVisibility)
+      );
+    }
+    if (typeof window !== "undefined") {
+      const onOnline = () => void this.syncNow();
+      window.addEventListener("online", onOnline);
+      this.teardown.push(() => window.removeEventListener("online", onOnline));
     }
 
-    this.isSyncing = true;
-    this.lastError = null;
-    this.notifyStatusChange();
+    void this.syncNow();
+  }
 
+  stop() {
+    this.teardown.forEach((fn) => fn());
+    this.teardown = [];
+    if (this.timer) clearTimeout(this.timer);
+    if (this.debounce) clearTimeout(this.debounce);
+    this.timer = null;
+    this.debounce = null;
+    this.config = null;
+  }
+
+  getState(): SyncState {
+    return this.state;
+  }
+
+  subscribe(listener: (state: SyncState) => void): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  /** Sync now. Resolves once done; joins a sync already in progress. */
+  syncNow(): Promise<void> {
+    if (!this.config) return Promise.resolve();
+    if (!this.running) {
+      const config = this.config;
+      this.running = this.withLock(config, () => this.sync(config)).finally(() => {
+        this.running = null;
+        this.scheduleNext(config);
+      });
+    }
+    return this.running;
+  }
+
+  private scheduleChangeSync() {
+    const config = this.config;
+    if (!config) return;
+    if (sameHeads(this.lastSyncedHeads, A.getHeads(config.handle.doc()))) return;
+    if (this.debounce) clearTimeout(this.debounce);
+    this.debounce = setTimeout(() => {
+      this.debounce = null;
+      void this.syncNow();
+    }, CHANGE_DEBOUNCE_MS);
+  }
+
+  private scheduleNext(config: SyncConfig<T>) {
+    if (this.config !== config || !config.autoSync) return;
+    if (this.timer) clearTimeout(this.timer);
+    const delay = Math.min(
+      config.intervalMs * 2 ** this.failures,
+      Math.max(config.intervalMs, MAX_BACKOFF_MS)
+    );
+    this.timer = setTimeout(() => {
+      this.timer = null;
+      void this.syncNow();
+    }, delay);
+  }
+
+  private async withLock(config: SyncConfig<T>, fn: () => Promise<void>) {
+    const locks = typeof navigator !== "undefined" ? navigator.locks : undefined;
+    if (!locks) return fn();
+    // Another tab already syncing will pick up this tab's changes too: they
+    // share the document through the repo's BroadcastChannel.
+    await locks.request(config.lockName, { ifAvailable: true }, async (lock) => {
+      if (lock) await fn();
+    });
+  }
+
+  private async sync(config: SyncConfig<T>) {
+    this.setState({ status: "syncing" });
     try {
-      await this.performSync();
-      this.lastSyncTime = new Date();
-      this.lastError = null;
-    } catch (error) {
-      this.lastError = error as CloudSyncError;
-      console.error('CloudSyncManager: Sync failed', error);
-    } finally {
-      this.isSyncing = false;
-      this.notifyStatusChange();
-    }
-  }
-
-  /**
-   * Perform the actual sync operation
-   */
-  private async performSync() {
-    if (!this.provider || !this.handle) return;
-
-    const docUrl = FAVORITES_SYNC_FILE_ID;
-
-    // Step 1: Download remote document if it exists
-    const remoteData = await this.provider.download(docUrl);
-
-    if (remoteData) {
-      // Step 2: Merge remote document with local
-      try {
-        const remoteDoc = load<FavoritesDoc>(remoteData);
-        // Automerge handles CRDT merge automatically
-        this.handle.change((doc) => {
-          // Merge each collection
-          Object.assign(doc.instances, remoteDoc.instances);
-          Object.assign(doc.posts, remoteDoc.posts);
-          Object.assign(doc.comments, remoteDoc.comments);
-          Object.assign(doc.communities, remoteDoc.communities);
-        });
-        console.log('CloudSyncManager: Merged remote changes');
-      } catch (error) {
-        console.error('CloudSyncManager: Failed to merge remote document', error);
-        // Continue with upload even if merge fails
+      const { provider, repo, handle, docUrl } = config;
+      const remoteBytes = await provider.download(docUrl);
+      let remoteHeads: string[] | null = null;
+      if (remoteBytes) {
+        const remote = A.load(remoteBytes);
+        if (!config.isValidRemote(remote)) {
+          throw new CloudSyncError(
+            "The copy in cloud storage isn't a library this app can merge with"
+          );
+        }
+        remoteHeads = A.getHeads(remote);
+        // Merges into the existing handle (loadIncremental under the hood).
+        repo.import(remoteBytes, { docId: handle.documentId });
+      } else {
+        await config.onNoRemote?.(provider);
       }
-    }
-
-    // Step 3: Upload current local state
-    const localDoc = this.handle.docSync();
-    if (localDoc) {
-      const localData = save(localDoc);
-      await this.provider.upload(docUrl, localData);
-      console.log('CloudSyncManager: Uploaded local document');
+      // A.getHeads, not handle.heads(): the handle's are url-encoded.
+      const heads = A.getHeads(handle.doc());
+      if (!sameHeads(remoteHeads, heads)) {
+        await provider.upload(docUrl, A.save(handle.doc()));
+      }
+      if (this.config !== config) return;
+      this.lastSyncedHeads = heads;
+      this.failures = 0;
+      this.setState({ status: "success", lastSyncTime: new Date(), lastError: null });
+    } catch (e) {
+      if (this.config !== config) return;
+      this.failures++;
+      const error = e instanceof Error ? e : new CloudSyncError(String(e));
+      console.error("Cloud sync failed", error);
+      this.setState({ status: "error", lastError: error });
     }
   }
 
-  /**
-   * Clean up resources
-   */
-  dispose() {
-    this.stopPeriodicSync();
-    this.statusListeners.clear();
-    this.provider = null;
-    this.handle = null;
+  private setState(partial: Partial<SyncState>) {
+    this.state = { ...this.state, ...partial };
+    this.listeners.forEach((l) => l(this.state));
   }
 }
