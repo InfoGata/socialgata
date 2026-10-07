@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach, beforeEach } from 'vitest';
 import { screen, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { renderWithProviders } from './renderWithProviders';
-import { Index } from '@/routes';
+import Home from '@/components/Home';
 
 describe('Index Route', () => {
   beforeEach(() => {
@@ -16,7 +16,7 @@ describe('Index Route', () => {
   });
 
   it('renders without crashing', () => {
-    renderWithProviders(<Index />);
+    renderWithProviders(<Home />);
     expect(screen).toBeDefined();
   });
 }); 
