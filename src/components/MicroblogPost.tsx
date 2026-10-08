@@ -11,7 +11,7 @@ import ExpandedMedia from "./ExpandedMedia";
 import PostBody from "./PostBody";
 import { htmlToText } from "@/lib/post-body-links";
 import { FavoriteButton } from "./FavoriteButton";
-import { getYouTubeEmbed } from "@/lib/embeds";
+import { getVideoEmbed } from "@/lib/embeds";
 
 type Props = {
   post: Post;
@@ -104,7 +104,7 @@ const MicroblogPost: React.FC<Props> = ({ post, instanceId, showFullPost = false
   // A gallery or a player shows the picture itself, so the preview above it
   // would be the same thing twice.
   const isGalleryExpanded =
-    expand && (!!post.images?.length || !!getYouTubeEmbed(post.url));
+    expand && (!!post.images?.length || !!getVideoEmbed(post.url));
 
   return (
     <div className="group relative bg-card rounded-lg border hover:border-primary/50 transition-all duration-200">

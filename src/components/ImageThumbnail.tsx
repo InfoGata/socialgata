@@ -1,5 +1,6 @@
 import { MessageSquareIcon, ExternalLinkIcon, PlayIcon, ImagesIcon } from "lucide-react";
-import { getYouTubeEmbed, youTubeThumbnail } from "@/lib/embeds";
+import { useState } from "react";
+import { getVideoEmbed, videoEmbedThumbnail } from "@/lib/embeds";
 
 type ImageThumbnailProps = {
   url?: string;
@@ -21,6 +22,7 @@ function isImageUrl(url: string | undefined) {
 
 const ImageThumbnail: React.FC<ImageThumbnailProps> = (props) => {
   const { url, thumbnailUrl, isVideo, imageCount, toggleExpand } = props;
+  const [brokenSrc, setBrokenSrc] = useState<string>();
 
   // A gallery's url is a reddit.com/gallery link, so it matches neither the
   // video branch nor `isImageUrl` and would otherwise fall through to the
@@ -60,17 +62,29 @@ const ImageThumbnail: React.FC<ImageThumbnailProps> = (props) => {
 
   // A video's url points at a player page, not a file, so it must expand
   // in place rather than fall through to the open-in-new-tab branch below.
-  // A YouTube link plays in place too, rather than sending the reader off to
-  // youtube.com. YouTube serves a preview for every video, so it gets one even
-  // when the plugin had none. Without somewhere to expand into, it stays a
-  // link.
-  const youTube = toggleExpand ? getYouTubeEmbed(url) : undefined;
-  if (isVideo || youTube) {
-    const src = thumbnailUrl ?? (youTube ? youTubeThumbnail(youTube.id) : url);
+  // A YouTube or Streamable link plays in place too, rather than sending the
+  // reader off to that site. Both serve a preview from the video's id, so it
+  // gets one even when the plugin had none. Without somewhere to expand into,
+  // it stays a link.
+  const embed = toggleExpand ? getVideoEmbed(url) : undefined;
+  if (isVideo || embed) {
+    const src = thumbnailUrl ?? (embed ? videoEmbedThumbnail(embed) : url);
     if (!src) return <MessageSquareIcon className="w-full h-full p-2" />;
     return (
-      <button onClick={toggleExpand} className="relative cursor-pointer block w-full h-full">
-        <img alt="video thumbnail" loading="lazy" src={src} className="rounded-md w-full h-full object-cover" />
+      <button onClick={toggleExpand} className="relative cursor-pointer block w-full h-full rounded-md bg-muted">
+        {brokenSrc !== src ? (
+          <img
+            alt="video thumbnail"
+            loading="lazy"
+            src={src}
+            // A guessed preview can be missing (an old Streamable video); the
+            // play button on a plain tile beats a broken image.
+            onError={() => setBrokenSrc(src)}
+            className="rounded-md w-full h-full object-cover"
+          />
+        ) : (
+          <span className="sr-only">video thumbnail</span>
+        )}
         <span className="absolute inset-0 flex items-center justify-center">
           <span className="rounded-full bg-black/60 p-1.5">
             <PlayIcon className="h-4 w-4 text-white fill-white" />

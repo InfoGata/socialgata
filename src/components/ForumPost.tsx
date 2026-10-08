@@ -10,7 +10,7 @@ import parse from 'html-react-parser';
 import DOMPurify from "dompurify";
 import ExpandedMedia from "./ExpandedMedia";
 import { FavoriteButton } from "./FavoriteButton";
-import { getYouTubeEmbed } from "@/lib/embeds";
+import { getVideoEmbed } from "@/lib/embeds";
 
 type Props = {
   post: Post;
@@ -31,18 +31,18 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
     setUserExpanded(true);
     setExpand(!expand);
   };
-  const isYouTube = !!getYouTubeEmbed(post.url);
+  const isEmbed = !!getVideoEmbed(post.url);
   const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
   const sanitizer = DOMPurify.sanitize;
   const hasThumbnail =
-    !!post.thumbnailUrl || !!post.images?.length || isYouTube || (post.url && imageRegex.test(post.url));
+    !!post.thumbnailUrl || !!post.images?.length || isEmbed || (post.url && imageRegex.test(post.url));
   const isExternal = post.url && !post.url.startsWith('/');
   // Videos may carry sources without a usable `url` (it points at a player page),
   // and a gallery's url is a reddit.com/gallery link that no regex will match.
   const hasExpandableMedia =
     !!post.videoSources?.length ||
     !!post.images?.length ||
-    isYouTube ||
+    isEmbed ||
     (!!post.url && (post.isVideo || imageRegex.test(post.url)));
   const isMediaExpanded = expand && hasExpandableMedia;
 

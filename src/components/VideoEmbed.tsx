@@ -1,5 +1,5 @@
 import React from "react";
-import { YouTubeEmbed as Embed, youTubeEmbedSrc } from "@/lib/embeds";
+import { VideoEmbed as Embed, videoEmbedSrc } from "@/lib/embeds";
 
 type Props = {
   embed: Embed;
@@ -7,9 +7,9 @@ type Props = {
   autoPlay?: boolean;
 };
 
-const YouTubeEmbed: React.FC<Props> = ({ embed, title, autoPlay }) => (
+const VideoEmbed: React.FC<Props> = ({ embed, title, autoPlay }) => (
   <iframe
-    src={youTubeEmbedSrc(embed, { autoplay: autoPlay })}
+    src={videoEmbedSrc(embed, { autoplay: autoPlay })}
     title={title}
     allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
     allowFullScreen
@@ -19,11 +19,11 @@ const YouTubeEmbed: React.FC<Props> = ({ embed, title, autoPlay }) => (
     // player alone.
     referrerPolicy="strict-origin-when-cross-origin"
     className={`mx-auto mb-2 block rounded-lg border-0 ${
-      embed.isShort
+      embed.provider === "youtube" && embed.isShort
         ? "aspect-9/16 h-[70vh] max-w-full"
         : "aspect-video w-full max-w-3xl"
     }`}
   />
 );
 
-export default YouTubeEmbed;
+export default VideoEmbed;

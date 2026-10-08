@@ -127,3 +127,35 @@ describe("YouTube embeds", () => {
     expect(scope.queryByRole("button", { name: "video thumbnail" })).toBeNull();
   });
 });
+
+describe("Streamable embeds", () => {
+  const url = "https://streamable.com/3fq451";
+
+  it("plays in place from the feed thumbnail", async () => {
+    const scope = renderPost({ url });
+    fireEvent.click(await scope.findByRole("button", { name: "video thumbnail" }));
+
+    const src = new URL(iframe(scope.container)!.getAttribute("src")!);
+    expect(src.origin).toBe("https://streamable.com");
+    expect(src.pathname).toBe("/o/3fq451");
+    expect(src.searchParams.get("autoplay")).toBe("1");
+  });
+
+  it("shows the player on a post page, without starting it", async () => {
+    const scope = renderPost({ url }, { showFullPost: true });
+    await scope.findByRole("button", { name: "Collapse media" });
+
+    expect(iframe(scope.container)!.getAttribute("src")).toBe("https://streamable.com/o/3fq451");
+  });
+
+  it("falls back to Streamable's poster, and to a plain tile if that is missing", async () => {
+    const scope = renderPost({ url, thumbnailUrl: undefined });
+    const thumb = await scope.findByRole("button", { name: "video thumbnail" });
+    const img = within(thumb).getByRole("img");
+    expect(img.getAttribute("src")).toBe("https://cdn-cf-east.streamable.com/image/3fq451.jpg");
+
+    fireEvent.error(img);
+    const tile = scope.getByRole("button", { name: "video thumbnail" });
+    expect(within(tile).queryByRole("img")).toBeNull();
+  });
+});

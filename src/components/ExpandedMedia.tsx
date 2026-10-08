@@ -3,8 +3,8 @@ import { ChevronsDownUpIcon } from "lucide-react";
 import { PostImage, VideoSource } from "@/plugintypes";
 import VideoPlayer from "./VideoPlayer";
 import PostGallery from "./PostGallery";
-import YouTubeEmbed from "./YouTubeEmbed";
-import { getYouTubeEmbed } from "@/lib/embeds";
+import VideoEmbed from "./VideoEmbed";
+import { getVideoEmbed } from "@/lib/embeds";
 
 type Props = {
   url: string;
@@ -91,11 +91,11 @@ const ExpandedMedia: React.FC<Props> = ({ url, isVideo, videoSources, images, al
 
   // After `sources`, so a plugin that has the video file itself still gets
   // the native player.
-  const youTube = getYouTubeEmbed(url);
-  if (youTube) {
+  const embed = getVideoEmbed(url);
+  if (embed) {
     return (
       <div className="relative">
-        <YouTubeEmbed embed={youTube} title={alt} autoPlay={autoPlay} />
+        <VideoEmbed embed={embed} title={alt} autoPlay={autoPlay} />
         {toggleExpand && <CollapseButton onClick={toggleExpand} />}
       </div>
     );
