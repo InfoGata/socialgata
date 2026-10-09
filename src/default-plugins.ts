@@ -62,7 +62,13 @@ export const defaultPlugins: PluginDescription[] = [
     name: "Dropbox Sync Plugin for SocialGata",
     description: "Sync favorites and settings to Dropbox cloud storage",
     url: "https://cdn.jsdelivr.net/gh/InfoGata/dropbox-socialgata@latest/manifest.json",
-  }
+  },
+  {
+    id: "749a7108-85be-4716-bdce-2f6f50ab2290",
+    name: "Google Drive Sync Plugin for SocialGata",
+    description: "Sync favorites to Google Drive cloud storage",
+    url: "https://cdn.jsdelivr.net/gh/InfoGata/googledrive-socialgata@latest/manifest.json",
+  },
 ];
 
 export const defaultPluginMap = new Map(defaultPlugins.map((p) => [p.id, p]));
