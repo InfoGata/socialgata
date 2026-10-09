@@ -4,9 +4,15 @@ import userEvent from "@testing-library/user-event";
 import { renderWithProviders } from "./renderWithProviders";
 import RouteErrorComponent from "@/components/RouteErrorComponent";
 import { createPluginError } from "@/plugin-errors";
+import { siteVisitTransport } from "@/lib/site-visit";
+
+vi.mock("@/lib/site-visit", () => ({ siteVisitTransport: vi.fn() }));
 
 // Vitest globals are off, so testing-library's automatic cleanup isn't wired up.
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.mocked(siteVisitTransport).mockReset();
+});
 
 const renderError = (error: unknown, reset = vi.fn()) => {
   renderWithProviders(
@@ -74,6 +80,36 @@ describe("RouteErrorComponent", () => {
     // Only the one visit is honoured, so a later tab switch is not a refetch.
     window.dispatchEvent(new Event("focus"));
     expect(reset).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows the site in the app on Android and retries once it is closed", async () => {
+    let close = () => {};
+    const visit = vi.fn(
+      () => new Promise<void>((resolve) => (close = resolve))
+    );
+    vi.mocked(siteVisitTransport).mockReturnValue(visit);
+    const reset = renderError(
+      asPayload(
+        createPluginError({
+          code: "blocked",
+          message: "blocked",
+          status: 403,
+          requestUrl: "https://www.reddit.com/hot.json",
+        })
+      )
+    );
+
+    // A link would hand the site to the system browser, whose cookies the
+    // app never sees.
+    expect(screen.queryByRole("link", { name: "Open www.reddit.com" })).toBeNull();
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Open www.reddit.com" })
+    );
+    expect(visit).toHaveBeenCalledWith("https://www.reddit.com", "Close");
+    expect(reset).not.toHaveBeenCalled();
+
+    close();
+    await vi.waitFor(() => expect(reset).toHaveBeenCalledTimes(1));
   });
 
   it("does not send the user to the site for content that is simply private", async () => {

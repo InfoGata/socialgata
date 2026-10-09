@@ -10,6 +10,7 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         // Local plugins have to be registered before the bridge starts.
         registerPlugin(PageContextPlugin.class);
+        registerPlugin(SiteVisitPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }

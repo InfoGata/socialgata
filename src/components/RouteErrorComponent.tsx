@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { usePlugins } from "@/hooks/usePlugins";
 import { useExtension } from "@/hooks/useExtension";
 import { isCorsDisabled } from "@/utils";
+import { siteVisitTransport } from "@/lib/site-visit";
 import {
   PluginErrorCode,
   errorSiteHost,
@@ -142,6 +143,9 @@ const RouteErrorComponent: React.FC<ErrorComponentProps> = ({
   // own scripts, which is where the session comes from — a background request
   // can't do that. So once someone has been sent there, retry as soon as they
   // come back rather than making them ask for it.
+  // On Android a link would open the system browser, whose cookies the app
+  // never sees, so the site is shown in the app instead -- see site-visit.ts.
+  const siteVisit = siteVisitTransport();
   const visitedSite = React.useRef(false);
   React.useEffect(() => {
     const onFocus = () => {
@@ -157,7 +161,18 @@ const RouteErrorComponent: React.FC<ErrorComponentProps> = ({
     <ErrorState icon={ICONS[code]} title={title} description={description}>
       <div className="flex flex-wrap items-center justify-center gap-2">
         <Button onClick={retry}>{t("tryAgain")}</Button>
-        {offerSiteLink && (
+        {offerSiteLink && siteVisit && (
+          <Button
+            variant="outline"
+            onClick={async () => {
+              await siteVisit(`https://${site}`, tCommon("close"));
+              retry();
+            }}
+          >
+            {t("openSite", { site })}
+          </Button>
+        )}
+        {offerSiteLink && !siteVisit && (
           <a
             href={`https://${site}`}
             target="_blank"
