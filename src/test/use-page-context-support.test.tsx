@@ -5,7 +5,7 @@ import { usePageContextSupport } from "@/hooks/usePageContextSupport";
 const mocks = vi.hoisted(() => ({
   extensionDetected: undefined as boolean | undefined,
   isElectron: false,
-  isNative: false,
+  platform: "web",
 }));
 
 vi.mock("@/hooks/useExtension", () => ({
@@ -13,13 +13,13 @@ vi.mock("@/hooks/useExtension", () => ({
 }));
 vi.mock("is-electron", () => ({ default: () => mocks.isElectron }));
 vi.mock("@capacitor/core", () => ({
-  Capacitor: { isNativePlatform: () => mocks.isNative },
+  Capacitor: { getPlatform: () => mocks.platform },
 }));
 
 afterEach(() => {
   mocks.extensionDetected = undefined;
   mocks.isElectron = false;
-  mocks.isNative = false;
+  mocks.platform = "web";
   delete (window as { InfoGata?: unknown }).InfoGata;
 });
 
@@ -41,10 +41,17 @@ describe("usePageContextSupport", () => {
     await waitFor(() => expect(result.current).toBe(true));
   });
 
-  it("supports the mobile build without an extension", async () => {
-    mocks.isNative = true;
+  it("supports the Android build without an extension", async () => {
+    mocks.platform = "android";
     const { result } = renderHook(() => usePageContextSupport());
     await waitFor(() => expect(result.current).toBe(true));
+  });
+
+  it("does not claim support on iOS, which has no transport yet", async () => {
+    mocks.platform = "ios";
+    mocks.extensionDetected = false;
+    const { result } = renderHook(() => usePageContextSupport());
+    await waitFor(() => expect(result.current).toBe(false));
   });
 
   it("is false in a browser with no extension", async () => {

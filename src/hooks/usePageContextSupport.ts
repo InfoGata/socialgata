@@ -13,8 +13,9 @@ export const PAGE_CONTEXT_MIN_EXTENSION_VERSION = "1.4.0";
 /**
  * Whether this host can fetch from a page on the target site.
  *
- * The desktop and mobile builds carry their own transport, so they can always
- * do it. In the browser it depends on the extension being new enough; an older
+ * The desktop and Android builds carry their own transport, so they can always
+ * do it. iOS has none yet (see `src/lib/page-context.ts`), so it falls through
+ * to the extension check below, which it never passes. In the browser it depends on the extension being new enough; an older
  * one would install such a plugin happily and then fail every request it makes.
  *
  * `undefined` while the answer is still unknown — the extension injects
@@ -26,7 +27,7 @@ export const usePageContextSupport = (): boolean | undefined => {
 
   // Everything that can be answered without waiting is derived rather than
   // stored, so the effect below only ever sets state from its async result.
-  const nativeHost = isElectron() || Capacitor.isNativePlatform();
+  const nativeHost = isElectron() || Capacitor.getPlatform() === "android";
   const getVersion =
     extensionDetected === true ? window.InfoGata?.getVersion : undefined;
 

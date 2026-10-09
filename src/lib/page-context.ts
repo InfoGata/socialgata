@@ -72,7 +72,7 @@ export const needsPageContext = (
 import { Capacitor, registerPlugin } from "@capacitor/core";
 import type { PageContextInit, PageContextResponse } from "@/types";
 
-/** The Android/iOS half of the same transport; see `PageContextPlugin.java`. */
+/** The Android half of the same transport; see `PageContextPlugin.java`. */
 const NativePageContext = registerPlugin<{
   fetch(options: { url: string } & PageContextInit): Promise<PageContextResponse>;
 }>("PageContext");
@@ -87,7 +87,9 @@ export const pageContextTransport = ():
   if (window.api?.pageContextFetch) {
     return (url, init) => window.api!.pageContextFetch(url, init);
   }
-  if (Capacitor.isNativePlatform()) {
+  // Android only: there is no iOS implementation of the plugin, and offering
+  // one there would install page-context plugins that fail every request.
+  if (Capacitor.getPlatform() === "android") {
     return (url, init) => NativePageContext.fetch({ url, ...(init ?? {}) });
   }
   return undefined;
