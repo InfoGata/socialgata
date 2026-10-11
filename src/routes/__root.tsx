@@ -20,7 +20,7 @@ export const Root: React.FC = () => {
         {/* The bar is ~49px; the extra top padding here is just breathing room,
             which a phone screen has less to spare. `min-w-0` keeps a wide child
             from stretching the flex row into a sideways scroll. */}
-        <main className="grow min-w-0 p-1 pt-14 sm:pt-16">
+        <main className="grow min-w-0 p-1 pt-[calc(3.5rem+env(safe-area-inset-top))] sm:pt-[calc(4rem+env(safe-area-inset-top))]">
           <Outlet />
         </main>
       </div>

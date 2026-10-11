@@ -71,8 +71,10 @@ export const TopBar: React.FC = () => {
     });
   };
 
+  // viewport-fit=cover lets the page run under an iPhone's status bar; the
+  // padding keeps the bar's contents below it. The inset is 0 elsewhere.
   return (
-    <header className="fixed top-0 left-auto right-0 w-full shadow-lg z-40 bg-background border-b">
+    <header className="fixed top-0 left-auto right-0 w-full shadow-lg z-40 bg-background border-b pt-[env(safe-area-inset-top)]">
       <div className="flex items-center gap-2 sm:gap-4 px-2 sm:px-6 min-h-12">
         <Button variant="ghost" size="icon" onClick={onToggleNavigationMenu} className="shrink-0" aria-label="Open menu">
           <MenuIcon />
