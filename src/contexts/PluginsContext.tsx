@@ -1,3 +1,5 @@
+import { Capacitor } from "@capacitor/core";
+import { nativeNetworkRequest } from "@/lib/native-http";
 import { PluginInterface, PluginFrame } from "plugin-frame";
 import React from "react";
 import { toast } from "sonner";
@@ -273,6 +275,11 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
               newInit.headers = Object.fromEntries(headers.entries());
             }
           }
+        }
+
+        if (Capacitor.isNativePlatform()) {
+          const result = await nativeNetworkRequest(input, newInit);
+          if (result) return result;
         }
 
         const response = await fetch(input, newInit);
