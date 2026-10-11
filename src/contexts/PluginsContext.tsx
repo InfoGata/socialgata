@@ -506,8 +506,16 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
       // Save to database
       await db.plugins.add(plugin);
 
-      // Load the plugin
-      const pluginFrame = await loadPlugin(plugin, pluginFiles);
+      // Load the plugin. A plugin that never loads is dropped again, or it
+      // stays in the database: absent from the list, yet every later add of it
+      // offers an update instead.
+      let pluginFrame: PluginFrameContainer;
+      try {
+        pluginFrame = await loadPlugin(plugin, pluginFiles);
+      } catch (error) {
+        await db.plugins.delete(id);
+        throw error;
+      }
       publishFrames([...pluginFramesRef.current, pluginFrame]);
     },
     [loadPlugin, publishFrames]

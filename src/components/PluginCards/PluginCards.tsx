@@ -1,4 +1,6 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { defaultPlugins } from "../../default-plugins";
 import { PluginDescription } from "../../types";
 import { usePlugins } from "../../hooks/usePlugins";
@@ -13,6 +15,7 @@ import Spinner from "../Spinner";
 import PluginCard from "./PluginCard";
 import { isOfferable, needsSignIn } from "@/lib/plugin-catalog";
 const PluginCards: React.FC = () => {
+  const { t } = useTranslation("plugins");
   const { plugins, addPlugin, pluginsLoaded } = usePlugins();
   const [backdropOpen, setBackdropOpen] = React.useState(false);
   const corsDisabled = useCorsDisabled();
@@ -21,17 +24,27 @@ const PluginCards: React.FC = () => {
   const onAddPlugin = async (description: PluginDescription) => {
     if (!description.url) return;
     setBackdropOpen(true);
-    const fileType = getFileTypeFromPluginUrl(description.url);
+    try {
+      const fileType = getFileTypeFromPluginUrl(description.url);
 
-    const plugin = await getPlugin(fileType);
+      const plugin = await getPlugin(fileType);
 
-    if (plugin) {
-      if (!plugin.id) {
-        plugin.id = generatePluginId();
+      if (plugin) {
+        if (!plugin.id) {
+          plugin.id = generatePluginId();
+        }
+        await addPlugin(plugin);
       }
-      await addPlugin(plugin);
+    } catch (error) {
+      toast.error(
+        t("addPluginFailed", {
+          name: description.name,
+          error: error instanceof Error ? error.message : String(error),
+        })
+      );
+    } finally {
+      setBackdropOpen(false);
     }
-    setBackdropOpen(false);
   };
 
   const pluginCards = defaultPlugins

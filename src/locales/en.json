@@ -69,6 +69,7 @@
     "fileNotFound": "File not found: {{name}}",
     "couldNotFetchFile": "Could not fetch file: {{name}}",
     "manifestNoScript": "Manifest does not contain a script property",
+    "addPluginFailed": "Couldn't add {{name}}: {{error}}",
     "urlAlias": "URL Alias",
     "urlAliasDescription": "Used in this plugin's urls, e.g. /s/{{alias}}/feed",
     "renameAlias": "Rename",

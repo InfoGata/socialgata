@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { usePlugins } from "../../hooks/usePlugins";
 import { PluginInfo } from "../../plugintypes";
 import { Button } from "../ui/button";
@@ -37,7 +38,16 @@ const ConfirmPluginDialog: React.FC<ConfirmPluginDialogProps> = (props) => {
   const onConfirm = async () => {
     for (const plugin of plugins) {
       if (plugin) {
-        await addPlugin(plugin);
+        try {
+          await addPlugin(plugin);
+        } catch (error) {
+          toast.error(
+            t("addPluginFailed", {
+              name: plugin.name,
+              error: error instanceof Error ? error.message : String(error),
+            })
+          );
+        }
       }
     }
 
