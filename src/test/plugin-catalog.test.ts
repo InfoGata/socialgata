@@ -76,11 +76,14 @@ describe("when the card warns that an account is needed", () => {
 });
 
 describe("the real catalog", () => {
-  it("offers Reddit in a plain browser, with the sign-in note", () => {
+  it("offers Reddit in a plain browser, without the sign-in note", () => {
+    // Signed out it reads oauth.reddit.com with an app-only token, which a
+    // plain browser can reach, so neither the extension nor an account is
+    // needed.
     const reddit = defaultPlugins.find((p) => p.name.startsWith("Reddit"))!;
 
     expect(isOfferable(reddit, PLAIN_BROWSER, undefined)).toBe(true);
-    expect(needsSignIn(reddit, PLAIN_BROWSER)).toBe(true);
+    expect(needsSignIn(reddit, PLAIN_BROWSER)).toBe(false);
   });
 
   it("keeps hiding Twitter in a plain browser", () => {
