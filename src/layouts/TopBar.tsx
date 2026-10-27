@@ -14,7 +14,7 @@ interface SearchSource {
 
 /** The installed plugins that implement onSearch, in install order. */
 const useSearchSources = (): SearchSource[] => {
-  const { plugins } = usePlugins();
+  const { plugins, pageContextSettled } = usePlugins();
   const [searchSources, setSearchSources] = React.useState<SearchSource[]>([]);
 
   React.useEffect(() => {
@@ -40,7 +40,9 @@ const useSearchSources = (): SearchSource[] => {
     return () => {
       cancelled = true;
     };
-  }, [plugins]);
+    // pageContextSettled: a plugin may only turn search on once it knows it can
+    // reach its site (lobsters needs a page on lobste.rs).
+  }, [plugins, pageContextSettled]);
 
   return searchSources;
 };

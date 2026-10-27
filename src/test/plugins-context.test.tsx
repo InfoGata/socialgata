@@ -330,3 +330,53 @@ describe("PluginsProvider", () => {
     });
   });
 });
+
+describe("the isPageContextAvailable handed to plugins", () => {
+  beforeEach(async () => {
+    frames.lastApi = undefined;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({ name: "a", script: "plugin.js", version: "1.0.0" }),
+            { status: 200 },
+          ),
+      ),
+    );
+    await db.plugins.clear();
+    await db.plugins.add(makePlugin("a"));
+  });
+
+  afterEach(async () => {
+    cleanup();
+    await settleFrames();
+    vi.unstubAllGlobals();
+  });
+
+  const hostApi = async () => {
+    renderProvider();
+    await waitFor(() => expect(frames.lastApi).toBeDefined());
+    return frames.lastApi;
+  };
+
+  it("is true with an extension new enough to make page-context requests", async () => {
+    vi.stubGlobal("InfoGata", { getVersion: async () => "1.5.0" });
+    const api = await hostApi();
+    await expect(api.isPageContextAvailable()).resolves.toBe(true);
+  });
+
+  it("waits for extension detection to give up before answering false", async () => {
+    const api = await hostApi();
+    let answer: boolean | undefined;
+    const pending = api.isPageContextAvailable().then((value: boolean) => {
+      answer = value;
+    });
+    // Still polling for the extension: "not found yet" must not read as "no",
+    // or a plugin loading before the extension injects itself turns search off.
+    await new Promise((r) => setTimeout(r, 200));
+    expect(answer).toBeUndefined();
+    await pending;
+    expect(answer).toBe(false);
+  }, 10_000);
+});

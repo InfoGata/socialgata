@@ -59,6 +59,7 @@ import i18next from "i18next";
 import { hasExtension, isCorsDisabled } from "@/utils";
 import { createPluginError, toPluginErrorPayload } from "@/plugin-errors";
 import { NETWORK_TIMEOUT_MS, withTimeout } from "@/lib/network-timeout";
+import { usePageContextSupport } from "@/hooks/usePageContextSupport";
 import {
   needsPageContext,
   pageContextTransport,
@@ -78,6 +79,7 @@ interface ApplicationPluginInterface extends PluginInterface {
   postUiMessage(message: any): Promise<void>;
   getCorsProxy(): Promise<string | undefined>;
   isNetworkRequestCorsDisabled(): Promise<boolean>;
+  isPageContextAvailable(): Promise<boolean>;
   isLoggedIn(): Promise<boolean>;
   getTheme(): Promise<Theme>;
   getShowNsfw(): Promise<boolean>;
@@ -148,6 +150,12 @@ export interface PluginContextInterface {
   pluginMessage?: PluginMessage;
   pluginsLoaded: boolean;
   pluginsFailed: boolean;
+  /**
+   * Flips true once plugins asking `isPageContextAvailable` have their answer.
+   * A plugin may turn methods on in response, so cached `hasDefined` checks
+   * should re-run when this changes.
+   */
+  pageContextSettled: boolean;
   reloadPlugins: () => Promise<void>;
 }
 
@@ -165,6 +173,25 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
   const [pluginMessage, setPluginMessage] = React.useState<PluginMessage>();
   const [pendingUpdatePlugin, setPendingUpdatePlugin] = React.useState<PluginInfo | null>(null);
   const { extensionDetected } = useExtension();
+
+  // Plugins ask this while they load, which is usually before the extension has
+  // announced itself, so the answer waits until detection has settled.
+  const pageContextSupported = usePageContextSupport();
+  const pageContextRef = React.useRef<boolean | undefined>(undefined);
+  const pageContextWaiters = React.useRef<((supported: boolean) => void)[]>([]);
+  const [pageContextSettled, setPageContextSettled] = React.useState(false);
+  React.useEffect(() => {
+    pageContextRef.current = pageContextSupported;
+    if (pageContextSupported === undefined) return;
+    for (const resolve of pageContextWaiters.current.splice(0)) {
+      resolve(pageContextSupported);
+    }
+    // A state change rather than a derived value: the re-render it schedules
+    // runs after the answers above have been posted to the plugins, so a
+    // consumer re-checking then sees whatever a plugin turned on in response.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- see above
+    setPageContextSettled(true);
+  }, [pageContextSupported]);
 
   // Mirrors of state that background tasks (dev poll, auto-update) read without
   // re-subscribing, so they don't have to re-run every time a load flips state.
@@ -314,6 +341,11 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
         isNetworkRequestCorsDisabled: async () => {
           return isCorsDisabled();
         },
+        isPageContextAvailable: async () =>
+          pageContextRef.current ??
+          new Promise<boolean>((resolve) => {
+            pageContextWaiters.current.push(resolve);
+          }),
         isLoggedIn: async () => {
           if (plugin?.id) {
             const auth = await db.pluginAuths.get(plugin.id);
@@ -796,6 +828,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
     plugins: pluginFrames,
     pluginMessage,
     pluginsLoaded,
+    pageContextSettled,
     pluginsFailed,
     reloadPlugins,
   };

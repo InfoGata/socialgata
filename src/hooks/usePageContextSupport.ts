@@ -59,7 +59,8 @@ export const usePageContextSupport = (): boolean | undefined => {
   }, [nativeHost, getVersion]);
 
   if (nativeHost) return true;
-  if (extensionDetected === undefined) return undefined;
+  // `null` while the provider is still polling for the extension.
+  if (extensionDetected == null) return undefined;
   if (!extensionDetected) return false;
   // An extension without `getVersion` predates it, so it predates this too.
   if (!getVersion) return false;

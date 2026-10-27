@@ -3,7 +3,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { usePageContextSupport } from "@/hooks/usePageContextSupport";
 
 const mocks = vi.hoisted(() => ({
-  extensionDetected: undefined as boolean | undefined,
+  // `null` is what the provider reports while it is still polling.
+  extensionDetected: null as boolean | null,
   isElectron: false,
   platform: "web",
 }));
@@ -17,7 +18,7 @@ vi.mock("@capacitor/core", () => ({
 }));
 
 afterEach(() => {
-  mocks.extensionDetected = undefined;
+  mocks.extensionDetected = null;
   mocks.isElectron = false;
   mocks.platform = "web";
   delete (window as { InfoGata?: unknown }).InfoGata;

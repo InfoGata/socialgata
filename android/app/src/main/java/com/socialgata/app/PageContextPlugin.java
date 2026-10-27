@@ -57,6 +57,8 @@ public class PageContextPlugin extends Plugin {
         "if(/^Just a moment|Attention Required|Verifying your browser/i.test(t))return true;" +
         "if(document.getElementById('challenge-error-text'))return true;" +
         "if(document.getElementById('cf-challenge-running'))return true;" +
+        // Anubis (lobste.rs): its proof-of-work page carries the challenge as JSON.
+        "if(document.getElementById('anubis_challenge'))return true;" +
         "return typeof window._cf_chl_opt!=='undefined';})()";
 
     @PluginMethod
@@ -81,7 +83,7 @@ public class PageContextPlugin extends Plugin {
             return;
         }
 
-        main.post(() -> ensureWebView(origin, call, webView -> runFetch(webView, call, url, true)));
+        main.post(() -> ensureWebView(origin, origin, call, webView -> runFetch(webView, call, url, true)));
     }
 
     private interface WebViewReady {
@@ -89,7 +91,15 @@ public class PageContextPlugin extends Plugin {
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private void ensureWebView(String origin, PluginCall call, WebViewReady ready) {
+    /**
+     * `loadUrl` is usually the origin. A check that guards only some paths
+     * (Anubis on lobste.rs/search) never runs there, so the page has to load the
+     * guarded url itself to earn the cookie the in-page fetch then carries.
+     * It gets there from the origin's own page, the way following a link would:
+     * lobste.rs answers a /search load with no Referer with an empty 403, and
+     * `loadUrl` sends none.
+     */
+    private void ensureWebView(String origin, String loadUrl, PluginCall call, WebViewReady ready) {
         WebView existing = parked.get(origin);
         if (existing != null) {
             ready.onReady(existing);
@@ -119,10 +129,17 @@ public class PageContextPlugin extends Plugin {
             FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
         final boolean[] settled = { false };
+        final boolean[] onTarget = { loadUrl.equals(origin) };
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
                 if (settled[0]) return;
+                if (!onTarget[0]) {
+                    onTarget[0] = true;
+                    view.evaluateJavascript(
+                        "location.href = " + JSONObject.quote(loadUrl) + ";", null);
+                    return;
+                }
                 settled[0] = true;
                 parked.put(origin, webView);
                 waitForChallenge(webView, System.currentTimeMillis() + CHALLENGE_TIMEOUT_MS,
@@ -148,10 +165,13 @@ public class PageContextPlugin extends Plugin {
             return;
         }
         webView.evaluateJavascript(CHALLENGE_PROBE, value -> {
-            if ("true".equals(value)) {
-                main.postDelayed(() -> waitForChallenge(webView, deadline, done), CHALLENGE_POLL_MS);
-            } else {
+            // Only an explicit "false" is cleared. Mid-navigation -- Anubis
+            // redirects once solved -- the probe can come back "null", which
+            // means it could not answer, not that the check has passed.
+            if ("false".equals(value)) {
                 done.run();
+            } else {
+                main.postDelayed(() -> waitForChallenge(webView, deadline, done), CHALLENGE_POLL_MS);
             }
         });
     }
@@ -210,6 +230,22 @@ public class PageContextPlugin extends Plugin {
         try {
             JSObject result = new JSObject(json);
 
+            boolean isGet = "GET".equalsIgnoreCase(call.getString("method", "GET"));
+            if (retryOnChallenge && isGet && (result.has("error") || looksAnubisChallenged(result))) {
+                // Anubis guards paths, not the origin, so the page loads the
+                // guarded url and solves the check there. The same load rescues
+                // a fetch the parked page's CSP refused: lobste.rs serves
+                // `connect-src 'none'` on its cached pages, the origin's landing
+                // page among them, but not on /search. Only a GET replays as a
+                // page load.
+                String origin = originFor(url);
+                WebView stale = parked.remove(origin);
+                if (stale != null) destroy(origin, stale);
+                main.post(() -> ensureWebView(origin, url, call,
+                    fresh -> runFetch(fresh, call, url, false)));
+                return;
+            }
+
             if (result.has("error")) {
                 call.reject("Page-context request to " + url + " failed: " + result.getString("error"));
                 return;
@@ -221,7 +257,7 @@ public class PageContextPlugin extends Plugin {
                 String origin = originFor(url);
                 WebView stale = parked.remove(origin);
                 if (stale != null) destroy(origin, stale);
-                main.post(() -> ensureWebView(origin, call,
+                main.post(() -> ensureWebView(origin, origin, call,
                     fresh -> runFetch(fresh, call, url, false)));
                 return;
             }
@@ -241,6 +277,14 @@ public class PageContextPlugin extends Plugin {
             || head.contains("cf_chl")
             || head.contains("Attention Required")
             || head.contains("Verifying your browser");
+    }
+
+    /**
+     * Anubis answers a challenged request with its proof-of-work page, as a 200
+     * on lobste.rs. The page has to be loaded to be solved; a fetch never does.
+     */
+    private boolean looksAnubisChallenged(JSObject result) {
+        return result.getString("body", "").contains("id=\"anubis_challenge\"");
     }
 
     private String originFor(String url) {

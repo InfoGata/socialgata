@@ -45,6 +45,8 @@ const CHALLENGE_PROBE = `(() => {
   if (/^Just a moment|Attention Required|Verifying your browser/i.test(title)) return true;
   if (document.getElementById("challenge-error-text")) return true;
   if (document.getElementById("cf-challenge-running")) return true;
+  // Anubis (lobste.rs): its proof-of-work page carries the challenge as JSON.
+  if (document.getElementById("anubis_challenge")) return true;
   return typeof window._cf_chl_opt !== "undefined";
 })()`;
 
@@ -64,6 +66,21 @@ const waitForChallenge = async (window: BrowserWindow): Promise<void> => {
   // Falling through is deliberate: the fetch below still runs and its status
   // tells the caller what actually happened, which beats a timeout error that
   // hides a working response.
+};
+
+/**
+ * Sends the window to `url` from inside its current page, the way following a
+ * link would. lobste.rs answers a /search load with no Referer with an empty
+ * 403, and `loadURL` sends none; navigating from one of its own pages does.
+ */
+const navigateInPage = async (window: BrowserWindow, url: string) => {
+  const loaded = new Promise<void>((resolve) =>
+    window.webContents.once("did-finish-load", () => resolve())
+  );
+  await window.webContents.executeJavaScript(
+    `location.href = ${JSON.stringify(url)}; undefined`
+  );
+  await loaded;
 };
 
 const scheduleIdleClose = (origin: string) => {
@@ -134,6 +151,13 @@ const looksChallenged = (response: PageContextResponse): boolean =>
     response.body.slice(0, 4000)
   );
 
+/**
+ * Anubis answers a challenged request with its proof-of-work page, as a 200 on
+ * lobste.rs. The page has to be loaded to be solved; a fetch never solves it.
+ */
+const looksAnubisChallenged = (response: PageContextResponse): boolean =>
+  response.body.includes('id="anubis_challenge"');
+
 const runFetch = async (
   window: BrowserWindow,
   url: string,
@@ -182,6 +206,21 @@ export const pageContextFetch = async (
   if (!("error" in result) && looksChallenged(result)) {
     const window = await ensureWindow(origin);
     await window.loadURL(origin);
+    await waitForChallenge(window);
+    result = await runFetch(window, url, init);
+  }
+
+  // Anubis guards paths, not the origin, so loading the origin never runs it.
+  // The window loads the guarded url instead and solves the check there, which
+  // sets the cookie the retried fetch carries. The same load rescues a fetch
+  // the parked page's CSP refused: lobste.rs serves `connect-src 'none'` on its
+  // cached pages, the origin's landing page among them, but not on /search.
+  // Only a GET replays as a load.
+  const method = (init?.method ?? "GET").toUpperCase();
+  if (method === "GET" && ("error" in result || looksAnubisChallenged(result))) {
+    const window = await ensureWindow(origin);
+    await window.loadURL(origin);
+    await navigateInPage(window, url);
     await waitForChallenge(window);
     result = await runFetch(window, url, init);
   }
