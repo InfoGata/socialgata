@@ -11,6 +11,7 @@ import DOMPurify from "dompurify";
 import ExpandedMedia from "./ExpandedMedia";
 import { FavoriteButton } from "./FavoriteButton";
 import { getVideoEmbed } from "@/lib/embeds";
+import { getPostDomain } from "@/lib/post-domain";
 
 type Props = {
   post: Post;
@@ -37,6 +38,7 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
   const hasThumbnail =
     !!post.thumbnailUrl || !!post.images?.length || isEmbed || (post.url && imageRegex.test(post.url));
   const isExternal = post.url && !post.url.startsWith('/');
+  const domain = getPostDomain(post.url);
   // Videos may carry sources without a usable `url` (it points at a player page),
   // and a gallery's url is a reddit.com/gallery link that no regex will match.
   const hasExpandableMedia =
@@ -157,17 +159,27 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
           )}
 
           {/* Title */}
-          <div className="flex items-start gap-1.5 mb-1">
+          {/* Inline rather than flex, so the domain follows the last word of
+              a wrapped title instead of sitting in a column of its own. */}
+          <div className="mb-1 leading-snug wrap-break-word">
             <PostLink
               post={post}
               isTitleLink
-              className={`text-[15px] font-semibold text-foreground hover:text-primary transition-colors leading-snug min-w-0 wrap-break-word`}
+              className={`text-[15px] font-semibold text-foreground hover:text-primary transition-colors`}
               instanceId={instanceId}
             >
               {post.title}
             </PostLink>
+            {domain && (
+              <span
+                className="ml-1.5 text-xs text-muted-foreground/70 whitespace-nowrap"
+                data-testid="post-domain"
+              >
+                ({domain})
+              </span>
+            )}
             {isExternal && (
-              <ExternalLinkIcon className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0 mt-0.5" />
+              <ExternalLinkIcon className="inline-block align-baseline h-3 w-3 ml-1 text-muted-foreground/40" />
             )}
           </div>
 

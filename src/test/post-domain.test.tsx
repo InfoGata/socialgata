@@ -1,0 +1,78 @@
+import { describe, expect, it } from "vitest";
+import { within } from "@testing-library/react";
+import { renderWithProviders } from "./renderWithProviders";
+import ForumPost from "@/components/ForumPost";
+import { FavoritesContext } from "@/sync/FavoritesContext";
+import type { FavoritesContextValue } from "@/sync/useFavoritesContext";
+import type { FavoritesDoc } from "@/sync/favorites-repo";
+import type { Post } from "@/plugintypes";
+import { getPostDomain } from "@/lib/post-domain";
+
+describe("getPostDomain", () => {
+  it.each([
+    ["https://github.com/automerge/automerge", "github.com"],
+    ["https://www.nytimes.com/2026/10/30/tech.html", "nytimes.com"],
+    ["https://i.redd.it/abc123.jpg", "i.redd.it"],
+    ["https://en.wikipedia.org/wiki/Gata", "en.wikipedia.org"],
+    ["http://EXAMPLE.com:8080/x", "example.com"],
+  ])("%s -> %s", (url, domain) => {
+    expect(getPostDomain(url)).toBe(domain);
+  });
+
+  it.each([
+    [undefined],
+    [""],
+    ["/r/rust/comments/abc"],
+    ["mailto:someone@example.com"],
+    ["not a url"],
+  ])("has no domain for %s", (url) => {
+    expect(getPostDomain(url)).toBeUndefined();
+  });
+});
+
+const emptyDoc: FavoritesDoc = {
+  instances: {},
+  posts: {},
+  comments: {},
+  communities: {},
+  users: {},
+} as FavoritesDoc;
+
+const favoritesValue = {
+  handle: { change: () => {}, doc: () => emptyDoc },
+  doc: emptyDoc,
+  isReady: true,
+} as unknown as FavoritesContextValue;
+
+const renderPost = (post: Partial<Post>) => {
+  const { container } = renderWithProviders(
+    <FavoritesContext.Provider value={favoritesValue}>
+      <ForumPost
+        post={{
+          apiId: "p1",
+          title: "Show HN: A thing I made",
+          authorName: "someone",
+          authorApiId: "someone",
+          pluginId: "a7f3e9b2c1d4",
+          ...post,
+        }}
+      />
+    </FavoritesContext.Provider>,
+  );
+  return within(container);
+};
+
+describe("ForumPost domain", () => {
+  it("shows the linked site beside the title", async () => {
+    const view = renderPost({ url: "https://www.github.com/a/b" });
+    expect((await view.findByTestId("post-domain")).textContent).toBe(
+      "(github.com)",
+    );
+  });
+
+  it("shows nothing for a text post", async () => {
+    const view = renderPost({ url: undefined, body: "Ask HN: anything" });
+    await view.findByText("Show HN: A thing I made");
+    expect(view.queryByTestId("post-domain")).toBeNull();
+  });
+});
