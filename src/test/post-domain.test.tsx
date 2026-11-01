@@ -19,7 +19,16 @@ vi.mock("@/hooks/usePlugins", async (importOriginal) => {
     ...actual,
     usePlugins: () => ({
       ...actual.usePlugins(),
-      plugins: [{ id: PLUGIN_ID, name: "Test", hasDomain: mocks.hasDomain }],
+      plugins: [
+        {
+          id: PLUGIN_ID,
+          name: "Test",
+          hasDomain: mocks.hasDomain,
+          // Other components (the top bar's search) ask the plugin what it
+          // defines; answer "nothing" for every method.
+          hasDefined: new Proxy({}, { get: () => async () => false }),
+        },
+      ],
     }),
   };
 });
