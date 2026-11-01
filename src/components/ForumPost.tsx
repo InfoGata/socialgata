@@ -12,6 +12,7 @@ import ExpandedMedia from "./ExpandedMedia";
 import { FavoriteButton } from "./FavoriteButton";
 import { getVideoEmbed } from "@/lib/embeds";
 import { getPostDomain } from "@/lib/post-domain";
+import { usePlugins } from "@/hooks/usePlugins";
 
 type Props = {
   post: Post;
@@ -39,6 +40,9 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
     !!post.thumbnailUrl || !!post.images?.length || isEmbed || (post.url && imageRegex.test(post.url));
   const isExternal = post.url && !post.url.startsWith('/');
   const domain = getPostDomain(post.url);
+  const { plugins } = usePlugins();
+  const hasDomainPage =
+    !!post.pluginId && !!plugins.find((p) => p.id === post.pluginId)?.hasDomain;
   // Videos may carry sources without a usable `url` (it points at a player page),
   // and a gallery's url is a reddit.com/gallery link that no regex will match.
   const hasExpandableMedia =
@@ -170,16 +174,34 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
             >
               {post.title}
             </PostLink>
-            {domain && (
-              <span
-                className="ml-1.5 text-xs text-muted-foreground/70 whitespace-nowrap"
-                data-testid="post-domain"
-              >
-                ({domain})
+            {/* One unbreakable unit, so the icon can't wrap onto a line of
+                its own after the domain */}
+            {(domain || isExternal) && (
+              <span className="whitespace-nowrap">
+                {domain && (
+                  <span
+                    className="ml-1.5 text-xs text-muted-foreground/70"
+                    data-testid="post-domain"
+                  >
+                    (
+                    {hasDomainPage ? (
+                      <Link
+                        to="/s/$pluginId/domain/$domain"
+                        params={{ pluginId: post.pluginId || "", domain }}
+                        className="hover:text-primary hover:underline transition-colors"
+                      >
+                        {domain}
+                      </Link>
+                    ) : (
+                      domain
+                    )}
+                    )
+                  </span>
+                )}
+                {isExternal && (
+                  <ExternalLinkIcon className="inline-block align-baseline h-3 w-3 ml-1 text-muted-foreground/40" />
+                )}
               </span>
-            )}
-            {isExternal && (
-              <ExternalLinkIcon className="inline-block align-baseline h-3 w-3 ml-1 text-muted-foreground/40" />
             )}
           </div>
 

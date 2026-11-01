@@ -29,6 +29,7 @@ import { Route as SPluginIdIIndexRouteImport } from './routes/s/$pluginId/i/inde
 import { Route as SPluginIdUserApiIdRouteImport } from './routes/s/$pluginId/user.$apiId'
 import { Route as SPluginIdTrendingTopicNameRouteImport } from './routes/s/$pluginId/trending.$topicName'
 import { Route as SPluginIdPostApiIdRouteImport } from './routes/s/$pluginId/post.$apiId'
+import { Route as SPluginIdDomainDomainRouteImport } from './routes/s/$pluginId/domain.$domain'
 import { Route as SPluginIdCApiIdIndexRouteImport } from './routes/s/$pluginId/c.$apiId.index'
 import { Route as SPluginIdIInstanceIdFeedRouteImport } from './routes/s/$pluginId/i/$instanceId/feed'
 import { Route as SPluginIdIInstanceIdCommunitiesRouteImport } from './routes/s/$pluginId/i/$instanceId/communities'
@@ -140,6 +141,11 @@ const SPluginIdPostApiIdRoute = SPluginIdPostApiIdRouteImport.update({
   path: '/s/$pluginId/post/$apiId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SPluginIdDomainDomainRoute = SPluginIdDomainDomainRouteImport.update({
+  id: '/s/$pluginId/domain/$domain',
+  path: '/s/$pluginId/domain/$domain',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SPluginIdCApiIdIndexRoute = SPluginIdCApiIdIndexRouteImport.update({
   id: '/s/$pluginId/c/$apiId/',
   path: '/s/$pluginId/c/$apiId/',
@@ -210,6 +216,7 @@ export interface FileRoutesByFullPath {
   '/s/$pluginId/feed': typeof SPluginIdFeedRoute
   '/plugins/$pluginId/': typeof PluginsPluginIdIndexRoute
   '/s/$pluginId/': typeof SPluginIdIndexRoute
+  '/s/$pluginId/domain/$domain': typeof SPluginIdDomainDomainRoute
   '/s/$pluginId/post/$apiId': typeof SPluginIdPostApiIdRoute
   '/s/$pluginId/trending/$topicName': typeof SPluginIdTrendingTopicNameRoute
   '/s/$pluginId/user/$apiId': typeof SPluginIdUserApiIdRoute
@@ -241,6 +248,7 @@ export interface FileRoutesByTo {
   '/s/$pluginId/feed': typeof SPluginIdFeedRoute
   '/plugins/$pluginId': typeof PluginsPluginIdIndexRoute
   '/s/$pluginId': typeof SPluginIdIndexRoute
+  '/s/$pluginId/domain/$domain': typeof SPluginIdDomainDomainRoute
   '/s/$pluginId/post/$apiId': typeof SPluginIdPostApiIdRoute
   '/s/$pluginId/trending/$topicName': typeof SPluginIdTrendingTopicNameRoute
   '/s/$pluginId/user/$apiId': typeof SPluginIdUserApiIdRoute
@@ -273,6 +281,7 @@ export interface FileRoutesById {
   '/s/$pluginId/feed': typeof SPluginIdFeedRoute
   '/plugins/$pluginId/': typeof PluginsPluginIdIndexRoute
   '/s/$pluginId/': typeof SPluginIdIndexRoute
+  '/s/$pluginId/domain/$domain': typeof SPluginIdDomainDomainRoute
   '/s/$pluginId/post/$apiId': typeof SPluginIdPostApiIdRoute
   '/s/$pluginId/trending/$topicName': typeof SPluginIdTrendingTopicNameRoute
   '/s/$pluginId/user/$apiId': typeof SPluginIdUserApiIdRoute
@@ -306,6 +315,7 @@ export interface FileRouteTypes {
     | '/s/$pluginId/feed'
     | '/plugins/$pluginId/'
     | '/s/$pluginId/'
+    | '/s/$pluginId/domain/$domain'
     | '/s/$pluginId/post/$apiId'
     | '/s/$pluginId/trending/$topicName'
     | '/s/$pluginId/user/$apiId'
@@ -337,6 +347,7 @@ export interface FileRouteTypes {
     | '/s/$pluginId/feed'
     | '/plugins/$pluginId'
     | '/s/$pluginId'
+    | '/s/$pluginId/domain/$domain'
     | '/s/$pluginId/post/$apiId'
     | '/s/$pluginId/trending/$topicName'
     | '/s/$pluginId/user/$apiId'
@@ -368,6 +379,7 @@ export interface FileRouteTypes {
     | '/s/$pluginId/feed'
     | '/plugins/$pluginId/'
     | '/s/$pluginId/'
+    | '/s/$pluginId/domain/$domain'
     | '/s/$pluginId/post/$apiId'
     | '/s/$pluginId/trending/$topicName'
     | '/s/$pluginId/user/$apiId'
@@ -400,6 +412,7 @@ export interface RootRouteChildren {
   SPluginIdFeedRoute: typeof SPluginIdFeedRoute
   PluginsPluginIdIndexRoute: typeof PluginsPluginIdIndexRoute
   SPluginIdIndexRoute: typeof SPluginIdIndexRoute
+  SPluginIdDomainDomainRoute: typeof SPluginIdDomainDomainRoute
   SPluginIdPostApiIdRoute: typeof SPluginIdPostApiIdRoute
   SPluginIdTrendingTopicNameRoute: typeof SPluginIdTrendingTopicNameRoute
   SPluginIdUserApiIdRoute: typeof SPluginIdUserApiIdRoute
@@ -558,6 +571,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SPluginIdPostApiIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/s/$pluginId/domain/$domain': {
+      id: '/s/$pluginId/domain/$domain'
+      path: '/s/$pluginId/domain/$domain'
+      fullPath: '/s/$pluginId/domain/$domain'
+      preLoaderRoute: typeof SPluginIdDomainDomainRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/s/$pluginId/c/$apiId/': {
       id: '/s/$pluginId/c/$apiId/'
       path: '/s/$pluginId/c/$apiId'
@@ -640,6 +660,7 @@ const rootRouteChildren: RootRouteChildren = {
   SPluginIdFeedRoute: SPluginIdFeedRoute,
   PluginsPluginIdIndexRoute: PluginsPluginIdIndexRoute,
   SPluginIdIndexRoute: SPluginIdIndexRoute,
+  SPluginIdDomainDomainRoute: SPluginIdDomainDomainRoute,
   SPluginIdPostApiIdRoute: SPluginIdPostApiIdRoute,
   SPluginIdTrendingTopicNameRoute: SPluginIdTrendingTopicNameRoute,
   SPluginIdUserApiIdRoute: SPluginIdUserApiIdRoute,

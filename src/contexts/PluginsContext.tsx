@@ -17,6 +17,8 @@ import {
   GetCommentsResponse,
   GetCommentRepliesRequest,
   GetCommentRepliesResponse,
+  GetDomainRequest,
+  GetDomainResponse,
   GetUserRequest,
   GetUserResponse,
   SearchRequest,
@@ -94,6 +96,7 @@ export interface PluginMethodInterface {
   onGetComments(request: GetCommentsRequest): Promise<GetCommentsResponse>;
   onGetCommentReplies(request: GetCommentRepliesRequest): Promise<GetCommentRepliesResponse>;
   onGetUser(request: GetUserRequest): Promise<GetUserResponse>;
+  onGetDomain(request: GetDomainRequest): Promise<GetDomainResponse>;
   onSearch(request: SearchRequest): Promise<SearchResponse>;
   onSearchCommunity(request: SearchCommunityRequest): Promise<SearchCommunityResponse>;
   onGetTrendingTopics(request?: GetTrendingTopicsRequest): Promise<GetTrendingTopicsResponse>;
@@ -126,6 +129,8 @@ export class PluginFrameContainer extends PluginFrame<PluginMethodInterface> {
   alias?: string;
   hasOptions?: boolean;
   hasFeed?: boolean;
+  /** Whether the plugin can list the posts linking to one site (onGetDomain) */
+  hasDomain?: boolean;
   fileList?: FileList;
   optionsSameOrigin?: boolean;
   version?: string;
@@ -412,6 +417,10 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
             response?.items.forEach(stampPost);
             return response;
           },
+          onGetDomain: (response: GetDomainResponse) => {
+            response?.items.forEach(stampPost);
+            return response;
+          },
           onGetComments: (response: GetCommentsResponse) => {
             stampPost(response?.post);
             response?.items.forEach(stampPost);
@@ -446,6 +455,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
 
         // Try to get platform type from plugin
         host.hasFeed = await host.hasDefined.onGetFeed();
+        host.hasDomain = await host.hasDefined.onGetDomain();
 
         if (await host.hasDefined.onGetPlatformType()) {
           host.platformType = await host.remote.onGetPlatformType();

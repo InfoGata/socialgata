@@ -300,6 +300,30 @@ export interface GetCommunitiesResponse {
   pageInfo?: PageInfo;
 }
 
+export interface GetDomainRequest {
+  /**
+   * Hostname the posts link to, lowercased and without a leading `www.`
+   * (e.g. "github.com", "en.wikipedia.org")
+   */
+  domain: string;
+  pageInfo?: PageInfo;
+  /** Selected sort order id (matches a SortOption.id from the response) */
+  sortId?: string;
+  /** Selected time range id for sorts that declare time ranges */
+  timeRangeId?: string;
+}
+
+export interface GetDomainResponse {
+  items: Post[];
+  pageInfo?: PageInfo;
+  /** Available sort orders for this domain's listing */
+  sortOptions?: SortOption[];
+  /** Currently applied sort order id */
+  sortId?: string;
+  /** Currently applied time range id */
+  timeRangeId?: string;
+}
+
 export interface GetUserResponse {
   pageInfo?: PageInfo;
   user?: User;

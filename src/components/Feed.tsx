@@ -17,10 +17,17 @@ type FeedProps = {
   pluginId: string;
   instanceId?: string;
   isLoading?: boolean;
+  /**
+   * Shown above the sort controls in place of the browse-communities button,
+   * for listings that aren't the plugin's own front page (a domain page).
+   */
+  header?: React.ReactNode;
+  /** Page title prefix; defaults to the plugin name */
+  title?: string;
 }
 
 const Feed: React.FC<FeedProps> = (props) => {
-  const { sortId, timeRangeId, data, pageInfo, pluginId, instanceId, isLoading } = props;
+  const { sortId, timeRangeId, data, pageInfo, pluginId, instanceId, isLoading, header, title } = props;
   const { nextPage, prevPage, hasNextPage, hasPreviousPage } = usePagination(pageInfo);
   const { plugins } = usePlugins();
   const plugin = plugins.find(p => p.id === pluginId);
@@ -28,11 +35,11 @@ const Feed: React.FC<FeedProps> = (props) => {
 
   return (
     <div className="min-h-screen bg-background">
-      {plugin?.name && <title>{`${plugin.name} - SocialGata`}</title>}
+      {(title || plugin?.name) && <title>{`${title || plugin?.name} - SocialGata`}</title>}
       <div className="max-w-3xl mx-auto px-3 sm:px-4 py-4">
         {/* Header */}
         <div className="mb-4">
-          <BrowseCommunitiesButton pluginId={pluginId} instanceId={instanceId} />
+          {header ?? <BrowseCommunitiesButton pluginId={pluginId} instanceId={instanceId} />}
 
           {/* Feed Type Tabs */}
           {data.feedTypes && data.feedTypes.length > 0 && (
