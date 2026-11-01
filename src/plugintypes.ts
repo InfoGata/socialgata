@@ -383,11 +383,21 @@ export interface SearchRequest {
   query: string;
   pageInfo?: PageInfo;
   instanceId?: string;
+  /** Selected sort order id (matches a SortOption.id from the response) */
+  sortId?: string;
+  /** Selected time range id for sorts that declare time ranges */
+  timeRangeId?: string;
 }
 
 export interface SearchResponse {
   items: Post[];
   pageInfo?: PageInfo;
+  /** Available sort orders for these search results */
+  sortOptions?: SortOption[];
+  /** Currently applied sort order id */
+  sortId?: string;
+  /** Currently applied time range id */
+  timeRangeId?: string;
 }
 
 export interface SearchCommunityRequest {
