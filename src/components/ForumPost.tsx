@@ -161,7 +161,7 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
             <PostLink
               post={post}
               isTitleLink
-              className={`text-[15px] font-semibold text-foreground hover:text-primary transition-colors leading-snug ${showFullPost ? "" : "line-clamp-2"}`}
+              className={`text-[15px] font-semibold text-foreground hover:text-primary transition-colors leading-snug min-w-0 wrap-break-word`}
               instanceId={instanceId}
             >
               {post.title}

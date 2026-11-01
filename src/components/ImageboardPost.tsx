@@ -116,7 +116,7 @@ const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
               <PostLink
                 post={post}
                 isTitleLink
-                className="text-base font-bold text-foreground hover:text-primary transition-colors line-clamp-2 mb-2 block"
+                className="text-base font-bold text-foreground hover:text-primary transition-colors wrap-break-word mb-2 block"
                 instanceId={instanceId}
               >
                 {post.title}
