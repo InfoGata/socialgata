@@ -5,7 +5,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 
 export default tseslint.config(
   {
-    ignores: ["dist/**", "node_modules/**", "public/**", "android/**", "out/**", "cors-server.js"],
+    ignores: ["dist/**", "node_modules/**", "public/**", "android/**", "ios/**", "out/**", "cors-server.js"],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
