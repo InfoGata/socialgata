@@ -407,6 +407,8 @@ export interface SearchRequest {
   query: string;
   pageInfo?: PageInfo;
   instanceId?: string;
+  /** Selected result type id (matches a FeedType.id from the response's feedTypes, e.g. "story" or "comment") */
+  feedTypeId?: string;
   /** Selected sort order id (matches a SortOption.id from the response) */
   sortId?: string;
   /** Selected time range id for sorts that declare time ranges */
@@ -416,6 +418,10 @@ export interface SearchRequest {
 export interface SearchResponse {
   items: Post[];
   pageInfo?: PageInfo;
+  /** Kinds of result the search can be narrowed to, shown as tabs (e.g. Stories / Comments / All) */
+  feedTypes?: FeedType[];
+  /** Currently applied result type id */
+  feedTypeId?: string;
   /** Available sort orders for these search results */
   sortOptions?: SortOption[];
   /** Currently applied sort order id */

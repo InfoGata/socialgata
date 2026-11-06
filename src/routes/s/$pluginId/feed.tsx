@@ -44,6 +44,7 @@ export const Route = createFileRoute('/s/$pluginId/feed')({
         const response = await plugin.remote.onSearch({
           query: q,
           pageInfo: { page },
+          feedTypeId,
           sortId,
           timeRangeId,
         });
