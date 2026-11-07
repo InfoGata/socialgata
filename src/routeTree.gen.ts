@@ -31,11 +31,13 @@ import { Route as SPluginIdTrendingTopicNameRouteImport } from './routes/s/$plug
 import { Route as SPluginIdPostApiIdRouteImport } from './routes/s/$pluginId/post.$apiId'
 import { Route as SPluginIdDomainDomainRouteImport } from './routes/s/$pluginId/domain.$domain'
 import { Route as SPluginIdCApiIdIndexRouteImport } from './routes/s/$pluginId/c.$apiId.index'
+import { Route as SPluginIdPostApiIdDuplicatesRouteImport } from './routes/s/$pluginId/post.$apiId_.duplicates'
 import { Route as SPluginIdIInstanceIdFeedRouteImport } from './routes/s/$pluginId/i/$instanceId/feed'
 import { Route as SPluginIdIInstanceIdCommunitiesRouteImport } from './routes/s/$pluginId/i/$instanceId/communities'
 import { Route as SPluginIdPostApiIdCommentCommentIdRouteImport } from './routes/s/$pluginId/post.$apiId_.comment.$commentId'
 import { Route as SPluginIdCCommunityIdPostApiIdRouteImport } from './routes/s/$pluginId/c.$communityId.post.$apiId'
 import { Route as SPluginIdIInstanceIdCApiIdIndexRouteImport } from './routes/s/$pluginId/i/$instanceId/c.$apiId.index'
+import { Route as SPluginIdCCommunityIdPostApiIdDuplicatesRouteImport } from './routes/s/$pluginId/c.$communityId.post.$apiId_.duplicates'
 import { Route as SPluginIdIInstanceIdCCommunityIdPostApiIdRouteImport } from './routes/s/$pluginId/i/$instanceId/c.$communityId.post.$apiId'
 import { Route as SPluginIdCCommunityIdPostApiIdCommentCommentIdRouteImport } from './routes/s/$pluginId/c.$communityId.post.$apiId_.comment.$commentId'
 import { Route as SPluginIdIInstanceIdCCommunityIdPostApiIdCommentCommentIdRouteImport } from './routes/s/$pluginId/i/$instanceId/c.$communityId.post.$apiId_.comment.$commentId'
@@ -151,6 +153,12 @@ const SPluginIdCApiIdIndexRoute = SPluginIdCApiIdIndexRouteImport.update({
   path: '/s/$pluginId/c/$apiId/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SPluginIdPostApiIdDuplicatesRoute =
+  SPluginIdPostApiIdDuplicatesRouteImport.update({
+    id: '/s/$pluginId/post/$apiId_/duplicates',
+    path: '/s/$pluginId/post/$apiId/duplicates',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SPluginIdIInstanceIdFeedRoute =
   SPluginIdIInstanceIdFeedRouteImport.update({
     id: '/s/$pluginId/i/$instanceId/feed',
@@ -179,6 +187,12 @@ const SPluginIdIInstanceIdCApiIdIndexRoute =
   SPluginIdIInstanceIdCApiIdIndexRouteImport.update({
     id: '/s/$pluginId/i/$instanceId/c/$apiId/',
     path: '/s/$pluginId/i/$instanceId/c/$apiId/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SPluginIdCCommunityIdPostApiIdDuplicatesRoute =
+  SPluginIdCCommunityIdPostApiIdDuplicatesRouteImport.update({
+    id: '/s/$pluginId/c/$communityId/post/$apiId_/duplicates',
+    path: '/s/$pluginId/c/$communityId/post/$apiId/duplicates',
     getParentRoute: () => rootRouteImport,
   } as any)
 const SPluginIdIInstanceIdCCommunityIdPostApiIdRoute =
@@ -224,9 +238,11 @@ export interface FileRoutesByFullPath {
   '/s/$pluginId/trending/': typeof SPluginIdTrendingIndexRoute
   '/s/$pluginId/i/$instanceId/communities': typeof SPluginIdIInstanceIdCommunitiesRoute
   '/s/$pluginId/i/$instanceId/feed': typeof SPluginIdIInstanceIdFeedRoute
+  '/s/$pluginId/post/$apiId/duplicates': typeof SPluginIdPostApiIdDuplicatesRoute
   '/s/$pluginId/c/$apiId/': typeof SPluginIdCApiIdIndexRoute
   '/s/$pluginId/c/$communityId/post/$apiId': typeof SPluginIdCCommunityIdPostApiIdRoute
   '/s/$pluginId/post/$apiId/comment/$commentId': typeof SPluginIdPostApiIdCommentCommentIdRoute
+  '/s/$pluginId/c/$communityId/post/$apiId/duplicates': typeof SPluginIdCCommunityIdPostApiIdDuplicatesRoute
   '/s/$pluginId/i/$instanceId/c/$apiId/': typeof SPluginIdIInstanceIdCApiIdIndexRoute
   '/s/$pluginId/c/$communityId/post/$apiId/comment/$commentId': typeof SPluginIdCCommunityIdPostApiIdCommentCommentIdRoute
   '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId': typeof SPluginIdIInstanceIdCCommunityIdPostApiIdRoute
@@ -256,9 +272,11 @@ export interface FileRoutesByTo {
   '/s/$pluginId/trending': typeof SPluginIdTrendingIndexRoute
   '/s/$pluginId/i/$instanceId/communities': typeof SPluginIdIInstanceIdCommunitiesRoute
   '/s/$pluginId/i/$instanceId/feed': typeof SPluginIdIInstanceIdFeedRoute
+  '/s/$pluginId/post/$apiId/duplicates': typeof SPluginIdPostApiIdDuplicatesRoute
   '/s/$pluginId/c/$apiId': typeof SPluginIdCApiIdIndexRoute
   '/s/$pluginId/c/$communityId/post/$apiId': typeof SPluginIdCCommunityIdPostApiIdRoute
   '/s/$pluginId/post/$apiId/comment/$commentId': typeof SPluginIdPostApiIdCommentCommentIdRoute
+  '/s/$pluginId/c/$communityId/post/$apiId/duplicates': typeof SPluginIdCCommunityIdPostApiIdDuplicatesRoute
   '/s/$pluginId/i/$instanceId/c/$apiId': typeof SPluginIdIInstanceIdCApiIdIndexRoute
   '/s/$pluginId/c/$communityId/post/$apiId/comment/$commentId': typeof SPluginIdCCommunityIdPostApiIdCommentCommentIdRoute
   '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId': typeof SPluginIdIInstanceIdCCommunityIdPostApiIdRoute
@@ -289,9 +307,11 @@ export interface FileRoutesById {
   '/s/$pluginId/trending/': typeof SPluginIdTrendingIndexRoute
   '/s/$pluginId/i/$instanceId/communities': typeof SPluginIdIInstanceIdCommunitiesRoute
   '/s/$pluginId/i/$instanceId/feed': typeof SPluginIdIInstanceIdFeedRoute
+  '/s/$pluginId/post/$apiId_/duplicates': typeof SPluginIdPostApiIdDuplicatesRoute
   '/s/$pluginId/c/$apiId/': typeof SPluginIdCApiIdIndexRoute
   '/s/$pluginId/c/$communityId/post/$apiId': typeof SPluginIdCCommunityIdPostApiIdRoute
   '/s/$pluginId/post/$apiId_/comment/$commentId': typeof SPluginIdPostApiIdCommentCommentIdRoute
+  '/s/$pluginId/c/$communityId/post/$apiId_/duplicates': typeof SPluginIdCCommunityIdPostApiIdDuplicatesRoute
   '/s/$pluginId/i/$instanceId/c/$apiId/': typeof SPluginIdIInstanceIdCApiIdIndexRoute
   '/s/$pluginId/c/$communityId/post/$apiId_/comment/$commentId': typeof SPluginIdCCommunityIdPostApiIdCommentCommentIdRoute
   '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId': typeof SPluginIdIInstanceIdCCommunityIdPostApiIdRoute
@@ -323,9 +343,11 @@ export interface FileRouteTypes {
     | '/s/$pluginId/trending/'
     | '/s/$pluginId/i/$instanceId/communities'
     | '/s/$pluginId/i/$instanceId/feed'
+    | '/s/$pluginId/post/$apiId/duplicates'
     | '/s/$pluginId/c/$apiId/'
     | '/s/$pluginId/c/$communityId/post/$apiId'
     | '/s/$pluginId/post/$apiId/comment/$commentId'
+    | '/s/$pluginId/c/$communityId/post/$apiId/duplicates'
     | '/s/$pluginId/i/$instanceId/c/$apiId/'
     | '/s/$pluginId/c/$communityId/post/$apiId/comment/$commentId'
     | '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId'
@@ -355,9 +377,11 @@ export interface FileRouteTypes {
     | '/s/$pluginId/trending'
     | '/s/$pluginId/i/$instanceId/communities'
     | '/s/$pluginId/i/$instanceId/feed'
+    | '/s/$pluginId/post/$apiId/duplicates'
     | '/s/$pluginId/c/$apiId'
     | '/s/$pluginId/c/$communityId/post/$apiId'
     | '/s/$pluginId/post/$apiId/comment/$commentId'
+    | '/s/$pluginId/c/$communityId/post/$apiId/duplicates'
     | '/s/$pluginId/i/$instanceId/c/$apiId'
     | '/s/$pluginId/c/$communityId/post/$apiId/comment/$commentId'
     | '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId'
@@ -387,9 +411,11 @@ export interface FileRouteTypes {
     | '/s/$pluginId/trending/'
     | '/s/$pluginId/i/$instanceId/communities'
     | '/s/$pluginId/i/$instanceId/feed'
+    | '/s/$pluginId/post/$apiId_/duplicates'
     | '/s/$pluginId/c/$apiId/'
     | '/s/$pluginId/c/$communityId/post/$apiId'
     | '/s/$pluginId/post/$apiId_/comment/$commentId'
+    | '/s/$pluginId/c/$communityId/post/$apiId_/duplicates'
     | '/s/$pluginId/i/$instanceId/c/$apiId/'
     | '/s/$pluginId/c/$communityId/post/$apiId_/comment/$commentId'
     | '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId'
@@ -420,9 +446,11 @@ export interface RootRouteChildren {
   SPluginIdTrendingIndexRoute: typeof SPluginIdTrendingIndexRoute
   SPluginIdIInstanceIdCommunitiesRoute: typeof SPluginIdIInstanceIdCommunitiesRoute
   SPluginIdIInstanceIdFeedRoute: typeof SPluginIdIInstanceIdFeedRoute
+  SPluginIdPostApiIdDuplicatesRoute: typeof SPluginIdPostApiIdDuplicatesRoute
   SPluginIdCApiIdIndexRoute: typeof SPluginIdCApiIdIndexRoute
   SPluginIdCCommunityIdPostApiIdRoute: typeof SPluginIdCCommunityIdPostApiIdRoute
   SPluginIdPostApiIdCommentCommentIdRoute: typeof SPluginIdPostApiIdCommentCommentIdRoute
+  SPluginIdCCommunityIdPostApiIdDuplicatesRoute: typeof SPluginIdCCommunityIdPostApiIdDuplicatesRoute
   SPluginIdIInstanceIdCApiIdIndexRoute: typeof SPluginIdIInstanceIdCApiIdIndexRoute
   SPluginIdCCommunityIdPostApiIdCommentCommentIdRoute: typeof SPluginIdCCommunityIdPostApiIdCommentCommentIdRoute
   SPluginIdIInstanceIdCCommunityIdPostApiIdRoute: typeof SPluginIdIInstanceIdCCommunityIdPostApiIdRoute
@@ -585,6 +613,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SPluginIdCApiIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/s/$pluginId/post/$apiId_/duplicates': {
+      id: '/s/$pluginId/post/$apiId_/duplicates'
+      path: '/s/$pluginId/post/$apiId/duplicates'
+      fullPath: '/s/$pluginId/post/$apiId/duplicates'
+      preLoaderRoute: typeof SPluginIdPostApiIdDuplicatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/s/$pluginId/i/$instanceId/feed': {
       id: '/s/$pluginId/i/$instanceId/feed'
       path: '/s/$pluginId/i/$instanceId/feed'
@@ -618,6 +653,13 @@ declare module '@tanstack/react-router' {
       path: '/s/$pluginId/i/$instanceId/c/$apiId'
       fullPath: '/s/$pluginId/i/$instanceId/c/$apiId/'
       preLoaderRoute: typeof SPluginIdIInstanceIdCApiIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/s/$pluginId/c/$communityId/post/$apiId_/duplicates': {
+      id: '/s/$pluginId/c/$communityId/post/$apiId_/duplicates'
+      path: '/s/$pluginId/c/$communityId/post/$apiId/duplicates'
+      fullPath: '/s/$pluginId/c/$communityId/post/$apiId/duplicates'
+      preLoaderRoute: typeof SPluginIdCCommunityIdPostApiIdDuplicatesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId': {
@@ -668,10 +710,13 @@ const rootRouteChildren: RootRouteChildren = {
   SPluginIdTrendingIndexRoute: SPluginIdTrendingIndexRoute,
   SPluginIdIInstanceIdCommunitiesRoute: SPluginIdIInstanceIdCommunitiesRoute,
   SPluginIdIInstanceIdFeedRoute: SPluginIdIInstanceIdFeedRoute,
+  SPluginIdPostApiIdDuplicatesRoute: SPluginIdPostApiIdDuplicatesRoute,
   SPluginIdCApiIdIndexRoute: SPluginIdCApiIdIndexRoute,
   SPluginIdCCommunityIdPostApiIdRoute: SPluginIdCCommunityIdPostApiIdRoute,
   SPluginIdPostApiIdCommentCommentIdRoute:
     SPluginIdPostApiIdCommentCommentIdRoute,
+  SPluginIdCCommunityIdPostApiIdDuplicatesRoute:
+    SPluginIdCCommunityIdPostApiIdDuplicatesRoute,
   SPluginIdIInstanceIdCApiIdIndexRoute: SPluginIdIInstanceIdCApiIdIndexRoute,
   SPluginIdCCommunityIdPostApiIdCommentCommentIdRoute:
     SPluginIdCCommunityIdPostApiIdCommentCommentIdRoute,

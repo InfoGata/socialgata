@@ -19,6 +19,8 @@ import {
   GetCommentRepliesResponse,
   GetDomainRequest,
   GetDomainResponse,
+  GetPostDuplicatesRequest,
+  GetPostDuplicatesResponse,
   GetUserRequest,
   GetUserResponse,
   SearchRequest,
@@ -97,6 +99,7 @@ export interface PluginMethodInterface {
   onGetCommentReplies(request: GetCommentRepliesRequest): Promise<GetCommentRepliesResponse>;
   onGetUser(request: GetUserRequest): Promise<GetUserResponse>;
   onGetDomain(request: GetDomainRequest): Promise<GetDomainResponse>;
+  onGetPostDuplicates(request: GetPostDuplicatesRequest): Promise<GetPostDuplicatesResponse>;
   onSearch(request: SearchRequest): Promise<SearchResponse>;
   onSearchCommunity(request: SearchCommunityRequest): Promise<SearchCommunityResponse>;
   onGetTrendingTopics(request?: GetTrendingTopicsRequest): Promise<GetTrendingTopicsResponse>;
@@ -131,6 +134,8 @@ export class PluginFrameContainer extends PluginFrame<PluginMethodInterface> {
   hasFeed?: boolean;
   /** Whether the plugin can list the posts linking to one site (onGetDomain) */
   hasDomain?: boolean;
+  /** Whether the plugin can list a post's other discussions (onGetPostDuplicates) */
+  hasDuplicates?: boolean;
   fileList?: FileList;
   optionsSameOrigin?: boolean;
   version?: string;
@@ -421,6 +426,11 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
             response?.items.forEach(stampPost);
             return response;
           },
+          onGetPostDuplicates: (response: GetPostDuplicatesResponse) => {
+            stampPost(response?.post);
+            response?.items.forEach(stampPost);
+            return response;
+          },
           onGetComments: (response: GetCommentsResponse) => {
             stampPost(response?.post);
             response?.items.forEach(stampPost);
@@ -456,6 +466,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
         // Try to get platform type from plugin
         host.hasFeed = await host.hasDefined.onGetFeed();
         host.hasDomain = await host.hasDefined.onGetDomain();
+        host.hasDuplicates = await host.hasDefined.onGetPostDuplicates();
 
         if (await host.hasDefined.onGetPlatformType()) {
           host.platformType = await host.remote.onGetPlatformType();

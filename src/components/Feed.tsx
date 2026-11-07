@@ -24,10 +24,13 @@ type FeedProps = {
   header?: React.ReactNode;
   /** Page title prefix; defaults to the plugin name */
   title?: string;
+  /** Heading and line shown when there are no posts */
+  emptyTitle?: string;
+  emptyDescription?: string;
 }
 
 const Feed: React.FC<FeedProps> = (props) => {
-  const { sortId, timeRangeId, data, pageInfo, pluginId, instanceId, isLoading, header, title } = props;
+  const { sortId, timeRangeId, data, pageInfo, pluginId, instanceId, isLoading, header, title, emptyTitle, emptyDescription } = props;
   const { nextPage, prevPage, hasNextPage, hasPreviousPage } = usePagination(pageInfo);
   const { plugins } = usePlugins();
   const plugin = plugins.find(p => p.id === pluginId);
@@ -92,8 +95,8 @@ const Feed: React.FC<FeedProps> = (props) => {
         ) : data.items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
             <Inbox className="w-10 h-10 text-muted-foreground/50 mb-2" />
-            <h3 className="text-sm font-medium mb-1">No posts yet</h3>
-            <p className="text-xs text-muted-foreground">Check back later for new content.</p>
+            <h3 className="text-sm font-medium mb-1">{emptyTitle ?? "No posts yet"}</h3>
+            <p className="text-xs text-muted-foreground">{emptyDescription ?? "Check back later for new content."}</p>
           </div>
         ) : (
           <>

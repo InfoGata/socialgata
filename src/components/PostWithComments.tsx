@@ -5,7 +5,7 @@ import React from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { usePlugins } from "@/hooks/usePlugins";
-import { ArrowLeftIcon, ExternalLinkIcon, MessageCircleIcon, RefreshCwIcon, Users2Icon } from "lucide-react";
+import { ArrowLeftIcon, ExternalLinkIcon, Layers2Icon, MessageCircleIcon, RefreshCwIcon, Users2Icon } from "lucide-react";
 import { Link, useRouter } from "@tanstack/react-router";
 import { ImageboardPostsProvider } from "@/contexts/ImageboardPostsContext";
 import {
@@ -65,6 +65,35 @@ const PostWithComments: React.FC<Props> = (props) => {
   const { plugins } = usePlugins();
   const plugin = pluginId ? plugins.find(p => p.id === pluginId) : null;
   const platformType = plugin?.platformType || "forum";
+
+  // Old Reddit's "other discussions". Instance-scoped plugins have no route
+  // for it yet, so it's only offered where the plugin isn't instance-based.
+  const duplicatesPostId = data.post?.apiId;
+  const duplicatesCommunityId = communityId ?? data.post?.communityApiId;
+  const duplicatesLinkClass =
+    "inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors";
+  const duplicatesLink =
+    plugin?.hasDuplicates && pluginId && duplicatesPostId && !instanceId ? (
+      duplicatesCommunityId ? (
+        <Link
+          to="/s/$pluginId/c/$communityId/post/$apiId/duplicates"
+          params={{ pluginId, communityId: duplicatesCommunityId, apiId: duplicatesPostId }}
+          className={duplicatesLinkClass}
+        >
+          <Layers2Icon className="h-4 w-4" />
+          <span>Other discussions</span>
+        </Link>
+      ) : (
+        <Link
+          to="/s/$pluginId/post/$apiId/duplicates"
+          params={{ pluginId, apiId: duplicatesPostId }}
+          className={duplicatesLinkClass}
+        >
+          <Layers2Icon className="h-4 w-4" />
+          <span>Other discussions</span>
+        </Link>
+      )
+    ) : null;
 
   React.useEffect(() => {
     if (plugin) {
@@ -264,17 +293,20 @@ const PostWithComments: React.FC<Props> = (props) => {
           <CardContent className="p-0">
             <PostComponent post={data.post} platformType={platformType} showFullPost={true} />
           </CardContent>
-          {data.post.originalUrl && (
-            <CardContent className="pt-0 pb-3 px-3 sm:px-4">
-              <a
-                href={data.post.originalUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                <ExternalLinkIcon className="h-4 w-4" />
-                <span>View original</span>
-              </a>
+          {(data.post.originalUrl || duplicatesLink) && (
+            <CardContent className="pt-0 pb-3 px-3 sm:px-4 flex flex-wrap items-center gap-x-4 gap-y-1">
+              {data.post.originalUrl && (
+                <a
+                  href={data.post.originalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <ExternalLinkIcon className="h-4 w-4" />
+                  <span>View original</span>
+                </a>
+              )}
+              {duplicatesLink}
             </CardContent>
           )}
         </Card>

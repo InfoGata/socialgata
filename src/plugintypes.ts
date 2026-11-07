@@ -324,6 +324,28 @@ export interface GetDomainResponse {
   timeRangeId?: string;
 }
 
+export interface GetPostDuplicatesRequest {
+  /** Api id of the post whose other discussions are wanted */
+  apiId: string;
+  communityId?: string;
+  instanceId?: string;
+  pageInfo?: PageInfo;
+  /** Selected sort order id (matches a SortOption.id from the response) */
+  sortId?: string;
+}
+
+export interface GetPostDuplicatesResponse {
+  /** The other posts, not including the original */
+  items: Post[];
+  /** The original post, for the page's header */
+  post?: Post;
+  pageInfo?: PageInfo;
+  /** Available sort orders for the listing */
+  sortOptions?: SortOption[];
+  /** Currently applied sort order id */
+  sortId?: string;
+}
+
 export interface GetUserResponse {
   pageInfo?: PageInfo;
   user?: User;
