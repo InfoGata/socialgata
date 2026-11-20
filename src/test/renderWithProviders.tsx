@@ -18,7 +18,11 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "../i18n";
 import { Toaster } from "sonner";
 
-export function renderWithProviders(ui: React.ReactElement) {
+export function renderWithProviders(
+  ui: React.ReactElement,
+  /** Where the router starts, e.g. `/#q123` to render under a url fragment. */
+  options: { initialPath?: string } = {},
+) {
   function Wrapper({ children }: PropsWithChildren<unknown>): React.JSX.Element {
     const rootRoute = createRootRoute({
       component: Root,
@@ -31,7 +35,9 @@ export function renderWithProviders(ui: React.ReactElement) {
 
     const router = createRouter({
       routeTree: rootRoute.addChildren([route]),
-      history: createMemoryHistory(),
+      history: createMemoryHistory(
+        options.initialPath ? { initialEntries: [options.initialPath] } : undefined,
+      ),
     });
     return (
       <Provider store={store}>

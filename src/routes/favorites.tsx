@@ -15,6 +15,7 @@ import InstanceCard from '@/components/InstanceCard';
 import PostComponent from '@/components/PostComponent';
 import CommentComponent from '@/components/CommentComponent';
 import { FullThreadLink } from '@/components/CommentPermalink';
+import { imageboardPostAnchor } from '@/lib/imageboard-anchor';
 import type { FavoriteComment } from '@/sync/favorites-repo';
 import type { Community } from '@/plugintypes';
 import { Link } from '@tanstack/react-router';
@@ -309,6 +310,8 @@ function FavoriteCommentCard({ pluginId, comment }: { pluginId: string; comment:
             in{' '}
             <FullThreadLink
               context={source}
+              // An imageboard reply opens its thread at the reply.
+              hash={isImageboard && comment.number != null ? imageboardPostAnchor(comment.number) : undefined}
               className="font-medium text-foreground hover:text-primary transition-colors"
             >
               {source.postTitle || 'this post'}

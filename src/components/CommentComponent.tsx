@@ -1,6 +1,6 @@
 import { Post } from "@/plugintypes";
 import { Link } from "@tanstack/react-router";
-import { ExternalLinkIcon, MessageCircleIcon } from "lucide-react";
+import { ExternalLinkIcon, LinkIcon, MessageCircleIcon } from "lucide-react";
 import parse from 'html-react-parser';
 import DOMPurify from "dompurify";
 import React from "react";
@@ -14,7 +14,9 @@ import {
   CommentPermalink,
   CommentPermalinkContext,
   FavoriteCommentSource,
+  FullThreadLink,
 } from "./CommentPermalink";
+import { imageboardPostAnchor } from "@/lib/imageboard-anchor";
 import { useNsfwGate } from "@/hooks/useNsfwGate";
 
 type Props = {
@@ -35,6 +37,11 @@ type Props = {
   favoriteSource?: FavoriteCommentSource;
   /** How deep in the reply tree this comment sits; 0 for a top-level one. */
   depth?: number;
+  /**
+   * The reply the url points at (`#q<number>`), drawn highlighted the way an
+   * imageboard marks a linked post. Imageboard replies only.
+   */
+  isTarget?: boolean;
 };
 
 const numberFormatter = Intl.NumberFormat("en", { notation: "compact" });
@@ -82,7 +89,7 @@ const distinguishedLabel = (distinguished: string): string => {
 // Named separately from the memoized export below so the recursive renders
 // inside go through the memo rather than around it.
 const Comment = (props: Props) => {
-  const { comment, platformType = "forum", routePluginId, permalinkContext, favoriteSource, depth = 0 } = props;
+  const { comment, platformType = "forum", routePluginId, permalinkContext, favoriteSource, depth = 0, isTarget = false } = props;
   const [expand, setExpand] = React.useState(false);
   const [collapsed, setCollapsed] = React.useState(false);
   const toggleExpand = () => {
@@ -139,7 +146,12 @@ const Comment = (props: Props) => {
   // Imageboard-style rendering
   if (platformType === "imageboard") {
     return (
-      <div className={`border-l-2 ${threadLineColor(depth)} pl-2 sm:pl-4 my-3 sm:my-4`} data-post-number={comment.number}>
+      <div
+        id={comment.number != null ? imageboardPostAnchor(comment.number) : undefined}
+        className={`border-l-2 ${threadLineColor(depth)} pl-2 sm:pl-4 my-3 sm:my-4 scroll-mt-20 ${isTarget ? "rounded-r-md bg-primary/10 ring-1 ring-primary/40" : ""}`}
+        data-post-number={comment.number}
+        aria-current={isTarget ? "location" : undefined}
+      >
         {/* Expanded Media - Full Width Above Content */}
         {expand &&
           (comment.url || comment.videoSources?.length || comment.images?.length) &&
@@ -216,7 +228,7 @@ const Comment = (props: Props) => {
             )}
 
             {/* Favorite Button & Original Link */}
-            {(favoritePluginId && comment.apiId || comment.originalUrl) && (
+            {(favoritePluginId && comment.apiId || comment.originalUrl || favoriteSource) && (
               <div className="mt-1 flex items-center gap-0.5 sm:gap-2 -ml-1.5 sm:ml-0">
                 {favoritePluginId && comment.apiId && (
                   <FavoriteButton
@@ -228,18 +240,17 @@ const Comment = (props: Props) => {
                     source={favoriteSource}
                   />
                 )}
-                {routePluginId && comment.apiId && (
-                  <Link
-                    to="/s/$pluginId/post/$apiId"
-                    params={{
-                      pluginId: routePluginId,
-                      apiId: comment.apiId,
-                    }}
+                {/* A reply's link is its thread scrolled to it, the way the
+                    board's own `#q<number>` links work. */}
+                {favoriteSource && comment.number != null && (
+                  <FullThreadLink
+                    context={favoriteSource}
+                    hash={imageboardPostAnchor(comment.number)}
                     className={commentActionClass}
-                    aria-label="View comment thread"
+                    title="Link to this post"
                   >
-                    <MessageCircleIcon className="h-4 w-4" />
-                  </Link>
+                    <LinkIcon className="h-3.5 w-3.5" />
+                  </FullThreadLink>
                 )}
                 {comment.originalUrl && (
                   <a

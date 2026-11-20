@@ -7,6 +7,7 @@ import DOMPurify from "dompurify";
 import ReactTimeago from "react-timeago";
 import { useImageboardPosts } from "@/contexts/ImageboardPostsContext";
 import { replaceEmbeddedMedia } from "./EmbeddedImage";
+import { imageboardPostAnchor } from "@/lib/imageboard-anchor";
 import {
   HoverCard,
   HoverCardContent,
@@ -18,6 +19,11 @@ type Props = {
   pluginId: string;
   communityApiId?: string;
   instanceId?: string;
+  /**
+   * Thread the quoted post is in. Plugins that predate it send only the post
+   * number, which is then taken to be a thread of its own.
+   */
+  threadId?: string;
 };
 
 const ImageboardQuoteLink: React.FC<Props> = ({
@@ -25,6 +31,7 @@ const ImageboardQuoteLink: React.FC<Props> = ({
   pluginId,
   communityApiId,
   instanceId,
+  threadId,
 }) => {
   const navigate = useNavigate();
   const { getPostByNumber } = useImageboardPosts();
@@ -32,31 +39,35 @@ const ImageboardQuoteLink: React.FC<Props> = ({
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    const hash = imageboardPostAnchor(postNumber);
 
-    // Try to scroll to the referenced post on the current page
-    const target = document.querySelector(`[data-post-number="${postNumber}"]`);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "center" });
-      target.classList.add("ring-2", "ring-primary");
-      setTimeout(() => target.classList.remove("ring-2", "ring-primary"), 2000);
+    // In this thread: move the url to the post, the way a board's own quote
+    // links do. The thread scrolls to it and marks it, mounting it first if
+    // it's further down than has been rendered. Same route, so no reload.
+    if (post) {
+      navigate({ to: ".", params: true, search: true, hash, resetScroll: false });
       return;
     }
 
-    // Navigate to the post's page
+    // Elsewhere: open the post's thread at the post.
+    const apiId = threadId ?? postNumber;
     if (communityApiId && instanceId) {
       navigate({
         to: "/s/$pluginId/i/$instanceId/c/$communityId/post/$apiId",
-        params: { pluginId, instanceId, communityId: communityApiId, apiId: postNumber },
+        params: { pluginId, instanceId, communityId: communityApiId, apiId },
+        hash,
       });
     } else if (communityApiId) {
       navigate({
         to: "/s/$pluginId/c/$communityId/post/$apiId",
-        params: { pluginId, communityId: communityApiId, apiId: postNumber },
+        params: { pluginId, communityId: communityApiId, apiId },
+        hash,
       });
     } else {
       navigate({
         to: "/s/$pluginId/post/$apiId",
-        params: { pluginId, apiId: postNumber },
+        params: { pluginId, apiId },
+        hash,
       });
     }
   };
@@ -124,6 +135,16 @@ const ImageboardQuoteLink: React.FC<Props> = ({
   );
 };
 
+/** A plugin-written data attribute, which the plugin url-encodes. */
+const decodeAttr = (value: string | undefined): string | undefined => {
+  if (!value) return undefined;
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return undefined;
+  }
+};
+
 // eslint-disable-next-line react-refresh/only-export-components
 export function createImageboardParseOptions(
   pluginId: string,
@@ -145,12 +166,16 @@ export function createImageboardParseOptions(
         if (textChild?.type === "text" && textChild.data) {
           const match = textChild.data.match(/^>>(\d+)$/);
           if (match) {
+            const attribs = (domNode as any).attribs ?? {};
             return (
               <ImageboardQuoteLink
                 postNumber={match[1]}
                 pluginId={pluginId}
-                communityApiId={communityApiId}
+                communityApiId={
+                  decodeAttr(attribs["data-board-id"]) ?? communityApiId
+                }
                 instanceId={instanceId}
+                threadId={decodeAttr(attribs["data-thread-id"])}
               />
             );
           }

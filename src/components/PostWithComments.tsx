@@ -6,7 +6,7 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { usePlugins } from "@/hooks/usePlugins";
 import { ArrowLeftIcon, ExternalLinkIcon, Layers2Icon, MessageCircleIcon, RefreshCwIcon, Users2Icon } from "lucide-react";
-import { Link, useRouter } from "@tanstack/react-router";
+import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { ImageboardPostsProvider } from "@/contexts/ImageboardPostsContext";
 import {
   CommentPermalinkContext,
@@ -14,6 +14,7 @@ import {
   FullThreadLink,
 } from "./CommentPermalink";
 import SortControls from "./SortControls";
+import { parseImageboardAnchor } from "@/lib/imageboard-anchor";
 
 /** How many top-level comments to add per batch. */
 export const COMMENT_BATCH_SIZE = 25;
@@ -65,6 +66,21 @@ const PostWithComments: React.FC<Props> = (props) => {
   const { plugins } = usePlugins();
   const plugin = pluginId ? plugins.find(p => p.id === pluginId) : null;
   const platformType = plugin?.platformType || "forum";
+  const isImageboard = platformType === "imageboard";
+  const hash = useLocation({ select: (location) => location.hash });
+  // Changes with every navigation, so following the same link twice scrolls
+  // back to the post, while a refresh (same location) leaves the reader be.
+  const locationKey = useLocation({
+    select: (location) => location.state.__TSR_key,
+  });
+
+  // The reply an imageboard url points at: `#q<number>` on the thread, or the
+  // comment route, which is the same jump for a board (its thread is one page,
+  // not a tree to cut down to a single branch).
+  const targetNumber = isImageboard
+    ? (parseImageboardAnchor(hash) ??
+      (commentId ? parseImageboardAnchor(commentId) : undefined))
+    : undefined;
 
   // Old Reddit's "other discussions". Instance-scoped plugins have no route
   // for it yet, so it's only offered where the plugin isn't instance-based.
@@ -163,15 +179,16 @@ const PostWithComments: React.FC<Props> = (props) => {
   // individually addressable comments, so they get no permalinks. The post they
   // live in is still linkable, which is why favoriteSource isn't gated here.
   const permalinkContext: CommentPermalinkContext | undefined =
-    platformType === "imageboard" ? undefined : favoriteSource;
+    isImageboard ? undefined : favoriteSource;
 
   // A plugin that understands `commentApiId` already returns just the one
   // thread; narrow it here for the ones that hand back the whole post.
+  // Imageboards keep the whole thread and jump to the reply instead.
   const comments = React.useMemo(() => {
-    if (!commentId) return data.items;
+    if (!commentId || isImageboard) return data.items;
     const comment = findComment(data.items, commentId);
     return comment ? [comment] : data.items;
-  }, [data.items, commentId]);
+  }, [data.items, commentId, isImageboard]);
 
   // A big thread is thousands of components, and mounting them all in one go
   // blocks the main thread for seconds. Render the top-level comments in
@@ -184,6 +201,44 @@ const PostWithComments: React.FC<Props> = (props) => {
     setBatchedComments(comments);
     setVisibleCount(COMMENT_BATCH_SIZE);
   }
+
+  // A linked reply further down than the first batch has to be mounted before
+  // it can be scrolled to, so render at least up to the batch that holds it.
+  const targetIndex = React.useMemo(
+    () =>
+      targetNumber === undefined
+        ? -1
+        : comments.findIndex((comment) => comment.number === targetNumber),
+    [comments, targetNumber],
+  );
+  if (targetIndex >= visibleCount) {
+    setVisibleCount(
+      Math.ceil((targetIndex + 1) / COMMENT_BATCH_SIZE) * COMMENT_BATCH_SIZE,
+    );
+  }
+
+  // Scroll to the linked post once per link followed — not again when a
+  // refresh or a later batch re-renders the thread under the reader.
+  const scrolledToRef = React.useRef<string | null>(null);
+  const targetRendered = targetIndex !== -1 && targetIndex < visibleCount;
+  const targetIsOp =
+    targetNumber !== undefined && data.post?.number === targetNumber;
+  React.useEffect(() => {
+    if (targetNumber === undefined) {
+      scrolledToRef.current = null;
+      return;
+    }
+    if (!targetRendered && !targetIsOp) return;
+    const key = `${locationKey}|${data.post?.apiId}|${targetNumber}`;
+    if (scrolledToRef.current === key) return;
+
+    const target = document.querySelector(
+      `[data-post-number="${targetNumber}"]`,
+    );
+    if (!target) return;
+    scrolledToRef.current = key;
+    target.scrollIntoView({ block: "center" });
+  }, [targetNumber, targetRendered, targetIsOp, data.post?.apiId, locationKey]);
 
   const visibleComments = React.useMemo(
     () => comments.slice(0, visibleCount),
@@ -362,7 +417,7 @@ const PostWithComments: React.FC<Props> = (props) => {
           {comments.length > 0 ? (
             <>
               {visibleComments.map((d) => (
-                <CommentComponent key={d.apiId} comment={d} platformType={platformType} routePluginId={pluginId} permalinkContext={permalinkContext} favoriteSource={favoriteSource} />
+                <CommentComponent key={d.apiId} comment={d} platformType={platformType} routePluginId={pluginId} permalinkContext={permalinkContext} favoriteSource={favoriteSource} isTarget={targetNumber !== undefined && d.number === targetNumber} />
               ))}
               {hasMoreComments && (
                 <div ref={sentinelRef} className="flex justify-center pt-2">
@@ -411,7 +466,7 @@ const PostWithComments: React.FC<Props> = (props) => {
           </CardHeader>
           <CardContent className="space-y-4 p-3 pt-0 sm:p-6 sm:pt-0">
             {replies.map((r) => (
-              <CommentComponent key={r.apiId} comment={r} platformType={platformType} routePluginId={pluginId} permalinkContext={permalinkContext} favoriteSource={favoriteSource} />
+              <CommentComponent key={r.apiId} comment={r} platformType={platformType} routePluginId={pluginId} permalinkContext={permalinkContext} favoriteSource={favoriteSource} isTarget={targetNumber !== undefined && r.number === targetNumber} />
             ))}
           </CardContent>
         </Card>
@@ -419,7 +474,7 @@ const PostWithComments: React.FC<Props> = (props) => {
     </div>
   );
 
-  if (platformType === "imageboard") {
+  if (isImageboard) {
     return (
       <ImageboardPostsProvider posts={allPosts}>
         {content}

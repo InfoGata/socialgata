@@ -93,12 +93,30 @@ export const CommentPermalink: React.FC<PermalinkProps> = (props) => {
 type FullThreadProps = {
   context: CommentPermalinkContext;
   className?: string;
+  /**
+   * Url fragment (without `#`) naming one post on the page — how an imageboard
+   * reply is linked, since its thread is a single page rather than a tree.
+   */
+  hash?: string;
+  title?: string;
   children: React.ReactNode;
 };
 
-/** Link back to every comment on the post, from a single comment thread. */
+/**
+ * Link to every comment on the post: back from a single comment thread, or,
+ * with `hash`, to one imageboard reply in place.
+ */
 export const FullThreadLink: React.FC<FullThreadProps> = (props) => {
-  const { context, className, children } = props;
+  const { context, className, hash, title, children } = props;
+  // A jump within the thread already on screen keeps its scroll position for
+  // the thread to move to the reply itself; the reply may not be rendered yet.
+  const linkProps = {
+    className,
+    hash,
+    title,
+    "aria-label": title,
+    resetScroll: hash ? false : undefined,
+  };
   const { pluginId, postApiId, communityId, instanceId } = context;
 
   if (communityId && instanceId) {
@@ -111,7 +129,7 @@ export const FullThreadLink: React.FC<FullThreadProps> = (props) => {
           communityId,
           apiId: postApiId,
         }}
-        className={className}
+        {...linkProps}
       >
         {children}
       </Link>
@@ -123,7 +141,7 @@ export const FullThreadLink: React.FC<FullThreadProps> = (props) => {
       <Link
         to="/s/$pluginId/c/$communityId/post/$apiId"
         params={{ pluginId, communityId, apiId: postApiId }}
-        className={className}
+        {...linkProps}
       >
         {children}
       </Link>
@@ -134,7 +152,7 @@ export const FullThreadLink: React.FC<FullThreadProps> = (props) => {
     <Link
       to="/s/$pluginId/post/$apiId"
       params={{ pluginId, apiId: postApiId }}
-      className={className}
+      {...linkProps}
     >
       {children}
     </Link>
