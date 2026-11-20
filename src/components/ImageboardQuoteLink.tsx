@@ -8,6 +8,7 @@ import ReactTimeago from "react-timeago";
 import { useImageboardPosts } from "@/contexts/ImageboardPostsContext";
 import { replaceEmbeddedMedia } from "./EmbeddedImage";
 import { imageboardPostAnchor } from "@/lib/imageboard-anchor";
+import type { Post } from "@/plugintypes";
 import {
   HoverCard,
   HoverCardContent,
@@ -86,52 +87,146 @@ const ImageboardQuoteLink: React.FC<Props> = ({
     return link;
   }
 
-  const sanitizedBody = post.body ? DOMPurify.sanitize(post.body) : "";
-
   return (
     <HoverCard openDelay={200} closeDelay={100}>
       <HoverCardTrigger asChild>{link}</HoverCardTrigger>
       <HoverCardContent className="w-80 p-3" side="top">
-        {/* Header */}
-        <div className="flex items-center gap-1.5 mb-1.5 text-xs flex-wrap">
-          <span className="font-semibold text-muted-foreground">
-            {post.authorName || "Anonymous"}
-          </span>
-          {post.number && (
-            <>
-              <span className="text-muted-foreground">&middot;</span>
-              <span className="text-muted-foreground font-mono">
-                No. {post.number}
-              </span>
-            </>
-          )}
-          {post.publishedDate && (
-            <>
-              <span className="text-muted-foreground">&middot;</span>
-              <span className="text-muted-foreground">
-                <ReactTimeago date={post.publishedDate} />
-              </span>
-            </>
-          )}
-        </div>
-
-        {/* Thumbnail */}
-        {post.thumbnailUrl && (
-          <img
-            src={post.thumbnailUrl}
-            alt=""
-            className="rounded w-16 h-16 object-cover float-left mr-2 mb-1"
-          />
-        )}
-
-        {/* Body */}
-        {sanitizedBody && (
-          <div className="text-xs text-foreground line-clamp-4 whitespace-pre-wrap wrap-break-word">
-            {parse(sanitizedBody)}
-          </div>
-        )}
+        <QuotePreview
+          post={post}
+          pluginId={pluginId}
+          communityApiId={communityApiId}
+          instanceId={instanceId}
+        />
       </HoverCardContent>
     </HoverCard>
+  );
+};
+
+type PreviewProps = {
+  post: Post;
+  pluginId: string;
+  communityApiId?: string;
+  instanceId?: string;
+};
+
+/**
+ * The quoted post inside a hover card. Its own quotes and backlinks are live
+ * quote links, so a reply chain can be followed preview to preview the way a
+ * board's own hover previews nest. Each card only mounts while it is open, so
+ * the nesting costs nothing until someone hovers.
+ */
+const QuotePreview: React.FC<PreviewProps> = ({
+  post,
+  pluginId,
+  communityApiId,
+  instanceId,
+}) => {
+  const parseOptions = React.useMemo(
+    () =>
+      createImageboardParseOptions(
+        pluginId,
+        post.communityApiId ?? communityApiId,
+        instanceId,
+      ),
+    [pluginId, post.communityApiId, communityApiId, instanceId],
+  );
+  const sanitizedBody = post.body ? DOMPurify.sanitize(post.body) : "";
+
+  return (
+    <>
+      {/* Header */}
+      <div className="flex items-center gap-1.5 mb-1.5 text-xs flex-wrap">
+        <span className="font-semibold text-muted-foreground">
+          {post.authorName || "Anonymous"}
+        </span>
+        {post.number && (
+          <>
+            <span className="text-muted-foreground">&middot;</span>
+            <span className="text-muted-foreground font-mono">
+              No. {post.number}
+            </span>
+          </>
+        )}
+        {post.publishedDate && (
+          <>
+            <span className="text-muted-foreground">&middot;</span>
+            <span className="text-muted-foreground">
+              <ReactTimeago date={post.publishedDate} />
+            </span>
+          </>
+        )}
+      </div>
+
+      {/* Thumbnail */}
+      {post.thumbnailUrl && (
+        <img
+          src={post.thumbnailUrl}
+          alt=""
+          className="rounded w-16 h-16 object-cover float-left mr-2 mb-1"
+        />
+      )}
+
+      {/* Body */}
+      {sanitizedBody && (
+        <div className="text-xs text-foreground line-clamp-4 whitespace-pre-wrap wrap-break-word">
+          {parse(sanitizedBody, parseOptions)}
+        </div>
+      )}
+
+      {post.number != null && (
+        <ImageboardBacklinks
+          number={post.number}
+          pluginId={pluginId}
+          communityApiId={post.communityApiId ?? communityApiId}
+          instanceId={instanceId}
+          className="clear-both mt-1.5 text-xs"
+        />
+      )}
+    </>
+  );
+};
+
+type BacklinksProps = {
+  /** The post whose replies are listed. */
+  number: number;
+  pluginId: string;
+  communityApiId?: string;
+  instanceId?: string;
+  className?: string;
+};
+
+/**
+ * "Replies: >>1 >>2", the posts in this thread that quote this one. Each is a
+ * quote link, so it previews on hover and jumps to the reply on click. Renders
+ * nothing outside a thread, where no replies are known.
+ */
+export const ImageboardBacklinks: React.FC<BacklinksProps> = ({
+  number,
+  pluginId,
+  communityApiId,
+  instanceId,
+  className = "",
+}) => {
+  const { getReplyNumbers } = useImageboardPosts();
+  const replyNumbers = getReplyNumbers(number);
+  if (replyNumbers.length === 0) return null;
+
+  return (
+    <div
+      className={`flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-muted-foreground ${className}`}
+      aria-label={`Replies to post ${number}`}
+    >
+      <span>Replies:</span>
+      {replyNumbers.map((reply) => (
+        <ImageboardQuoteLink
+          key={reply}
+          postNumber={String(reply)}
+          pluginId={pluginId}
+          communityApiId={communityApiId}
+          instanceId={instanceId}
+        />
+      ))}
+    </div>
   );
 };
 

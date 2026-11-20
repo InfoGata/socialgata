@@ -10,7 +10,7 @@ import DOMPurify from "dompurify";
 import ImageThumbnail from "./ImageThumbnail";
 import ExpandedMedia from "./ExpandedMedia";
 import { FavoriteButton } from "./FavoriteButton";
-import { createImageboardParseOptions } from "./ImageboardQuoteLink";
+import { createImageboardParseOptions, ImageboardBacklinks } from "./ImageboardQuoteLink";
 
 type Props = {
   post: Post;
@@ -130,6 +130,16 @@ const ImageboardPost: React.FC<Props> = ({ post, instanceId }) => {
                   {parse(sanitizer(post.body), parseOptions)}
                 </div>
               </div>
+            )}
+
+            {post.number != null && (
+              <ImageboardBacklinks
+                number={post.number}
+                pluginId={post.pluginId || ""}
+                communityApiId={post.communityApiId}
+                instanceId={instanceId ?? post.instanceId}
+                className="mb-2 text-xs"
+              />
             )}
 
             {/* Actions Bar */}

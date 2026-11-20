@@ -476,7 +476,11 @@ const PostWithComments: React.FC<Props> = (props) => {
 
   if (isImageboard) {
     return (
-      <ImageboardPostsProvider posts={allPosts}>
+      <ImageboardPostsProvider
+        posts={allPosts}
+        threadNumber={data.post?.number}
+        boardId={data.post?.communityApiId ?? communityId}
+      >
         {content}
       </ImageboardPostsProvider>
     );

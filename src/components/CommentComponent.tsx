@@ -8,7 +8,7 @@ import ImageThumbnail from "./ImageThumbnail";
 import ExpandedMedia from "./ExpandedMedia";
 import ReactTimeago from "react-timeago";
 import { FavoriteButton } from "./FavoriteButton";
-import { createImageboardParseOptions } from "./ImageboardQuoteLink";
+import { createImageboardParseOptions, ImageboardBacklinks } from "./ImageboardQuoteLink";
 import { createPostBodyParseOptions } from "@/lib/post-body-links";
 import {
   CommentPermalink,
@@ -225,6 +225,16 @@ const Comment = (props: Props) => {
                   {parsedBody}
                 </div>
               </div>
+            )}
+
+            {comment.number != null && (
+              <ImageboardBacklinks
+                number={comment.number}
+                pluginId={comment.pluginId || routePluginId || ""}
+                communityApiId={comment.communityApiId}
+                instanceId={comment.instanceId}
+                className="mt-1 text-xs"
+              />
             )}
 
             {/* Favorite Button & Original Link */}
