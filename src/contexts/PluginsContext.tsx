@@ -132,6 +132,8 @@ export class PluginFrameContainer extends PluginFrame<PluginMethodInterface> {
   alias?: string;
   hasOptions?: boolean;
   hasFeed?: boolean;
+  /** Whether the plugin lists trending topics (onGetTrendingTopics) */
+  hasTrending?: boolean;
   /** Whether the plugin can list the posts linking to one site (onGetDomain) */
   hasDomain?: boolean;
   /** Whether the plugin can list a post's other discussions (onGetPostDuplicates) */
@@ -465,6 +467,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
 
         // Try to get platform type from plugin
         host.hasFeed = await host.hasDefined.onGetFeed();
+        host.hasTrending = await host.hasDefined.onGetTrendingTopics();
         host.hasDomain = await host.hasDefined.onGetDomain();
         host.hasDuplicates = await host.hasDefined.onGetPostDuplicates();
 

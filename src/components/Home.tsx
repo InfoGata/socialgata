@@ -10,7 +10,10 @@ import React from "react";
 
 const Home: React.FC = () => {
   const { plugins, pluginsLoaded } = usePlugins();
-  const feedPlugins = plugins.filter((plugin) => plugin.hasFeed);
+  // Trending alone is enough to browse a plugin: Twitter has no feed of its own.
+  const feedPlugins = plugins.filter(
+    (plugin) => plugin.hasFeed || plugin.hasTrending
+  );
   const hasPlugins = feedPlugins.length > 0;
 
   return (

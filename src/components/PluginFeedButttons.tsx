@@ -103,7 +103,7 @@ const PluginFeedButtons = ({ pluginId }: PluginFeedButtonsProps) => {
       </CardHeader>
       <CardContent className="pt-3 pb-4">
         <div className="flex flex-wrap gap-2">
-          {!hasInstances && (
+          {!hasInstances && plugin?.hasFeed && (
             <Link
               className={cn(buttonVariants({ variant: "default", size: "sm" }))}
               to={`/s/$pluginId/feed`}

@@ -5,7 +5,10 @@ import {
   pluginNotFoundComponent,
 } from "@/lib/plugin-route";
 
-/** `/s/reddit` is the natural thing to type or share, so send it to the feed. */
+/**
+ * `/s/reddit` is the natural thing to type or share, so send it to the feed,
+ * or to trending for a plugin without one (Twitter).
+ */
 export const Route = createFileRoute("/s/$pluginId/")({
   params: pluginIdParams(),
   notFoundComponent: pluginNotFoundComponent,
@@ -17,7 +20,11 @@ export const Route = createFileRoute("/s/$pluginId/")({
     if (!plugin) throw notFound();
 
     throw redirect({
-      to: plugin.hasFeed ? "/s/$pluginId/feed" : "/plugins/$pluginId",
+      to: plugin.hasFeed
+        ? "/s/$pluginId/feed"
+        : plugin.hasTrending
+          ? "/s/$pluginId/trending"
+          : "/plugins/$pluginId",
       params: { pluginId: params.pluginId },
       replace: true,
     });
