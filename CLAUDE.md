@@ -130,7 +130,10 @@ the router.
 `vite-plugin-pwa` (same library as the other InfoGata apps) in `vite.config.ts`,
 web build only — the electron and capacitor builds are not wired to it.
 `registerType: "autoUpdate"` so a client on a stale precached shell recovers
-without needing the page to post SKIP_WAITING.
+without needing the page to post SKIP_WAITING. `injectRegister: false`:
+`src/lib/service-worker.ts` registers it on the web only and unregisters it
+(plus its caches) in the native app, where it would keep serving the old
+bundle after an OTA update.
 
 The `navigateFallbackDenylist` is load-bearing: `public/` holds real pages
 (`pluginframe.html`, `ui.html`, `login_popup.html`) and without the denylist the
@@ -140,6 +143,33 @@ extensionless would need its own entry.
 
 `maximumFileSizeToCacheInBytes` must stay above the automerge wasm (~2.7MB) or
 the app installs and then won't open offline, and it fails silently.
+
+### OTA Updates (native app)
+`@capgo/capacitor-updater`, self-hosted, with `autoUpdate: false` and stats
+off, so nothing goes to Capgo. `npm run ota:publish` (`scripts/ota-publish.ts`)
+builds, zips `dist`, and attaches the zip plus `ota.json` to GitHub release
+`v<version>`. `src/lib/ota-update.ts` reads `releases/latest/download/ota.json`.
+- A bundle is only installed on a binary with the same **native fingerprint**
+  (`native-fingerprint.ts`): a hash of the Java/Swift, the gradle files,
+  `capacitor.config.ts`, and installed native plugin versions. The binary gets
+  it through the CapacitorUpdater `version` (`<version>+native.<hash>`), and
+  the bundle through `__NATIVE_FINGERPRINT__`. Changing any hashed file means
+  the next release needs a store build. Don't add `cap sync`-generated files
+  to the hash: sync writes them after it reads the config, so the binary would
+  get a stale fingerprint.
+- `notifyAppReady` runs from `components/OtaUpdates.tsx` after the first
+  commit. A bundle that doesn't reach it within 10s is rolled back and kept
+  as `error` (`autoDeleteFailed: false`), so it is never downloaded again.
+- One OTA per version: the app only installs versions newer than the one it
+  is running.
+- **Signed**: `capacitor.config.ts` embeds `ota-public-key.pem` as Capgo's
+  `publicKey`, and Capgo refuses any bundle without a session key and checksum
+  made by the private key (`scripts/ota-crypto.ts`, the "encryption v2"
+  format). The private key is outside the repo (`scripts/ota-paths.ts`,
+  `OTA_PRIVATE_KEY_PATH`). The signature doesn't cover the version label in
+  `ota.json`, so downloads are labelled `<version>+native.<fingerprint>` and a
+  running bundle whose label doesn't match its own `__APP_VERSION__` and
+  fingerprint marks itself failed and resets.
 
 ### Versioning
 `package.json` is the single source of truth; see the Versioning section of the

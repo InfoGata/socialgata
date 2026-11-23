@@ -29,6 +29,11 @@ export default defineConfig({
       // to post SKIP_WAITING — impossible when the stale build is what failed to
       // boot.
       registerType: "autoUpdate",
+      // Registered by src/lib/service-worker.ts, which only does it on the
+      // web. In the Android app a worker would answer requests from its
+      // precache and keep serving the old bundle after an over-the-air update
+      // swaps the files underneath it.
+      injectRegister: false,
       workbox: {
         // The automerge wasm is ~2.7MB on its own and the favorites CRDT can't
         // start without it, so a limit that excludes it would leave an app that

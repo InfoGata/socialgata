@@ -133,6 +133,34 @@ see [ABUSE.md](ABUSE.md).
 The app is pre-1.0 while the plugin API is still moving: a minor bump means
 plugins may need changes, a patch means they won't.
 
+## Over-the-air updates
+
+The Android and iOS apps can update their web code without a store release:
+
+```sh
+npm version patch      # each update needs a new version
+git push --follow-tags
+npm run ota:publish    # builds, then attaches the bundle to GitHub release v<version>
+```
+
+The app checks the latest release's `ota.json` on launch, downloads the
+bundle, and switches to it the next time it goes to the background. A bundle
+that fails to start is rolled back automatically. `-- --dry-run` builds and
+zips into `ota-out/` without uploading.
+
+Bundles are signed, and the app installs nothing else. `npm run ota:keygen`
+created the key pair once: the public key is `ota-public-key.pem` in the repo,
+and the private key is at `~/.android/socialgata-release/ota-private.pem`
+(override with `OTA_PRIVATE_KEY_PATH`). Back up the private key with the
+release keystore. Without it, no more OTA updates can be published until a
+store build ships with a new public key.
+
+A bundle is only offered to binaries built from the same native code
+(`native-fingerprint.ts`). After a change to anything under `android/` or
+`ios/`, `capacitor.config.ts`, or a Capacitor plugin version, ship a store build
+as well. Until users install it they stay on their current version, and nothing
+breaks.
+
 ## Contributing
 
 Issues and pull requests are welcome. `npm run lint`, `npm test` and

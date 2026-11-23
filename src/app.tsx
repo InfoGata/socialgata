@@ -18,12 +18,17 @@ import { FavoritesProvider } from "./sync/FavoritesContext";
 import Analytics from "./components/Analytics";
 import { Toaster } from "sonner";
 import AppErrorBoundary from "./components/AppErrorBoundary";
+import OtaUpdates from "./components/OtaUpdates";
+import { setUpServiceWorker } from "./lib/service-worker";
+
+setUpServiceWorker();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     {/* Outermost on purpose: everything below can throw during first render,
         and the router's own error component only covers routes. */}
     <AppErrorBoundary>
+      <OtaUpdates />
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
         {/* Inside PersistGate so it acts on the remembered choice rather than
