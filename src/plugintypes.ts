@@ -111,6 +111,13 @@ export interface Post {
   distinguished?: string;
   /** Whether the comment author is the original poster of the thread */
   isSubmitter?: boolean;
+  /**
+   * For a comment listed outside its thread (search results, a user's
+   * history): api id of the post it was made on, so it can link back there
+   */
+  postApiId?: string;
+  /** Title of the post named by `postApiId` */
+  postTitle?: string;
 }
 
 export interface VideoSource {

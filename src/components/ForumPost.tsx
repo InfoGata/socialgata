@@ -13,6 +13,7 @@ import { FavoriteButton } from "./FavoriteButton";
 import { getVideoEmbed } from "@/lib/embeds";
 import { getPostDomain } from "@/lib/post-domain";
 import { usePlugins } from "@/hooks/usePlugins";
+import { FullThreadLink } from "./CommentPermalink";
 
 type Props = {
   post: Post;
@@ -159,6 +160,23 @@ const ForumPost: React.FC<Props> = ({ post, instanceId, showFullPost = false }) 
                   Locked
                 </span>
               )}
+            </div>
+          )}
+
+          {/* A comment outside its thread (a search hit) names the post it
+              was made on, the way HN's "on:" does, where a post has a title. */}
+          {!post.title && post.postApiId && post.pluginId && (
+            <div className="mb-1 text-sm leading-snug wrap-break-word">
+              <span className="text-muted-foreground/60">on: </span>
+              <FullThreadLink
+                context={{
+                  pluginId: post.pluginId,
+                  postApiId: post.postApiId,
+                }}
+                className="font-semibold text-foreground hover:text-primary transition-colors"
+              >
+                {post.postTitle || "View post"}
+              </FullThreadLink>
             </div>
           )}
 
