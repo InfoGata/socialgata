@@ -159,7 +159,13 @@ export interface PluginContextInterface {
     alias: string
   ) => Promise<AliasError | null>;
   plugins: PluginFrameContainer[];
-  pluginMessage?: PluginMessage;
+  /**
+   * Calls `listener` with every message a plugin posts to its UI, and returns
+   * the unsubscribe function.
+   */
+  subscribeToPluginMessages: (
+    listener: (message: PluginMessage) => void
+  ) => () => void;
   pluginsLoaded: boolean;
   pluginsFailed: boolean;
   /**
@@ -182,7 +188,21 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
     (state) => state.ui.disableAutoUpdatePlugins
   );
   const [pluginFrames, setPluginFrames] = React.useState<PluginFrameContainer[]>([]);
-  const [pluginMessage, setPluginMessage] = React.useState<PluginMessage>();
+  // Not state: a plugin's UI messages can arrive several in one tick, and
+  // React would batch the updates and render only the last, so the earlier
+  // ones were never delivered.
+  const pluginMessageListeners = React.useRef(
+    new Set<(message: PluginMessage) => void>()
+  );
+  const subscribeToPluginMessages = React.useCallback(
+    (listener: (message: PluginMessage) => void) => {
+      pluginMessageListeners.current.add(listener);
+      return () => {
+        pluginMessageListeners.current.delete(listener);
+      };
+    },
+    []
+  );
   const [pendingUpdatePlugin, setPendingUpdatePlugin] = React.useState<PluginInfo | null>(null);
   const { extensionDetected } = useExtension();
 
@@ -347,7 +367,10 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
         },
 
         postUiMessage: async (message: any) => {
-          setPluginMessage({ pluginId: plugin.id, message });
+          const pluginMessage = { pluginId: plugin.id, message };
+          pluginMessageListeners.current.forEach((listener) =>
+            listener(pluginMessage)
+          );
         },
         getCorsProxy: async () => corsProxyUrl || undefined,
         isNetworkRequestCorsDisabled: async () => {
@@ -850,7 +873,7 @@ export const PluginsProvider: React.FC<React.PropsWithChildren> = (props) => {
     deletePlugin,
     setPluginAlias,
     plugins: pluginFrames,
-    pluginMessage,
+    subscribeToPluginMessages,
     pluginsLoaded,
     pageContextSettled,
     pluginsFailed,
