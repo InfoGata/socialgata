@@ -177,6 +177,10 @@ export interface User {
   /** Number of posts/tweets */
   tweetCount?: number;
   likeCount?: number;
+  /** Reputation score where the platform has one (e.g. Reddit karma) */
+  karma?: number;
+  /** Whether the profile is marked as adult content */
+  nsfw?: boolean;
 }
 
 export interface Community {
@@ -192,6 +196,10 @@ export interface Community {
    * own `nsfw`.
    */
   nsfw?: boolean;
+  /** Icon/avatar image URL of the community */
+  iconUrl?: string;
+  /** Number of members/subscribers */
+  memberCount?: number;
 }
 
 export interface Instance {
@@ -445,7 +453,12 @@ export interface SearchRequest {
 }
 
 export interface SearchResponse {
+  /** Matching posts; empty when the selected result type is communities or users */
   items: Post[];
+  /** Matching communities, for a result type that searches them; shown instead of `items` */
+  communities?: Community[];
+  /** Matching users, for a result type that searches accounts; shown instead of `items` */
+  users?: User[];
   pageInfo?: PageInfo;
   /** Kinds of result the search can be narrowed to, shown as tabs (e.g. Stories / Comments / All) */
   feedTypes?: FeedType[];

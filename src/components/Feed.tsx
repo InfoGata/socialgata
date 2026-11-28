@@ -1,6 +1,6 @@
 import { usePagination } from "@/hooks/usePagination";
 import PostComponent from "./PostComponent";
-import { GetFeedResponse, PageInfo } from "@/plugintypes";
+import { GetFeedResponse, PageInfo, SearchResponse } from "@/plugintypes";
 import { PaginationNext, PaginationPrevious, Pagination, PaginationContent, PaginationItem } from "./ui/pagination";
 import { Loader2, Inbox } from "lucide-react";
 import { Link } from "@tanstack/react-router";
@@ -8,11 +8,13 @@ import React from "react";
 import { usePlugins } from "@/hooks/usePlugins";
 import BrowseCommunitiesButton from "./BrowseCommunitiesButton";
 import SortControls from "./SortControls";
+import { CommunityResultRow, UserResultRow } from "./SearchResultRows";
 
 type FeedProps = {
   sortId?: string;
   timeRangeId?: string;
-  data: GetFeedResponse;
+  /** A search response may carry communities or users in place of posts */
+  data: GetFeedResponse & Pick<SearchResponse, "communities" | "users">;
   pageInfo?: PageInfo;
   pluginId: string;
   instanceId?: string;
@@ -35,6 +37,8 @@ const Feed: React.FC<FeedProps> = (props) => {
   const { plugins } = usePlugins();
   const plugin = plugins.find(p => p.id === pluginId);
   const platformType = plugin?.platformType || "forum";
+  // A search tab for communities or users fills its own array instead of items.
+  const resultCount = data.communities?.length ?? data.users?.length ?? data.items.length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -92,18 +96,26 @@ const Feed: React.FC<FeedProps> = (props) => {
             <Loader2 className="w-5 h-5 animate-spin text-primary mb-2" />
             <p className="text-sm text-muted-foreground">Loading posts...</p>
           </div>
-        ) : data.items.length === 0 ? (
+        ) : resultCount === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
             <Inbox className="w-10 h-10 text-muted-foreground/50 mb-2" />
-            <h3 className="text-sm font-medium mb-1">{emptyTitle ?? "No posts yet"}</h3>
+            <h3 className="text-sm font-medium mb-1">{emptyTitle ?? (data.communities || data.users ? "No results" : "No posts yet")}</h3>
             <p className="text-xs text-muted-foreground">{emptyDescription ?? "Check back later for new content."}</p>
           </div>
         ) : (
           <>
             <div className="space-y-2">
-              {data.items.map((item) => (
-                <PostComponent key={item.apiId} post={item} instanceId={instanceId} platformType={platformType} />
-              ))}
+              {data.communities
+                ? data.communities.map((community) => (
+                    <CommunityResultRow key={community.apiId} community={community} pluginId={pluginId} />
+                  ))
+                : data.users
+                  ? data.users.map((user) => (
+                      <UserResultRow key={user.apiId} user={user} pluginId={pluginId} />
+                    ))
+                  : data.items.map((item) => (
+                      <PostComponent key={item.apiId} post={item} instanceId={instanceId} platformType={platformType} />
+                    ))}
             </div>
 
             {/* Pagination */}
